@@ -1,19 +1,34 @@
-name: CI
+name: autofix.ci
 
 on:
   push:
-    branches: ['main']
+    branches: ["main"]
   pull_request:
-    branches: ['main']
+
+permissions:
+  contents: write
 
 jobs:
-  build:
+  autofix:
     runs-on: ubuntu-slim
     steps:
-      - uses: actions/checkout@v6
+      - name: Checkout repository
+        uses: actions/checkout@v6
 
-      - uses: voidzero-dev/setup-vp@v1
+      - name: Setup PMPM
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
         with:
-          node-version: "24"
-
-      - run: vp run fmt
+          node-version: lts/*
+          cache: pnpm
+      
+      - name: Install dependencies
+        run: pnpm install -D oxfmt
+      
+      - name: Run formatter
+        run: pnpm dlx oxfmt
+      
+      - name: Run autofix.ci
+        uses: autofix-ci/action@v1
