@@ -18,7 +18,7 @@ jobs:
       - name: Setup PMPM
         uses: pnpm/action-setup@v6
         with:
-          version: 11.0.9
+          version: 11.1.2
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
