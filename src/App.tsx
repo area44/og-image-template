@@ -224,30 +224,30 @@ export default function App() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-zinc-950 text-zinc-100">
+    <div className="flex min-h-screen flex-col bg-zinc-950 text-zinc-100">
       {/* Navbar */}
-      <header className="border-b border-zinc-800 bg-zinc-900/50 backdrop-blur px-6 py-4 flex items-center justify-between sticky top-0 z-50">
+      <header className="sticky top-0 z-50 flex items-center justify-between border-b border-zinc-800 bg-zinc-900/50 px-6 py-4 backdrop-blur">
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-gradient-to-tr from-indigo-500 to-purple-500 rounded-lg shadow-lg">
-            <Sparkles className="w-5 h-5 text-white" />
+          <div className="rounded-lg bg-gradient-to-tr from-indigo-500 to-purple-500 p-2 shadow-lg">
+            <Sparkles className="h-5 w-5 text-white" />
           </div>
           <div>
-            <h1 className="font-bold text-lg tracking-tight bg-gradient-to-r from-zinc-100 to-zinc-400 bg-clip-text text-transparent">
+            <h1 className="bg-gradient-to-r from-zinc-100 to-zinc-400 bg-clip-text text-lg font-bold tracking-tight text-transparent">
               OG Image Playground
             </h1>
             <p className="text-xs text-zinc-500">Powered by Satori Core & React</p>
           </div>
         </div>
         <div className="flex items-center gap-4">
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-zinc-800 text-zinc-400 border border-zinc-700">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-zinc-700 bg-zinc-800 px-2.5 py-1 text-xs font-medium text-zinc-400">
+            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500"></span>
             In-Browser Compiler
           </span>
           <a
             href="https://github.com/area44/og-image-template"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-xs text-zinc-400 hover:text-zinc-200 transition"
+            className="text-xs text-zinc-400 transition hover:text-zinc-200"
           >
             GitHub
           </a>
@@ -255,14 +255,14 @@ export default function App() {
       </header>
 
       {/* Main Content Area */}
-      <main className="flex-1 flex flex-col lg:flex-row min-h-0">
+      <main className="flex min-h-0 flex-1 flex-col lg:flex-row">
         {/* Left pane - Controls */}
-        <div className="w-full lg:w-[420px] border-r border-zinc-800 flex flex-col bg-zinc-900/20 divide-y divide-zinc-800/80 overflow-y-auto">
+        <div className="flex w-full flex-col divide-y divide-zinc-800/80 overflow-y-auto border-r border-zinc-800 bg-zinc-900/20 lg:w-[420px]">
           {/* Section: Templates Selection */}
           <div className="p-6">
-            <div className="flex items-center gap-2 mb-4">
-              <ImageIcon className="w-4 h-4 text-indigo-400" />
-              <h2 className="text-sm font-semibold text-zinc-300 uppercase tracking-wider">
+            <div className="mb-4 flex items-center gap-2">
+              <ImageIcon className="h-4 w-4 text-indigo-400" />
+              <h2 className="text-sm font-semibold tracking-wider text-zinc-300 uppercase">
                 Choose Template
               </h2>
             </div>
@@ -275,14 +275,14 @@ export default function App() {
                   <button
                     key={key}
                     onClick={() => handleTemplateChange(key)}
-                    className={`w-full text-left p-4 rounded-xl transition-all border ${
+                    className={`w-full rounded-xl border p-4 text-left transition-all ${
                       active
-                        ? "bg-indigo-600/10 border-indigo-500/50 text-white shadow-md"
-                        : "bg-zinc-900/60 border-zinc-800 hover:border-zinc-700 text-zinc-400"
+                        ? "border-indigo-500/50 bg-indigo-600/10 text-white shadow-md"
+                        : "border-zinc-800 bg-zinc-900/60 text-zinc-400 hover:border-zinc-700"
                     }`}
                   >
-                    <div className="font-medium text-sm text-zinc-200 mb-1">{t.name}</div>
-                    <div className="text-xs text-zinc-500 line-clamp-2">
+                    <div className="mb-1 text-sm font-medium text-zinc-200">{t.name}</div>
+                    <div className="line-clamp-2 text-xs text-zinc-500">
                       {t.features.join(" • ")}
                     </div>
                   </button>
@@ -293,35 +293,45 @@ export default function App() {
 
           {/* Section: Customize Fields */}
           <div className="p-6">
-            <div className="flex items-center gap-2 mb-4">
-              <Type className="w-4 h-4 text-indigo-400" />
-              <h2 className="text-sm font-semibold text-zinc-300 uppercase tracking-wider">
+            <div className="mb-4 flex items-center gap-2">
+              <Type className="h-4 w-4 text-indigo-400" />
+              <h2 className="text-sm font-semibold tracking-wider text-zinc-300 uppercase">
                 Customize Content
               </h2>
             </div>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-xs font-medium text-zinc-400 mb-1.5">Title</label>
+                <label
+                  htmlFor="title-input"
+                  className="mb-1.5 block text-xs font-medium text-zinc-400"
+                >
+                  Title
+                </label>
                 <input
+                  id="title-input"
                   type="text"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="Enter custom title..."
-                  className="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-sm text-zinc-200 focus:outline-none focus:border-indigo-500 transition"
+                  className="w-full rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-zinc-200 transition focus:border-indigo-500 focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-zinc-400 mb-1.5">
+                <label
+                  htmlFor="description-input"
+                  className="mb-1.5 block text-xs font-medium text-zinc-400"
+                >
                   Description
                 </label>
                 <textarea
+                  id="description-input"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Enter custom description..."
                   rows={3}
-                  className="w-full px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-sm text-zinc-200 focus:outline-none focus:border-indigo-500 transition resize-none"
+                  className="w-full resize-none rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-zinc-200 transition focus:border-indigo-500 focus:outline-none"
                 />
               </div>
             </div>
@@ -329,9 +339,9 @@ export default function App() {
 
           {/* Section: Output Dimensions */}
           <div className="p-6">
-            <div className="flex items-center gap-2 mb-4">
-              <Sliders className="w-4 h-4 text-indigo-400" />
-              <h2 className="text-sm font-semibold text-zinc-300 uppercase tracking-wider">
+            <div className="mb-4 flex items-center gap-2">
+              <Sliders className="h-4 w-4 text-indigo-400" />
+              <h2 className="text-sm font-semibold tracking-wider text-zinc-300 uppercase">
                 Dimensions
               </h2>
             </div>
@@ -339,21 +349,27 @@ export default function App() {
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs text-zinc-500 mb-1">Width (px)</label>
+                  <label htmlFor="width-input" className="mb-1 block text-xs text-zinc-500">
+                    Width (px)
+                  </label>
                   <input
+                    id="width-input"
                     type="number"
                     value={width}
                     onChange={(e) => setWidth(Math.max(100, parseInt(e.target.value) || 0))}
-                    className="w-full px-3 py-1.5 bg-zinc-900 border border-zinc-800 rounded-lg text-sm text-zinc-200 focus:outline-none focus:border-indigo-500 transition"
+                    className="w-full rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-1.5 text-sm text-zinc-200 transition focus:border-indigo-500 focus:outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-zinc-500 mb-1">Height (px)</label>
+                  <label htmlFor="height-input" className="mb-1 block text-xs text-zinc-500">
+                    Height (px)
+                  </label>
                   <input
+                    id="height-input"
                     type="number"
                     value={height}
                     onChange={(e) => setHeight(Math.max(100, parseInt(e.target.value) || 0))}
-                    className="w-full px-3 py-1.5 bg-zinc-900 border border-zinc-800 rounded-lg text-sm text-zinc-200 focus:outline-none focus:border-indigo-500 transition"
+                    className="w-full rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-1.5 text-sm text-zinc-200 transition focus:border-indigo-500 focus:outline-none"
                   />
                 </div>
               </div>
@@ -364,7 +380,7 @@ export default function App() {
                     setWidth(1200);
                     setHeight(630);
                   }}
-                  className="flex-1 py-1 px-2.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-zinc-700 text-xs text-zinc-400 rounded transition"
+                  className="flex-1 rounded border border-zinc-800 bg-zinc-900 px-2.5 py-1 text-xs text-zinc-400 transition hover:border-zinc-700 hover:bg-zinc-800"
                 >
                   Standard (1200×630)
                 </button>
@@ -373,7 +389,7 @@ export default function App() {
                     setWidth(800);
                     setHeight(400);
                   }}
-                  className="flex-1 py-1 px-2.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-zinc-700 text-xs text-zinc-400 rounded transition"
+                  className="flex-1 rounded border border-zinc-800 bg-zinc-900 px-2.5 py-1 text-xs text-zinc-400 transition hover:border-zinc-700 hover:bg-zinc-800"
                 >
                   Compact (800×400)
                 </button>
@@ -382,24 +398,24 @@ export default function App() {
           </div>
 
           {/* Section: Action Buttons */}
-          <div className="p-6 space-y-3 mt-auto">
+          <div className="mt-auto space-y-3 p-6">
             <button
               onClick={handleCopy}
               disabled={!svgContent || rendering}
-              className={`w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-sm font-medium transition ${
+              className={`flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition ${
                 copied
-                  ? "bg-emerald-600 hover:bg-emerald-700 text-white"
-                  : "bg-zinc-800 hover:bg-zinc-700 text-zinc-100"
-              } disabled:opacity-50 disabled:cursor-not-allowed`}
+                  ? "bg-emerald-600 text-white hover:bg-emerald-700"
+                  : "bg-zinc-800 text-zinc-100 hover:bg-zinc-700"
+              } disabled:cursor-not-allowed disabled:opacity-50`}
             >
               {copied ? (
                 <>
-                  <Check className="w-4 h-4" />
+                  <Check className="h-4 w-4" />
                   Copied SVG Code!
                 </>
               ) : (
                 <>
-                  <Copy className="w-4 h-4" />
+                  <Copy className="h-4 w-4" />
                   Copy SVG Code
                 </>
               )}
@@ -408,88 +424,88 @@ export default function App() {
             <button
               onClick={handleDownload}
               disabled={!svgContent || rendering}
-              className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-sm font-medium bg-indigo-600 hover:bg-indigo-500 text-white transition disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              <Download className="w-4 h-4" />
+              <Download className="h-4 w-4" />
               Download SVG File
             </button>
           </div>
         </div>
 
         {/* Right pane - Interactive Live Preview */}
-        <div className="flex-1 flex flex-col bg-zinc-950 p-6 lg:p-8 justify-between items-center relative overflow-hidden">
+        <div className="relative flex flex-1 flex-col items-center justify-between overflow-hidden bg-zinc-950 p-6 lg:p-8">
           {/* Background grid accents */}
-          <div className="absolute inset-0 bg-[linear-gradient(to_right,#1f293708_1px,transparent_1px),linear-gradient(to_bottom,#1f293708_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none" />
+          <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#1f293708_1px,transparent_1px),linear-gradient(to_bottom,#1f293708_1px,transparent_1px)] bg-[size:24px_24px]" />
 
           {/* Top Preview Controls */}
-          <div className="w-full flex items-center justify-between mb-4 z-10">
+          <div className="z-10 mb-4 flex w-full items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="text-xs text-zinc-400 font-mono">
+              <span className="font-mono text-xs text-zinc-400">
                 Canvas: {width} × {height}
               </span>
-              {rendering && <RefreshCw className="w-3.5 h-3.5 text-indigo-400 animate-spin" />}
+              {rendering && <RefreshCw className="h-3.5 w-3.5 animate-spin text-indigo-400" />}
             </div>
 
-            <div className="flex bg-zinc-900 border border-zinc-800 rounded-lg p-0.5">
+            <div className="flex rounded-lg border border-zinc-800 bg-zinc-900 p-0.5">
               <button
                 onClick={() => setPreviewScale("fit")}
-                className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-medium transition ${
+                className={`flex items-center gap-1.5 rounded-md px-3 py-1 text-xs font-medium transition ${
                   previewScale === "fit"
                     ? "bg-zinc-800 text-white"
                     : "text-zinc-400 hover:text-zinc-200"
                 }`}
               >
-                <Minimize2 className="w-3.5 h-3.5" />
+                <Minimize2 className="h-3.5 w-3.5" />
                 Fit View
               </button>
               <button
                 onClick={() => setPreviewScale("full")}
-                className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-medium transition ${
+                className={`flex items-center gap-1.5 rounded-md px-3 py-1 text-xs font-medium transition ${
                   previewScale === "full"
                     ? "bg-zinc-800 text-white"
                     : "text-zinc-400 hover:text-zinc-200"
                 }`}
               >
-                <Maximize2 className="w-3.5 h-3.5" />
+                <Maximize2 className="h-3.5 w-3.5" />
                 Actual Size
               </button>
             </div>
           </div>
 
           {/* Interactive Viewer Frame */}
-          <div className="flex-1 w-full flex items-center justify-center min-h-[300px] relative">
+          <div className="relative flex min-h-[300px] w-full flex-1 items-center justify-center">
             {fontsLoading ? (
               <div className="flex flex-col items-center gap-3">
-                <RefreshCw className="w-8 h-8 text-indigo-500 animate-spin" />
-                <p className="text-sm text-zinc-400 font-medium">
+                <RefreshCw className="h-8 w-8 animate-spin text-indigo-500" />
+                <p className="text-sm font-medium text-zinc-400">
                   Fetching font files for Satori...
                 </p>
               </div>
             ) : fontsError ? (
-              <div className="max-w-md p-6 bg-red-950/20 border border-red-900/50 rounded-2xl flex flex-col items-center gap-3 text-center">
-                <AlertCircle className="w-10 h-10 text-red-500" />
+              <div className="flex max-w-md flex-col items-center gap-3 rounded-2xl border border-red-900/50 bg-red-950/20 p-6 text-center">
+                <AlertCircle className="h-10 w-10 text-red-500" />
                 <h3 className="font-semibold text-red-400">Failed to Load Fonts</h3>
-                <p className="text-xs text-red-500/80 leading-relaxed">
+                <p className="text-xs leading-relaxed text-red-500/80">
                   {fontsError}. Please check your internet connection or reload the page.
                 </p>
                 <button
                   onClick={() => window.location.reload()}
-                  className="mt-2 px-4 py-1.5 bg-red-900 hover:bg-red-800 text-white rounded-lg text-xs font-medium transition"
+                  className="mt-2 rounded-lg bg-red-900 px-4 py-1.5 text-xs font-medium text-white transition hover:bg-red-800"
                 >
                   Retry Loading
                 </button>
               </div>
             ) : renderError ? (
-              <div className="max-w-md p-6 bg-amber-950/20 border border-amber-900/50 rounded-2xl flex flex-col items-center gap-3 text-center">
-                <AlertCircle className="w-10 h-10 text-amber-500" />
+              <div className="flex max-w-md flex-col items-center gap-3 rounded-2xl border border-amber-900/50 bg-amber-950/20 p-6 text-center">
+                <AlertCircle className="h-10 w-10 text-amber-500" />
                 <h3 className="font-semibold text-amber-400">Rendering Error</h3>
-                <p className="text-xs text-amber-500/80 font-mono leading-relaxed max-h-32 overflow-y-auto">
+                <p className="max-h-32 overflow-y-auto font-mono text-xs leading-relaxed text-amber-500/80">
                   {renderError}
                 </p>
               </div>
             ) : svgContent ? (
               <div
-                className="relative rounded-2xl shadow-2xl border border-zinc-800/80 overflow-hidden bg-zinc-900 transition-all duration-300"
+                className="relative overflow-hidden rounded-2xl border border-zinc-800/80 bg-zinc-900 shadow-2xl transition-all duration-300"
                 style={
                   previewScale === "fit"
                     ? {
@@ -509,7 +525,7 @@ export default function App() {
               >
                 {/* Checkerboard transparency background */}
                 <div
-                  className="absolute inset-0 opacity-[0.03] pointer-events-none"
+                  className="pointer-events-none absolute inset-0 opacity-[0.03]"
                   style={{
                     backgroundImage:
                       "radial-gradient(circle, #fff 10%, transparent 11%), radial-gradient(circle, #fff 10%, transparent 11%)",
@@ -520,22 +536,22 @@ export default function App() {
 
                 {/* Embedded Live SVG */}
                 <div
-                  className="w-full h-full flex items-center justify-center select-none"
+                  className="flex h-full w-full items-center justify-center select-none"
                   dangerouslySetInnerHTML={{ __html: svgContent }}
                 />
               </div>
             ) : (
               <div className="flex flex-col items-center gap-2">
-                <RefreshCw className="w-6 h-6 text-zinc-600 animate-spin" />
+                <RefreshCw className="h-6 w-6 animate-spin text-zinc-600" />
                 <p className="text-xs text-zinc-500">Generating preview...</p>
               </div>
             )}
           </div>
 
           {/* Footer Info / Status bar */}
-          <div className="w-full mt-6 flex flex-col sm:flex-row sm:items-center justify-between text-xs text-zinc-500 border-t border-zinc-900 pt-4 z-10">
+          <div className="z-10 mt-6 flex w-full flex-col justify-between border-t border-zinc-900 pt-4 text-xs text-zinc-500 sm:flex-row sm:items-center">
             <p>Designed to render beautiful Open Graph social share templates locally.</p>
-            <p className="font-mono mt-1 sm:mt-0">Renderer: satori-core v0.12.1</p>
+            <p className="mt-1 font-mono sm:mt-0">Renderer: satori-core v0.12.1</p>
           </div>
         </div>
       </main>
