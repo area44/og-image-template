@@ -1,4 +1,7 @@
-export default function OGImage({ title = "Long Nhat Nguyen", description = "Hello, world!" }: { title?: string, description?: string } = {}) {
+export default function OGImage({
+  title = "Long Nhat Nguyen",
+  description = "Hello, world!",
+}: { title?: string; description?: string } = {}) {
   return (
     <div
       style={{

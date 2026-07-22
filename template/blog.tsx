@@ -1,4 +1,7 @@
-export default function OGImage({ title = "Hello World!", description = "We are AREA44." }: { title?: string, description?: string } = {}) {
+export default function OGImage({
+  title = "Hello World!",
+  description = "We are AREA44.",
+}: { title?: string; description?: string } = {}) {
   return (
     <div tw="relative flex h-full w-full bg-black text-white">
       <div tw="absolute inset-y-0 left-16 w-px bg-white/40" />

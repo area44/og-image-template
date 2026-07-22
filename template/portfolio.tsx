@@ -1,4 +1,7 @@
-export default function OGImage({ title = "What's up, world!", description = "We are AREA44." }: { title?: string, description?: string } = {}) {
+export default function OGImage({
+  title = "What's up, world!",
+  description = "We are AREA44.",
+}: { title?: string; description?: string } = {}) {
   return (
     <div
       style={{
