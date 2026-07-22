@@ -1,4 +1,7 @@
-export default function OGImage() {
+export default function OGImage({
+  title = "Long Nhat Nguyen",
+  description = "Hello, world!",
+}: { title?: string; description?: string } = {}) {
   return (
     <div
       style={{
@@ -13,8 +16,8 @@ export default function OGImage() {
         fontFamily: "sans-serif",
       }}
     >
-      <h1 style={{ fontSize: 72 }}>Long Nhat Nguyen</h1>
-      <p style={{ fontSize: 36 }}>Hello, world!</p>
+      <h1 style={{ fontSize: 72 }}>{title}</h1>
+      <p style={{ fontSize: 36 }}>{description}</p>
     </div>
   );
 }

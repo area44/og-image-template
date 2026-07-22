@@ -1,4 +1,7 @@
-export default function OGImage() {
+export default function OGImage({
+  title = "What's up, world!",
+  description = "We are AREA44.",
+}: { title?: string; description?: string } = {}) {
   return (
     <div
       style={{
@@ -32,7 +35,7 @@ export default function OGImage() {
             margin: 0,
           }}
         >
-          What's up, world!
+          {title}
         </h1>
 
         <p
@@ -45,7 +48,7 @@ export default function OGImage() {
             lineHeight: 1.4,
           }}
         >
-          We are AREA44.
+          {description}
         </p>
       </div>
     </div>
