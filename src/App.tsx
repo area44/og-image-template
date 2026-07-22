@@ -14,9 +14,9 @@ import {
 import React, { useState, useEffect } from "react";
 import satori from "satori";
 
-import BlogTemplate from "../template/blog";
-import MinimalTemplate from "../template/minimal";
-import PortfolioTemplate from "../template/portfolio";
+import BlogTemplate from "./template/blog";
+import MinimalTemplate from "./template/minimal";
+import PortfolioTemplate from "./template/portfolio";
 
 // Definition of our templates
 const TEMPLATES = {

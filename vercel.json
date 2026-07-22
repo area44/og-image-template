@@ -1,0 +1,9 @@
+{
+  "installCommand": "pnpm install",
+  "buildCommand": "pnpm run build",
+  "outputDirectory": "dist",
+  "github": {
+    "silent": true
+  },
+  "cleanUrls": true
+}
