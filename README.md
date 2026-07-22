@@ -57,26 +57,31 @@ pnpm install
 ### Development Scripts
 
 - **Start Dev Server**: Run the development server locally:
+
   ```bash
   pnpm run dev
   ```
 
 - **Build**: Typecheck with TypeScript 7 and build production-ready files with Vite 8:
+
   ```bash
   pnpm run build
   ```
 
 - **Preview Build**: Preview the built production app locally:
+
   ```bash
   pnpm run preview
   ```
 
 - **Lint**: Run high-speed linter using `oxlint`:
+
   ```bash
   pnpm run lint
   ```
 
 - **Format**: Format the codebase with `oxfmt`:
+
   ```bash
   pnpm run format
   ```
@@ -93,6 +98,7 @@ pnpm install
 You can customize titles, descriptions, and other elements inside each of the beautiful preset layouts in `src/template/`.
 
 Standard dimensions for generated images are 1200 × 630 pixels, optimal for:
+
 - Open Graph metadata (`og:image`)
 - Twitter Cards (`twitter:image`)
 - Social preview embeds
