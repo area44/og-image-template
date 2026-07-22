@@ -14,6 +14,13 @@ import {
 import React, { useState, useEffect } from "react";
 import satori from "satori";
 
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+
 import BlogTemplate from "./template/blog";
 import MinimalTemplate from "./template/minimal";
 import PortfolioTemplate from "./template/portfolio";
@@ -224,7 +231,7 @@ export default function App() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-zinc-950 text-zinc-100">
+    <div className="flex min-h-screen flex-col bg-background text-foreground">
       {/* Navbar */}
       <header className="sticky top-0 z-50 flex items-center justify-between border-b border-zinc-800 bg-zinc-900/50 px-6 py-4 backdrop-blur">
         <div className="flex items-center gap-3">
@@ -272,20 +279,21 @@ export default function App() {
                 const t = TEMPLATES[key];
                 const active = selectedTemplate === key;
                 return (
-                  <button
+                  <Button
                     key={key}
                     onClick={() => handleTemplateChange(key)}
-                    className={`w-full rounded-xl border p-4 text-left transition-all ${
+                    variant={active ? "secondary" : "outline"}
+                    className={`flex h-auto w-full flex-col items-start justify-start border p-4 text-left ${
                       active
-                        ? "border-indigo-500/50 bg-indigo-600/10 text-white shadow-md"
-                        : "border-zinc-800 bg-zinc-900/60 text-zinc-400 hover:border-zinc-700"
+                        ? "border-indigo-500/50 bg-indigo-600/10 text-white shadow-md hover:bg-indigo-600/20"
+                        : "border-zinc-800 bg-zinc-900/60 text-zinc-400 hover:border-zinc-700 hover:bg-zinc-800/50"
                     }`}
                   >
                     <div className="mb-1 text-sm font-medium text-zinc-200">{t.name}</div>
-                    <div className="line-clamp-2 text-xs text-zinc-500">
+                    <div className="line-clamp-2 text-xs whitespace-normal text-zinc-500">
                       {t.features.join(" • ")}
                     </div>
-                  </button>
+                  </Button>
                 );
               })}
             </div>
@@ -301,37 +309,31 @@ export default function App() {
             </div>
 
             <div className="space-y-4">
-              <div>
-                <label
-                  htmlFor="title-input"
-                  className="mb-1.5 block text-xs font-medium text-zinc-400"
-                >
+              <div className="grid gap-1.5">
+                <Label htmlFor="title-input" className="text-xs font-medium text-zinc-400">
                   Title
-                </label>
-                <input
+                </Label>
+                <Input
                   id="title-input"
                   type="text"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="Enter custom title..."
-                  className="w-full rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-zinc-200 transition focus:border-indigo-500 focus:outline-none"
+                  className="border-zinc-800 bg-zinc-900 text-zinc-200 transition focus-visible:ring-indigo-500"
                 />
               </div>
 
-              <div>
-                <label
-                  htmlFor="description-input"
-                  className="mb-1.5 block text-xs font-medium text-zinc-400"
-                >
+              <div className="grid gap-1.5">
+                <Label htmlFor="description-input" className="text-xs font-medium text-zinc-400">
                   Description
-                </label>
-                <textarea
+                </Label>
+                <Textarea
                   id="description-input"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Enter custom description..."
                   rows={3}
-                  className="w-full resize-none rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-zinc-200 transition focus:border-indigo-500 focus:outline-none"
+                  className="resize-none border-zinc-800 bg-zinc-900 text-zinc-200 transition focus-visible:ring-indigo-500"
                 />
               </div>
             </div>
@@ -348,65 +350,70 @@ export default function App() {
 
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label htmlFor="width-input" className="mb-1 block text-xs text-zinc-500">
+                <div className="grid gap-1">
+                  <Label htmlFor="width-input" className="text-xs text-zinc-500">
                     Width (px)
-                  </label>
-                  <input
+                  </Label>
+                  <Input
                     id="width-input"
                     type="number"
                     value={width}
                     onChange={(e) => setWidth(Math.max(100, parseInt(e.target.value) || 0))}
-                    className="w-full rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-1.5 text-sm text-zinc-200 transition focus:border-indigo-500 focus:outline-none"
+                    className="h-9 border-zinc-800 bg-zinc-900 text-zinc-200 transition focus-visible:ring-indigo-500"
                   />
                 </div>
-                <div>
-                  <label htmlFor="height-input" className="mb-1 block text-xs text-zinc-500">
+                <div className="grid gap-1">
+                  <Label htmlFor="height-input" className="text-xs text-zinc-500">
                     Height (px)
-                  </label>
-                  <input
+                  </Label>
+                  <Input
                     id="height-input"
                     type="number"
                     value={height}
                     onChange={(e) => setHeight(Math.max(100, parseInt(e.target.value) || 0))}
-                    className="w-full rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-1.5 text-sm text-zinc-200 transition focus:border-indigo-500 focus:outline-none"
+                    className="h-9 border-zinc-800 bg-zinc-900 text-zinc-200 transition focus-visible:ring-indigo-500"
                   />
                 </div>
               </div>
 
               <div className="flex gap-2">
-                <button
+                <Button
+                  variant="outline"
+                  size="sm"
                   onClick={() => {
                     setWidth(1200);
                     setHeight(630);
                   }}
-                  className="flex-1 rounded border border-zinc-800 bg-zinc-900 px-2.5 py-1 text-xs text-zinc-400 transition hover:border-zinc-700 hover:bg-zinc-800"
+                  className="flex-1 border-zinc-800 bg-zinc-900 text-zinc-400 hover:border-zinc-700 hover:bg-zinc-800 hover:text-zinc-200"
                 >
                   Standard (1200×630)
-                </button>
-                <button
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
                   onClick={() => {
                     setWidth(800);
                     setHeight(400);
                   }}
-                  className="flex-1 rounded border border-zinc-800 bg-zinc-900 px-2.5 py-1 text-xs text-zinc-400 transition hover:border-zinc-700 hover:bg-zinc-800"
+                  className="flex-1 border-zinc-800 bg-zinc-900 text-zinc-400 hover:border-zinc-700 hover:bg-zinc-800 hover:text-zinc-200"
                 >
                   Compact (800×400)
-                </button>
+                </Button>
               </div>
             </div>
           </div>
 
           {/* Section: Action Buttons */}
           <div className="mt-auto space-y-3 p-6">
-            <button
+            <Button
               onClick={handleCopy}
               disabled={!svgContent || rendering}
-              className={`flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition ${
+              variant={copied ? "default" : "secondary"}
+              className={`w-full py-2.5 font-medium transition ${
                 copied
                   ? "bg-emerald-600 text-white hover:bg-emerald-700"
                   : "bg-zinc-800 text-zinc-100 hover:bg-zinc-700"
-              } disabled:cursor-not-allowed disabled:opacity-50`}
+              }`}
             >
               {copied ? (
                 <>
@@ -419,21 +426,21 @@ export default function App() {
                   Copy SVG Code
                 </>
               )}
-            </button>
+            </Button>
 
-            <button
+            <Button
               onClick={handleDownload}
               disabled={!svgContent || rendering}
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-50"
+              className="w-full bg-indigo-600 py-2.5 font-medium text-white hover:bg-indigo-500"
             >
               <Download className="h-4 w-4" />
               Download SVG File
-            </button>
+            </Button>
           </div>
         </div>
 
         {/* Right pane - Interactive Live Preview */}
-        <div className="relative flex flex-1 flex-col items-center justify-between overflow-hidden bg-zinc-950 p-6 lg:p-8">
+        <div className="relative flex flex-1 flex-col items-center justify-between overflow-hidden bg-background p-6 lg:p-8">
           {/* Background grid accents */}
           <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#1f293708_1px,transparent_1px),linear-gradient(to_bottom,#1f293708_1px,transparent_1px)] bg-[size:24px_24px]" />
 
@@ -447,28 +454,32 @@ export default function App() {
             </div>
 
             <div className="flex rounded-lg border border-zinc-800 bg-zinc-900 p-0.5">
-              <button
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={() => setPreviewScale("fit")}
-                className={`flex items-center gap-1.5 rounded-md px-3 py-1 text-xs font-medium transition ${
+                className={`flex h-7 items-center gap-1.5 px-3 py-1 text-xs font-medium transition ${
                   previewScale === "fit"
-                    ? "bg-zinc-800 text-white"
-                    : "text-zinc-400 hover:text-zinc-200"
+                    ? "bg-zinc-800 text-white hover:bg-zinc-800"
+                    : "text-zinc-400 hover:bg-transparent hover:text-zinc-200"
                 }`}
               >
                 <Minimize2 className="h-3.5 w-3.5" />
                 Fit View
-              </button>
-              <button
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={() => setPreviewScale("full")}
-                className={`flex items-center gap-1.5 rounded-md px-3 py-1 text-xs font-medium transition ${
+                className={`flex h-7 items-center gap-1.5 px-3 py-1 text-xs font-medium transition ${
                   previewScale === "full"
-                    ? "bg-zinc-800 text-white"
-                    : "text-zinc-400 hover:text-zinc-200"
+                    ? "bg-zinc-800 text-white hover:bg-zinc-800"
+                    : "text-zinc-400 hover:bg-transparent hover:text-zinc-200"
                 }`}
               >
                 <Maximize2 className="h-3.5 w-3.5" />
                 Actual Size
-              </button>
+              </Button>
             </div>
           </div>
 
@@ -482,30 +493,40 @@ export default function App() {
                 </p>
               </div>
             ) : fontsError ? (
-              <div className="flex max-w-md flex-col items-center gap-3 rounded-2xl border border-red-900/50 bg-red-950/20 p-6 text-center">
-                <AlertCircle className="h-10 w-10 text-red-500" />
-                <h3 className="font-semibold text-red-400">Failed to Load Fonts</h3>
-                <p className="text-xs leading-relaxed text-red-500/80">
+              <Alert
+                variant="destructive"
+                className="flex max-w-md flex-col items-center gap-3 bg-red-950/20 p-6 text-center"
+              >
+                <AlertCircle className="h-10 w-10 text-destructive" />
+                <AlertTitle className="font-semibold text-destructive">
+                  Failed to Load Fonts
+                </AlertTitle>
+                <AlertDescription className="text-xs leading-relaxed text-destructive/80">
                   {fontsError}. Please check your internet connection or reload the page.
-                </p>
-                <button
+                </AlertDescription>
+                <Button
                   onClick={() => window.location.reload()}
-                  className="mt-2 rounded-lg bg-red-900 px-4 py-1.5 text-xs font-medium text-white transition hover:bg-red-800"
+                  variant="destructive"
+                  size="sm"
+                  className="mt-2 font-medium text-white"
                 >
                   Retry Loading
-                </button>
-              </div>
+                </Button>
+              </Alert>
             ) : renderError ? (
-              <div className="flex max-w-md flex-col items-center gap-3 rounded-2xl border border-amber-900/50 bg-amber-950/20 p-6 text-center">
+              <Alert
+                variant="destructive"
+                className="flex max-w-md flex-col items-center gap-3 border-amber-900/50 bg-amber-950/20 p-6 text-center"
+              >
                 <AlertCircle className="h-10 w-10 text-amber-500" />
-                <h3 className="font-semibold text-amber-400">Rendering Error</h3>
-                <p className="max-h-32 overflow-y-auto font-mono text-xs leading-relaxed text-amber-500/80">
+                <AlertTitle className="font-semibold text-amber-400">Rendering Error</AlertTitle>
+                <AlertDescription className="max-h-32 overflow-y-auto font-mono text-xs leading-relaxed text-amber-500/80">
                   {renderError}
-                </p>
-              </div>
+                </AlertDescription>
+              </Alert>
             ) : svgContent ? (
-              <div
-                className="relative overflow-hidden rounded-2xl border border-zinc-800/80 bg-zinc-900 shadow-2xl transition-all duration-300"
+              <Card
+                className="relative overflow-hidden border-zinc-800/80 bg-zinc-900 shadow-2xl transition-all duration-300"
                 style={
                   previewScale === "fit"
                     ? {
@@ -523,23 +544,25 @@ export default function App() {
                       }
                 }
               >
-                {/* Checkerboard transparency background */}
-                <div
-                  className="pointer-events-none absolute inset-0 opacity-[0.03]"
-                  style={{
-                    backgroundImage:
-                      "radial-gradient(circle, #fff 10%, transparent 11%), radial-gradient(circle, #fff 10%, transparent 11%)",
-                    backgroundSize: "20px 20px",
-                    backgroundPosition: "0 0, 10px 10px",
-                  }}
-                />
+                <CardContent className="h-full w-full p-0">
+                  {/* Checkerboard transparency background */}
+                  <div
+                    className="pointer-events-none absolute inset-0 opacity-[0.03]"
+                    style={{
+                      backgroundImage:
+                        "radial-gradient(circle, #fff 10%, transparent 11%), radial-gradient(circle, #fff 10%, transparent 11%)",
+                      backgroundSize: "20px 20px",
+                      backgroundPosition: "0 0, 10px 10px",
+                    }}
+                  />
 
-                {/* Embedded Live SVG */}
-                <div
-                  className="flex h-full w-full items-center justify-center select-none"
-                  dangerouslySetInnerHTML={{ __html: svgContent }}
-                />
-              </div>
+                  {/* Embedded Live SVG */}
+                  <div
+                    className="flex h-full w-full items-center justify-center select-none"
+                    dangerouslySetInnerHTML={{ __html: svgContent }}
+                  />
+                </CardContent>
+              </Card>
             ) : (
               <div className="flex flex-col items-center gap-2">
                 <RefreshCw className="h-6 w-6 animate-spin text-zinc-600" />
