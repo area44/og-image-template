@@ -232,12 +232,12 @@ export default function App() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-zinc-950 text-zinc-100 selection:bg-rose-500/30 selection:text-rose-200">
+    <div className="selection:text-coral-200 flex min-h-screen flex-col bg-background text-foreground selection:bg-coral-500/30">
       {/* Decorative top ambient glow */}
       <div className="pointer-events-none absolute top-0 left-1/2 -z-10 h-[200px] w-full max-w-7xl -translate-x-1/2 bg-[radial-gradient(ellipse_at_top,rgba(251,113,133,0.15),transparent_50%)]" />
 
       {/* Navbar */}
-      <header className="sticky top-0 z-50 flex items-center justify-between border-b border-zinc-900 bg-zinc-950/80 px-6 py-4 backdrop-blur-md">
+      <header className="sticky top-0 z-50 flex items-center justify-between border-b border-zinc-900 bg-background/80 px-6 py-4 backdrop-blur-md">
         <div className="flex items-center gap-3">
           <div className="rounded-xl bg-gradient-to-tr from-coral-500 to-rose-500 p-2.5 shadow-lg shadow-rose-500/10">
             <Flame className="h-5 w-5 text-white" />
@@ -247,7 +247,7 @@ export default function App() {
               <h1 className="bg-gradient-to-r from-coral-400 via-orange-400 to-rose-400 bg-clip-text text-xl font-extrabold tracking-tight text-transparent">
                 OG Images Coral
               </h1>
-              <span className="rounded bg-rose-500/10 px-1.5 py-0.5 text-[10px] font-semibold tracking-wider text-rose-400 uppercase">
+              <span className="rounded bg-coral-500/10 px-1.5 py-0.5 text-[10px] font-semibold tracking-wider text-coral-400 uppercase">
                 v2.0
               </span>
             </div>
@@ -257,8 +257,8 @@ export default function App() {
           </div>
         </div>
         <div className="flex items-center gap-4">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-rose-950/40 bg-rose-950/10 px-3 py-1 text-xs font-semibold text-rose-300">
-            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-rose-400"></span>
+          <span className="border-coral-950/40 bg-coral-950/10 text-coral-300 inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold">
+            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-coral-400"></span>
             Base UI Activated
           </span>
           <a
@@ -279,7 +279,7 @@ export default function App() {
           {/* Section: Templates Selection */}
           <div className="p-6">
             <div className="mb-4 flex items-center gap-2">
-              <ImageIcon className="h-4 w-4 text-rose-400" />
+              <ImageIcon className="h-4 w-4 text-coral-400" />
               <h2 className="text-xs font-bold tracking-widest text-zinc-400 uppercase">
                 Choose Template
               </h2>
@@ -293,15 +293,21 @@ export default function App() {
                   <Button
                     key={key}
                     onClick={() => handleTemplateChange(key)}
-                    variant={active ? "secondary" : "outline"}
+                    variant={active ? "default" : "outline"}
                     className={`flex h-auto w-full flex-col items-start justify-start rounded-xl border p-4 text-left transition-all ${
                       active
-                        ? "border-rose-500/50 bg-rose-500/5 text-white shadow-md hover:bg-rose-500/10"
+                        ? "border-coral-500/50 shadow-md"
                         : "border-zinc-800 bg-zinc-900/40 text-zinc-400 hover:border-zinc-700 hover:bg-zinc-900/60"
                     }`}
                   >
-                    <div className="mb-1 text-sm font-semibold text-zinc-200">{t.name}</div>
-                    <div className="line-clamp-2 text-xs whitespace-normal text-zinc-500">
+                    <div
+                      className={`mb-1 text-sm font-semibold ${active ? "text-primary-foreground" : "text-zinc-200"}`}
+                    >
+                      {t.name}
+                    </div>
+                    <div
+                      className={`line-clamp-2 text-xs whitespace-normal ${active ? "text-primary-foreground/80" : "text-zinc-500"}`}
+                    >
                       {t.features.join(" • ")}
                     </div>
                   </Button>
@@ -313,7 +319,7 @@ export default function App() {
           {/* Section: Customize Fields */}
           <div className="p-6">
             <div className="mb-4 flex items-center gap-2">
-              <Type className="h-4 w-4 text-rose-400" />
+              <Type className="h-4 w-4 text-coral-400" />
               <h2 className="text-xs font-bold tracking-widest text-zinc-400 uppercase">
                 Customize Content
               </h2>
@@ -330,7 +336,7 @@ export default function App() {
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="Enter custom title..."
-                  className="border-zinc-800 bg-zinc-900/40 text-zinc-200 transition focus-visible:ring-rose-500/50"
+                  className="border-zinc-800 bg-zinc-900/40 text-zinc-200 transition focus-visible:ring-coral-500/50"
                 />
               </Field.Root>
 
@@ -344,7 +350,7 @@ export default function App() {
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Enter custom description..."
                   rows={3}
-                  className="resize-none border-zinc-800 bg-zinc-900/40 text-zinc-200 transition focus-visible:ring-rose-500/50"
+                  className="resize-none border-zinc-800 bg-zinc-900/40 text-zinc-200 transition focus-visible:ring-coral-500/50"
                 />
               </Field.Root>
             </div>
@@ -353,7 +359,7 @@ export default function App() {
           {/* Section: Output Dimensions */}
           <div className="p-6">
             <div className="mb-4 flex items-center gap-2">
-              <Sliders className="h-4 w-4 text-rose-400" />
+              <Sliders className="h-4 w-4 text-coral-400" />
               <h2 className="text-xs font-bold tracking-widest text-zinc-400 uppercase">
                 Dimensions
               </h2>
@@ -370,7 +376,7 @@ export default function App() {
                     type="number"
                     value={width}
                     onChange={(e) => setWidth(Math.max(100, parseInt(e.target.value) || 0))}
-                    className="h-9 border-zinc-800 bg-zinc-900/40 text-zinc-200 transition focus-visible:ring-rose-500/50"
+                    className="h-9 border-zinc-800 bg-zinc-900/40 text-zinc-200 transition focus-visible:ring-coral-500/50"
                   />
                 </Field.Root>
                 <Field.Root className="grid gap-1">
@@ -382,7 +388,7 @@ export default function App() {
                     type="number"
                     value={height}
                     onChange={(e) => setHeight(Math.max(100, parseInt(e.target.value) || 0))}
-                    className="h-9 border-zinc-800 bg-zinc-900/40 text-zinc-200 transition focus-visible:ring-rose-500/50"
+                    className="h-9 border-zinc-800 bg-zinc-900/40 text-zinc-200 transition focus-visible:ring-coral-500/50"
                   />
                 </Field.Root>
               </div>
@@ -442,7 +448,7 @@ export default function App() {
             <Button
               onClick={handleDownload}
               disabled={!svgContent || rendering}
-              className="w-full bg-gradient-to-r from-orange-500 to-rose-500 py-2.5 font-semibold text-white shadow-lg shadow-rose-500/10 hover:from-orange-600 hover:to-rose-600"
+              className="w-full bg-primary py-2.5 font-semibold text-primary-foreground shadow-lg shadow-coral-500/10 hover:opacity-90"
             >
               <Download className="h-4 w-4" />
               Download SVG File
@@ -461,10 +467,10 @@ export default function App() {
               <span className="rounded-md border border-zinc-900/50 bg-zinc-900/50 px-2.5 py-1 font-mono text-xs text-zinc-400">
                 Canvas: {width} × {height}
               </span>
-              {rendering && <RefreshCw className="h-3.5 w-3.5 animate-spin text-rose-400" />}
+              {rendering && <RefreshCw className="h-3.5 w-3.5 animate-spin text-coral-400" />}
             </div>
 
-            <div className="flex rounded-lg border border-zinc-900 bg-zinc-950 p-0.5">
+            <div className="flex rounded-lg border border-zinc-900 bg-background p-0.5">
               <Button
                 variant="ghost"
                 size="sm"
@@ -498,7 +504,7 @@ export default function App() {
           <div className="relative flex min-h-[300px] w-full flex-1 items-center justify-center">
             {fontsLoading ? (
               <div className="flex flex-col items-center gap-3">
-                <RefreshCw className="h-8 w-8 animate-spin text-rose-500" />
+                <RefreshCw className="h-8 w-8 animate-spin text-coral-500" />
                 <p className="text-sm font-medium text-zinc-400">
                   Fetching font files for Satori...
                 </p>
@@ -537,7 +543,7 @@ export default function App() {
               </Alert>
             ) : svgContent ? (
               <Card
-                className="relative overflow-hidden rounded-2xl border-zinc-900 bg-zinc-950 shadow-2xl shadow-black/80 transition-all duration-300"
+                className="relative overflow-hidden rounded-2xl border-zinc-900 bg-background shadow-2xl shadow-black/80 transition-all duration-300"
                 style={
                   previewScale === "fit"
                     ? {
