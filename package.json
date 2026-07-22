@@ -1,27 +1,32 @@
 {
-  "name": "og-image-template-playground",
+  "name": "@area44/og-images-coral",
   "version": "1.0.0",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "lint": "oxlint --fix .",
+    "format": "oxfmt .",
+    "check": "oxlint --fix . && oxfmt ."
   },
   "dependencies": {
-    "lucide-react": "^0.436.0",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
+    "lucide-react": "^0.475.0",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
     "satori": "^0.12.1"
   },
   "devDependencies": {
-    "@types/react": "^18.3.3",
-    "@types/react-dom": "^18.3.0",
-    "@vitejs/plugin-react": "^4.3.1",
-    "autoprefixer": "^10.4.20",
-    "postcss": "^8.4.45",
-    "tailwindcss": "^3.4.10",
-    "typescript": "^5.5.4",
-    "vite": "^5.4.2"
-  }
+    "@tailwindcss/vite": "^4.3.3",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.4",
+    "oxfmt": "^0.60.0",
+    "oxlint": "^1.75.0",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^7.0.2",
+    "vite": "^8.1.5"
+  },
+  "packageManager": "pnpm@11.15.1"
 }
