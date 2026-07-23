@@ -8,7 +8,6 @@ import {
   Minimize2,
   Sliders,
   Type,
-  Image as ImageIcon,
   AlertCircle,
   Flame,
   BookOpen,
@@ -238,60 +237,112 @@ export default function App() {
   };
 
   return (
-    <div className="selection:text-coral-200 flex min-h-screen flex-col bg-background text-foreground selection:bg-coral-500/30">
+    <div className="selection:text-coral-200 flex min-h-screen flex-col bg-background text-foreground selection:bg-coral-500/30 lg:h-screen lg:flex-row lg:overflow-hidden">
       {/* Decorative top ambient glow */}
       <div className="pointer-events-none absolute top-0 left-1/2 -z-10 h-[200px] w-full max-w-7xl -translate-x-1/2 bg-[radial-gradient(ellipse_at_top,rgba(251,113,133,0.15),transparent_50%)]" />
 
-      {/* Navbar */}
-      <header className="sticky top-0 z-50 flex items-center justify-between border-b border-zinc-900 bg-background/80 px-6 py-4 backdrop-blur-md">
-        <div className="flex items-center gap-3">
-          <div className="rounded-xl bg-gradient-to-tr from-coral-500 to-rose-500 p-2.5 shadow-lg shadow-rose-500/10">
+      {/* Sidebar: Shadcn-ui Inspired Full Height left bar */}
+      <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r border-zinc-900 bg-zinc-950/50 backdrop-blur-md select-none lg:flex">
+        {/* Sidebar Header */}
+        <div className="flex items-center gap-3 border-b border-zinc-900 px-6 py-5">
+          <div className="rounded-xl bg-gradient-to-tr from-coral-500 to-rose-500 p-2 shadow-lg shadow-rose-500/10">
             <Flame className="h-5 w-5 text-white" />
           </div>
           <div>
-            <div className="flex items-center gap-2">
-              <h1 className="bg-gradient-to-r from-coral-400 via-orange-400 to-rose-400 bg-clip-text text-xl font-extrabold tracking-tight text-transparent">
+            <div className="flex items-center gap-1.5">
+              <h1 className="bg-gradient-to-r from-coral-400 via-orange-400 to-rose-400 bg-clip-text text-sm font-extrabold tracking-tight text-transparent">
                 OG Images Coral
               </h1>
-              <span className="rounded bg-coral-500/10 px-1.5 py-0.5 text-[10px] font-semibold tracking-wider text-coral-400 uppercase">
+              <span className="rounded bg-coral-500/10 px-1 py-0.5 text-[8px] font-bold tracking-wider text-coral-400 uppercase">
                 v2.0
               </span>
             </div>
-            <p className="text-xs font-medium text-zinc-400">
-              Beautiful in-browser Open Graph playgrounds
-            </p>
+            <p className="text-[10px] font-medium text-zinc-500">In-browser OG playgrounds</p>
           </div>
         </div>
-        <div className="flex items-center gap-4">
-          <span className="border-coral-950/40 bg-coral-950/10 text-coral-300 inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold">
-            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-coral-400"></span>
-            Base UI Activated
-          </span>
-          <a
-            href="https://github.com/area44/og-image-template"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs font-semibold text-zinc-400 transition hover:text-zinc-200 hover:underline"
-          >
-            GitHub
-          </a>
-        </div>
-      </header>
 
-      {/* Main Content Area */}
-      <main className="flex min-h-0 flex-1 flex-col lg:flex-row">
-        {/* Navigation Sidebar - Template Selection */}
-        <div className="flex w-full shrink-0 flex-col border-b border-zinc-900 bg-zinc-950 lg:w-64 lg:border-r lg:border-b-0">
-          <div className="hidden border-b border-zinc-900 px-6 py-5 lg:block">
-            <div className="flex items-center gap-2">
-              <ImageIcon className="h-4 w-4 text-coral-400" />
-              <h2 className="text-xs font-bold tracking-widest text-zinc-400 uppercase">
-                Templates
-              </h2>
+        {/* Sidebar Content */}
+        <div className="flex-1 space-y-6 overflow-y-auto px-4 py-6">
+          <div className="space-y-2">
+            <h3 className="px-3 text-[10px] font-bold tracking-wider text-zinc-500 uppercase">
+              Templates
+            </h3>
+            <div className="space-y-1">
+              {(Object.keys(TEMPLATES) as TemplateId[]).map((key) => {
+                const t = TEMPLATES[key];
+                const active = selectedTemplate === key;
+                const IconComponent = t.icon;
+                return (
+                  <button
+                    key={key}
+                    onClick={() => handleTemplateChange(key)}
+                    className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold transition-all ${
+                      active
+                        ? "border-l-2 border-coral-500 bg-coral-500/10 pl-2.5 text-coral-400"
+                        : "border-l-2 border-transparent pl-2.5 text-zinc-400 hover:bg-zinc-900/50 hover:text-zinc-200"
+                    }`}
+                  >
+                    <IconComponent
+                      className={`h-4 w-4 shrink-0 ${active ? "text-coral-400" : "text-zinc-500"}`}
+                    />
+                    <span>{t.name}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
+        {/* Sidebar Footer */}
+        <div className="space-y-4 border-t border-zinc-900 p-4">
+          <div className="flex flex-col gap-2">
+            <span className="border-coral-950/40 bg-coral-950/10 text-coral-300 flex items-center justify-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-semibold">
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-coral-400"></span>
+              Base UI Activated
+            </span>
+          </div>
+          <div className="flex items-center justify-between px-1 text-xs text-zinc-500">
+            <span>By AREA44</span>
+            <a
+              href="https://github.com/area44/og-image-template"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium underline hover:text-zinc-300"
+            >
+              GitHub
+            </a>
+          </div>
+        </div>
+      </aside>
+
+      {/* Mobile Top Header */}
+      <header className="flex shrink-0 flex-col border-b border-zinc-900 bg-zinc-950 lg:hidden">
+        <div className="flex items-center justify-between px-6 py-4">
+          <div className="flex items-center gap-3">
+            <div className="rounded-xl bg-gradient-to-tr from-coral-500 to-rose-500 p-2 shadow-lg shadow-rose-500/10">
+              <Flame className="h-4 w-4 text-white" />
+            </div>
+            <div>
+              <div className="flex items-center gap-1.5">
+                <h1 className="bg-gradient-to-r from-coral-400 via-orange-400 to-rose-400 bg-clip-text text-sm font-extrabold tracking-tight text-transparent">
+                  OG Images Coral
+                </h1>
+                <span className="rounded bg-coral-500/10 px-1 py-0.5 text-[8px] font-bold tracking-wider text-coral-400 uppercase">
+                  v2.0
+                </span>
+              </div>
             </div>
           </div>
 
-          <nav className="flex flex-row gap-1 overflow-x-auto p-4 lg:flex-col lg:gap-1.5 lg:overflow-x-visible lg:p-4">
+          <span className="border-coral-950/40 bg-coral-950/10 text-coral-300 flex items-center gap-1 rounded-full border px-2 py-0.5 text-[9px] font-semibold">
+            <span className="h-1 w-1 animate-pulse rounded-full bg-coral-400"></span>
+            Base UI
+          </span>
+        </div>
+
+        {/* Mobile Template Selector Tabs */}
+        <div className="border-t border-zinc-900 px-4 py-3">
+          <div className="flex items-center gap-2 overflow-x-auto pb-1">
             {(Object.keys(TEMPLATES) as TemplateId[]).map((key) => {
               const t = TEMPLATES[key];
               const active = selectedTemplate === key;
@@ -300,22 +351,23 @@ export default function App() {
                 <button
                   key={key}
                   onClick={() => handleTemplateChange(key)}
-                  className={`flex shrink-0 items-center gap-3 rounded-lg px-4 py-2.5 text-sm font-semibold transition-all lg:w-full ${
-                    active
-                      ? "bg-coral-500/10 text-coral-400 lg:border-l-2 lg:border-coral-500 lg:pl-3.5"
-                      : "text-zinc-400 hover:bg-zinc-900/50 hover:text-zinc-200 lg:border-l-2 lg:border-transparent lg:pl-3.5"
+                  className={`flex shrink-0 items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all ${
+                    active ? "bg-zinc-900 text-coral-400" : "text-zinc-500 hover:text-zinc-300"
                   }`}
                 >
                   <IconComponent
-                    className={`h-4 w-4 shrink-0 ${active ? "text-coral-400" : "text-zinc-500"}`}
+                    className={`h-3.5 w-3.5 shrink-0 ${active ? "text-coral-400" : "text-zinc-500"}`}
                   />
                   <span className="whitespace-nowrap">{t.name}</span>
                 </button>
               );
             })}
-          </nav>
+          </div>
         </div>
+      </header>
 
+      {/* Main Content Area */}
+      <main className="flex min-h-0 flex-1 flex-col lg:flex-row">
         {/* Left pane - Controls */}
         <div className="flex w-full shrink-0 flex-col divide-y divide-zinc-900 overflow-y-auto border-r border-zinc-900 bg-zinc-950 lg:w-[380px]">
           {/* Section: Customize Fields */}
