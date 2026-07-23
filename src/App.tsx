@@ -8,7 +8,6 @@ import {
   Minimize2,
   Sliders,
   Type,
-  Image as ImageIcon,
   AlertCircle,
   Flame,
 } from "lucide-react";
@@ -232,32 +231,32 @@ export default function App() {
   };
 
   return (
-    <div className="selection:text-coral-200 flex min-h-screen flex-col bg-background text-foreground selection:bg-coral-500/30">
+    <div className="selection:text-coral-200 flex min-h-screen flex-col bg-background text-foreground selection:bg-coral-500/30 lg:h-screen lg:overflow-hidden">
       {/* Decorative top ambient glow */}
       <div className="pointer-events-none absolute top-0 left-1/2 -z-10 h-[200px] w-full max-w-7xl -translate-x-1/2 bg-[radial-gradient(ellipse_at_top,rgba(251,113,133,0.15),transparent_50%)]" />
 
-      {/* Navbar */}
-      <header className="sticky top-0 z-50 flex items-center justify-between border-b border-zinc-900 bg-background/80 px-6 py-4 backdrop-blur-md">
+      {/* Global Top Header (Fumadocs style) */}
+      <header className="sticky top-0 z-50 flex h-14 w-full shrink-0 items-center justify-between border-b border-zinc-900 bg-zinc-950/80 px-6 backdrop-blur-md select-none">
         <div className="flex items-center gap-3">
-          <div className="rounded-xl bg-gradient-to-tr from-coral-500 to-rose-500 p-2.5 shadow-lg shadow-rose-500/10">
-            <Flame className="h-5 w-5 text-white" />
+          <div className="rounded-xl bg-gradient-to-tr from-coral-500 to-rose-500 p-2 shadow-lg shadow-rose-500/10">
+            <Flame className="h-4 w-4 text-white" />
           </div>
           <div>
-            <div className="flex items-center gap-2">
-              <h1 className="bg-gradient-to-r from-coral-400 via-orange-400 to-rose-400 bg-clip-text text-xl font-extrabold tracking-tight text-transparent">
+            <div className="flex items-center gap-1.5">
+              <h1 className="bg-gradient-to-r from-coral-400 via-orange-400 to-rose-400 bg-clip-text text-sm font-extrabold tracking-tight text-transparent">
                 OG Images Coral
               </h1>
-              <span className="rounded bg-coral-500/10 px-1.5 py-0.5 text-[10px] font-semibold tracking-wider text-coral-400 uppercase">
+              <span className="rounded bg-coral-500/10 px-1 py-0.5 text-[8px] font-bold tracking-wider text-coral-400 uppercase">
                 v2.0
               </span>
             </div>
-            <p className="text-xs font-medium text-zinc-400">
+            <p className="hidden text-[10px] font-medium text-zinc-500 sm:block">
               Beautiful in-browser Open Graph playgrounds
             </p>
           </div>
         </div>
         <div className="flex items-center gap-4">
-          <span className="border-coral-950/40 bg-coral-950/10 text-coral-300 inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold">
+          <span className="border-coral-950/40 bg-coral-950/10 text-coral-300 hidden items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-semibold sm:inline-flex">
             <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-coral-400"></span>
             Base UI Activated
           </span>
@@ -272,329 +271,373 @@ export default function App() {
         </div>
       </header>
 
-      {/* Main Content Area */}
-      <main className="flex min-h-0 flex-1 flex-col lg:flex-row">
-        {/* Left pane - Controls */}
-        <div className="flex w-full flex-col divide-y divide-zinc-900 overflow-y-auto border-r border-zinc-900 bg-zinc-950 lg:w-[420px]">
-          {/* Section: Templates Selection */}
-          <div className="p-6">
-            <div className="mb-4 flex items-center gap-2">
-              <ImageIcon className="h-4 w-4 text-coral-400" />
-              <h2 className="text-xs font-bold tracking-widest text-zinc-400 uppercase">
-                Choose Template
-              </h2>
+      {/* Main Workspace below global header */}
+      <div className="flex flex-1 flex-col lg:flex-row lg:overflow-hidden">
+        {/* Left Navigation Sidebar - Fumadocs Tree style */}
+        <aside className="sticky top-14 hidden h-[calc(100vh-56px)] w-64 shrink-0 flex-col border-r border-zinc-900 bg-zinc-950/30 select-none lg:flex">
+          {/* Sidebar Content */}
+          <div className="flex-1 space-y-6 overflow-y-auto px-4 py-4 pt-6">
+            <div className="space-y-2">
+              <h3 className="px-3 text-[10px] font-bold tracking-wider text-zinc-500 uppercase">
+                Playground Templates
+              </h3>
+              <div className="space-y-1">
+                {(Object.keys(TEMPLATES) as TemplateId[]).map((key) => {
+                  const t = TEMPLATES[key];
+                  const active = selectedTemplate === key;
+                  return (
+                    <button
+                      key={key}
+                      onClick={() => handleTemplateChange(key)}
+                      className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold transition-all ${
+                        active
+                          ? "border-l-2 border-coral-500 bg-coral-500/10 pl-2.5 text-coral-400"
+                          : "border-l-2 border-transparent pl-2.5 text-zinc-400 hover:bg-zinc-900/50 hover:text-zinc-200"
+                      }`}
+                    >
+                      <span>{t.name}</span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
-            <div className="space-y-3">
-              {(Object.keys(TEMPLATES) as TemplateId[]).map((key) => {
-                const t = TEMPLATES[key];
-                const active = selectedTemplate === key;
-                return (
-                  <Button
-                    key={key}
-                    onClick={() => handleTemplateChange(key)}
-                    variant={active ? "default" : "outline"}
-                    className={`flex h-auto w-full flex-col items-start justify-start rounded-xl border p-4 text-left transition-all ${
-                      active
-                        ? "border-coral-500/50 shadow-md"
-                        : "border-zinc-800 bg-zinc-900/40 text-zinc-400 hover:border-zinc-700 hover:bg-zinc-900/60"
-                    }`}
+            {/* Resources Group (Fumadocs structure) */}
+            <div className="space-y-2">
+              <h3 className="px-3 text-[10px] font-bold tracking-wider text-zinc-500 uppercase">
+                Resources
+              </h3>
+              <div className="space-y-1">
+                <a
+                  href="https://github.com/area44/og-image-template"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex w-full items-center gap-3 rounded-lg border-l-2 border-transparent px-3 py-2 pl-2.5 text-sm font-medium text-zinc-400 transition-all hover:bg-zinc-900/50 hover:text-zinc-200"
+                >
+                  <Flame className="h-4 w-4 text-zinc-500" />
+                  <span>Repository</span>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          {/* Sidebar Footer */}
+          <div className="border-t border-zinc-900 p-4">
+            <div className="flex items-center justify-between px-1 text-[11px] text-zinc-500">
+              <span>By AREA44</span>
+              <span>Renderer v0.12.1</span>
+            </div>
+          </div>
+        </aside>
+
+        {/* Mobile Template Selector Tabs (Only visible on mobile) */}
+        <div className="shrink-0 border-b border-zinc-900 bg-zinc-950 px-4 py-3 lg:hidden">
+          <div className="flex items-center gap-2 overflow-x-auto pb-1">
+            {(Object.keys(TEMPLATES) as TemplateId[]).map((key) => {
+              const t = TEMPLATES[key];
+              const active = selectedTemplate === key;
+              return (
+                <button
+                  key={key}
+                  onClick={() => handleTemplateChange(key)}
+                  className={`flex shrink-0 items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all ${
+                    active ? "bg-zinc-900 text-coral-400" : "text-zinc-500 hover:text-zinc-300"
+                  }`}
+                >
+                  <span>{t.name}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Main Workspace: Controls + Live Preview */}
+        <main className="flex min-h-0 flex-1 flex-col lg:flex-row lg:overflow-hidden">
+          {/* Controls Pane (Middle pane) */}
+          <div className="flex w-full shrink-0 flex-col divide-y divide-zinc-900 overflow-y-auto border-r border-zinc-900 bg-zinc-950 lg:w-[380px]">
+            {/* Section: Customize Fields */}
+            <div className="p-6">
+              <div className="mb-4 flex items-center gap-2">
+                <Type className="h-4 w-4 text-coral-400" />
+                <h2 className="text-xs font-bold tracking-widest text-zinc-400 uppercase">
+                  Customize Content
+                </h2>
+              </div>
+
+              <div className="space-y-4">
+                <Field.Root className="grid gap-1.5">
+                  <Label htmlFor="title-input" className="text-xs font-semibold text-zinc-400">
+                    Title
+                  </Label>
+                  <Input
+                    id="title-input"
+                    type="text"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    placeholder="Enter custom title..."
+                    className="border-zinc-800 bg-zinc-900/40 text-zinc-200 transition focus-visible:ring-coral-500/50"
+                  />
+                </Field.Root>
+
+                <Field.Root className="grid gap-1.5">
+                  <Label
+                    htmlFor="description-input"
+                    className="text-xs font-semibold text-zinc-400"
                   >
-                    <div
-                      className={`mb-1 text-sm font-semibold ${active ? "text-primary-foreground" : "text-zinc-200"}`}
-                    >
-                      {t.name}
-                    </div>
-                    <div
-                      className={`line-clamp-2 text-xs whitespace-normal ${active ? "text-primary-foreground/80" : "text-zinc-500"}`}
-                    >
-                      {t.features.join(" • ")}
-                    </div>
-                  </Button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Section: Customize Fields */}
-          <div className="p-6">
-            <div className="mb-4 flex items-center gap-2">
-              <Type className="h-4 w-4 text-coral-400" />
-              <h2 className="text-xs font-bold tracking-widest text-zinc-400 uppercase">
-                Customize Content
-              </h2>
-            </div>
-
-            <div className="space-y-4">
-              <Field.Root className="grid gap-1.5">
-                <Label htmlFor="title-input" className="text-xs font-semibold text-zinc-400">
-                  Title
-                </Label>
-                <Input
-                  id="title-input"
-                  type="text"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder="Enter custom title..."
-                  className="border-zinc-800 bg-zinc-900/40 text-zinc-200 transition focus-visible:ring-coral-500/50"
-                />
-              </Field.Root>
-
-              <Field.Root className="grid gap-1.5">
-                <Label htmlFor="description-input" className="text-xs font-semibold text-zinc-400">
-                  Description
-                </Label>
-                <Textarea
-                  id="description-input"
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Enter custom description..."
-                  rows={3}
-                  className="resize-none border-zinc-800 bg-zinc-900/40 text-zinc-200 transition focus-visible:ring-coral-500/50"
-                />
-              </Field.Root>
-            </div>
-          </div>
-
-          {/* Section: Output Dimensions */}
-          <div className="p-6">
-            <div className="mb-4 flex items-center gap-2">
-              <Sliders className="h-4 w-4 text-coral-400" />
-              <h2 className="text-xs font-bold tracking-widest text-zinc-400 uppercase">
-                Dimensions
-              </h2>
-            </div>
-
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-3">
-                <Field.Root className="grid gap-1">
-                  <Label htmlFor="width-input" className="text-xs font-medium text-zinc-500">
-                    Width (px)
+                    Description
                   </Label>
-                  <Input
-                    id="width-input"
-                    type="number"
-                    value={width}
-                    onChange={(e) => setWidth(Math.max(100, parseInt(e.target.value) || 0))}
-                    className="h-9 border-zinc-800 bg-zinc-900/40 text-zinc-200 transition focus-visible:ring-coral-500/50"
-                  />
-                </Field.Root>
-                <Field.Root className="grid gap-1">
-                  <Label htmlFor="height-input" className="text-xs font-medium text-zinc-500">
-                    Height (px)
-                  </Label>
-                  <Input
-                    id="height-input"
-                    type="number"
-                    value={height}
-                    onChange={(e) => setHeight(Math.max(100, parseInt(e.target.value) || 0))}
-                    className="h-9 border-zinc-800 bg-zinc-900/40 text-zinc-200 transition focus-visible:ring-coral-500/50"
+                  <Textarea
+                    id="description-input"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    placeholder="Enter custom description..."
+                    rows={3}
+                    className="resize-none border-zinc-800 bg-zinc-900/40 text-zinc-200 transition focus-visible:ring-coral-500/50"
                   />
                 </Field.Root>
               </div>
+            </div>
 
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    setWidth(1200);
-                    setHeight(630);
-                  }}
-                  className="flex-1 border-zinc-800 bg-zinc-900/40 text-zinc-400 hover:border-zinc-700 hover:bg-zinc-900 hover:text-zinc-200"
-                >
-                  Standard (1200×630)
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    setWidth(800);
-                    setHeight(400);
-                  }}
-                  className="flex-1 border-zinc-800 bg-zinc-900/40 text-zinc-400 hover:border-zinc-700 hover:bg-zinc-900 hover:text-zinc-200"
-                >
-                  Compact (800×400)
-                </Button>
+            {/* Section: Output Dimensions */}
+            <div className="p-6">
+              <div className="mb-4 flex items-center gap-2">
+                <Sliders className="h-4 w-4 text-coral-400" />
+                <h2 className="text-xs font-bold tracking-widest text-zinc-400 uppercase">
+                  Dimensions
+                </h2>
               </div>
-            </div>
-          </div>
 
-          {/* Section: Action Buttons */}
-          <div className="mt-auto space-y-3 p-6">
-            <Button
-              onClick={handleCopy}
-              disabled={!svgContent || rendering}
-              variant={copied ? "default" : "secondary"}
-              className={`w-full py-2.5 font-semibold transition-all ${
-                copied
-                  ? "bg-emerald-600 text-white shadow-md shadow-emerald-600/10 hover:bg-emerald-700"
-                  : "border border-zinc-800 bg-zinc-900 text-zinc-100 hover:bg-zinc-800 hover:text-zinc-200"
-              }`}
-            >
-              {copied ? (
-                <>
-                  <Check className="h-4 w-4" />
-                  Copied SVG Code!
-                </>
-              ) : (
-                <>
-                  <Copy className="h-4 w-4" />
-                  Copy SVG Code
-                </>
-              )}
-            </Button>
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-3">
+                  <Field.Root className="grid gap-1">
+                    <Label htmlFor="width-input" className="text-xs font-medium text-zinc-500">
+                      Width (px)
+                    </Label>
+                    <Input
+                      id="width-input"
+                      type="number"
+                      value={width}
+                      onChange={(e) => setWidth(Math.max(100, parseInt(e.target.value) || 0))}
+                      className="h-9 border-zinc-800 bg-zinc-900/40 text-zinc-200 transition focus-visible:ring-coral-500/50"
+                    />
+                  </Field.Root>
+                  <Field.Root className="grid gap-1">
+                    <Label htmlFor="height-input" className="text-xs font-medium text-zinc-500">
+                      Height (px)
+                    </Label>
+                    <Input
+                      id="height-input"
+                      type="number"
+                      value={height}
+                      onChange={(e) => setHeight(Math.max(100, parseInt(e.target.value) || 0))}
+                      className="h-9 border-zinc-800 bg-zinc-900/40 text-zinc-200 transition focus-visible:ring-coral-500/50"
+                    />
+                  </Field.Root>
+                </div>
 
-            <Button
-              onClick={handleDownload}
-              disabled={!svgContent || rendering}
-              className="w-full bg-primary py-2.5 font-semibold text-primary-foreground shadow-lg shadow-coral-500/10 hover:opacity-90"
-            >
-              <Download className="h-4 w-4" />
-              Download SVG File
-            </Button>
-          </div>
-        </div>
-
-        {/* Right pane - Interactive Live Preview */}
-        <div className="relative flex flex-1 flex-col items-center justify-between overflow-hidden bg-zinc-950 p-6 lg:p-8">
-          {/* Background grid accents */}
-          <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#e11d4803_1px,transparent_1px),linear-gradient(to_bottom,#e11d4803_1px,transparent_1px)] bg-[size:32px_32px]" />
-
-          {/* Top Preview Controls */}
-          <div className="z-10 mb-4 flex w-full items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className="rounded-md border border-zinc-900/50 bg-zinc-900/50 px-2.5 py-1 font-mono text-xs text-zinc-400">
-                Canvas: {width} × {height}
-              </span>
-              {rendering && <RefreshCw className="h-3.5 w-3.5 animate-spin text-coral-400" />}
-            </div>
-
-            <div className="flex rounded-lg border border-zinc-900 bg-background p-0.5">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setPreviewScale("fit")}
-                className={`flex h-7 items-center gap-1.5 rounded-md px-3 py-1 text-xs font-semibold transition-all ${
-                  previewScale === "fit"
-                    ? "bg-zinc-900 text-white hover:bg-zinc-900"
-                    : "text-zinc-400 hover:bg-transparent hover:text-zinc-200"
-                }`}
-              >
-                <Minimize2 className="h-3.5 w-3.5" />
-                Fit View
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setPreviewScale("full")}
-                className={`flex h-7 items-center gap-1.5 rounded-md px-3 py-1 text-xs font-semibold transition-all ${
-                  previewScale === "full"
-                    ? "bg-zinc-900 text-white hover:bg-zinc-900"
-                    : "text-zinc-400 hover:bg-transparent hover:text-zinc-200"
-                }`}
-              >
-                <Maximize2 className="h-3.5 w-3.5" />
-                Actual Size
-              </Button>
-            </div>
-          </div>
-
-          {/* Interactive Viewer Frame */}
-          <div className="relative flex min-h-[300px] w-full flex-1 items-center justify-center">
-            {fontsLoading ? (
-              <div className="flex flex-col items-center gap-3">
-                <RefreshCw className="h-8 w-8 animate-spin text-coral-500" />
-                <p className="text-sm font-medium text-zinc-400">
-                  Fetching font files for Satori...
-                </p>
-              </div>
-            ) : fontsError ? (
-              <Alert
-                variant="destructive"
-                className="flex max-w-md flex-col items-center gap-3 bg-red-950/20 p-6 text-center"
-              >
-                <AlertCircle className="h-10 w-10 text-destructive" />
-                <AlertTitle className="font-semibold text-destructive">
-                  Failed to Load Fonts
-                </AlertTitle>
-                <AlertDescription className="text-xs leading-relaxed text-destructive/80">
-                  {fontsError}. Please check your internet connection or reload the page.
-                </AlertDescription>
-                <Button
-                  onClick={() => window.location.reload()}
-                  variant="destructive"
-                  size="sm"
-                  className="mt-2 font-medium text-white"
-                >
-                  Retry Loading
-                </Button>
-              </Alert>
-            ) : renderError ? (
-              <Alert
-                variant="destructive"
-                className="flex max-w-md flex-col items-center gap-3 border-amber-900/50 bg-amber-950/20 p-6 text-center"
-              >
-                <AlertCircle className="h-10 w-10 text-amber-500" />
-                <AlertTitle className="font-semibold text-amber-400">Rendering Error</AlertTitle>
-                <AlertDescription className="max-h-32 overflow-y-auto font-mono text-xs leading-relaxed text-amber-500/80">
-                  {renderError}
-                </AlertDescription>
-              </Alert>
-            ) : svgContent ? (
-              <Card
-                className="relative overflow-hidden rounded-2xl border-zinc-900 bg-background shadow-2xl shadow-black/80 transition-all duration-300"
-                style={
-                  previewScale === "fit"
-                    ? {
-                        width: "100%",
-                        maxWidth: `${width}px`,
-                        aspectRatio: `${width} / ${height}`,
-                      }
-                    : {
-                        width: `${width}px`,
-                        height: `${height}px`,
-                        transform: "none",
-                        maxWidth: "100%",
-                        maxHeight: "100%",
-                        overflow: "auto",
-                      }
-                }
-              >
-                <CardContent className="h-full w-full p-0">
-                  {/* Checkerboard transparency background */}
-                  <div
-                    className="pointer-events-none absolute inset-0 opacity-[0.03]"
-                    style={{
-                      backgroundImage:
-                        "radial-gradient(circle, #fff 10%, transparent 11%), radial-gradient(circle, #fff 10%, transparent 11%)",
-                      backgroundSize: "20px 20px",
-                      backgroundPosition: "0 0, 10px 10px",
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setWidth(1200);
+                      setHeight(630);
                     }}
-                  />
-
-                  {/* Embedded Live SVG */}
-                  <div
-                    className="flex h-full w-full items-center justify-center select-none"
-                    dangerouslySetInnerHTML={{ __html: svgContent }}
-                  />
-                </CardContent>
-              </Card>
-            ) : (
-              <div className="flex flex-col items-center gap-2">
-                <RefreshCw className="h-6 w-6 animate-spin text-zinc-600" />
-                <p className="text-xs text-zinc-500">Generating preview...</p>
+                    className="flex-1 border-zinc-800 bg-zinc-900/40 text-zinc-400 hover:border-zinc-700 hover:bg-zinc-900 hover:text-zinc-200"
+                  >
+                    Standard (1200×630)
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setWidth(800);
+                      setHeight(400);
+                    }}
+                    className="flex-1 border-zinc-800 bg-zinc-900/40 text-zinc-400 hover:border-zinc-700 hover:bg-zinc-900 hover:text-zinc-200"
+                  >
+                    Compact (800×400)
+                  </Button>
+                </div>
               </div>
-            )}
+            </div>
+
+            {/* Section: Action Buttons */}
+            <div className="mt-auto space-y-3 p-6">
+              <Button
+                onClick={handleCopy}
+                disabled={!svgContent || rendering}
+                variant={copied ? "default" : "secondary"}
+                className={`w-full py-2.5 font-semibold transition-all ${
+                  copied
+                    ? "bg-emerald-600 text-white shadow-md shadow-emerald-600/10 hover:bg-emerald-700"
+                    : "border border-zinc-800 bg-zinc-900 text-zinc-100 hover:bg-zinc-800 hover:text-zinc-200"
+                }`}
+              >
+                {copied ? (
+                  <>
+                    <Check className="h-4 w-4" />
+                    Copied SVG Code!
+                  </>
+                ) : (
+                  <>
+                    <Copy className="h-4 w-4" />
+                    Copy SVG Code
+                  </>
+                )}
+              </Button>
+
+              <Button
+                onClick={handleDownload}
+                disabled={!svgContent || rendering}
+                className="w-full bg-primary py-2.5 font-semibold text-primary-foreground shadow-lg shadow-coral-500/10 hover:opacity-90"
+              >
+                <Download className="h-4 w-4" />
+                Download SVG File
+              </Button>
+            </div>
           </div>
 
-          {/* Footer Info / Status bar */}
-          <div className="z-10 mt-6 flex w-full flex-col justify-between border-t border-zinc-900 pt-4 text-xs text-zinc-500 sm:flex-row sm:items-center">
-            <p>Designed to render beautiful Open Graph social share templates locally.</p>
-            <p className="mt-1 font-mono text-zinc-400 sm:mt-0">Renderer: satori-core v0.12.1</p>
+          {/* Right pane - Interactive Live Preview */}
+          <div className="relative flex flex-1 flex-col items-center justify-between overflow-hidden bg-zinc-950 p-6 lg:p-8">
+            {/* Background grid accents */}
+            <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#e11d4803_1px,transparent_1px),linear-gradient(to_bottom,#e11d4803_1px,transparent_1px)] bg-[size:32px_32px]" />
+
+            {/* Top Preview Controls */}
+            <div className="z-10 mb-4 flex w-full items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="rounded-md border border-zinc-900/50 bg-zinc-900/50 px-2.5 py-1 font-mono text-xs text-zinc-400">
+                  Canvas: {width} × {height}
+                </span>
+                {rendering && <RefreshCw className="h-3.5 w-3.5 animate-spin text-coral-400" />}
+              </div>
+
+              <div className="flex rounded-lg border border-zinc-900 bg-background p-0.5">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setPreviewScale("fit")}
+                  className={`flex h-7 items-center gap-1.5 rounded-md px-3 py-1 text-xs font-semibold transition-all ${
+                    previewScale === "fit"
+                      ? "bg-zinc-900 text-white hover:bg-zinc-900"
+                      : "text-zinc-400 hover:bg-transparent hover:text-zinc-200"
+                  }`}
+                >
+                  <Minimize2 className="h-3.5 w-3.5" />
+                  Fit View
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setPreviewScale("full")}
+                  className={`flex h-7 items-center gap-1.5 rounded-md px-3 py-1 text-xs font-semibold transition-all ${
+                    previewScale === "full"
+                      ? "bg-zinc-900 text-white hover:bg-zinc-900"
+                      : "text-zinc-400 hover:bg-transparent hover:text-zinc-200"
+                  }`}
+                >
+                  <Maximize2 className="h-3.5 w-3.5" />
+                  Actual Size
+                </Button>
+              </div>
+            </div>
+
+            {/* Interactive Viewer Frame */}
+            <div className="relative flex min-h-[300px] w-full flex-1 items-center justify-center">
+              {fontsLoading ? (
+                <div className="flex flex-col items-center gap-3">
+                  <RefreshCw className="h-8 w-8 animate-spin text-coral-500" />
+                  <p className="text-sm font-medium text-zinc-400">
+                    Fetching font files for Satori...
+                  </p>
+                </div>
+              ) : fontsError ? (
+                <Alert
+                  variant="destructive"
+                  className="flex max-w-md flex-col items-center gap-3 bg-red-950/20 p-6 text-center"
+                >
+                  <AlertCircle className="h-10 w-10 text-destructive" />
+                  <AlertTitle className="font-semibold text-destructive">
+                    Failed to Load Fonts
+                  </AlertTitle>
+                  <AlertDescription className="text-xs leading-relaxed text-destructive/80">
+                    {fontsError}. Please check your internet connection or reload the page.
+                  </AlertDescription>
+                  <Button
+                    onClick={() => window.location.reload()}
+                    variant="destructive"
+                    size="sm"
+                    className="mt-2 font-medium text-white"
+                  >
+                    Retry Loading
+                  </Button>
+                </Alert>
+              ) : renderError ? (
+                <Alert
+                  variant="destructive"
+                  className="flex max-w-md flex-col items-center gap-3 border-amber-900/50 bg-amber-950/20 p-6 text-center"
+                >
+                  <AlertCircle className="h-10 w-10 text-amber-500" />
+                  <AlertTitle className="font-semibold text-amber-400">Rendering Error</AlertTitle>
+                  <AlertDescription className="max-h-32 overflow-y-auto font-mono text-xs leading-relaxed text-amber-500/80">
+                    {renderError}
+                  </AlertDescription>
+                </Alert>
+              ) : svgContent ? (
+                <Card
+                  className="relative overflow-hidden rounded-2xl border-zinc-900 bg-background shadow-2xl shadow-black/80 transition-all duration-300"
+                  style={
+                    previewScale === "fit"
+                      ? {
+                          width: "100%",
+                          maxWidth: `${width}px`,
+                          aspectRatio: `${width} / ${height}`,
+                        }
+                      : {
+                          width: `${width}px`,
+                          height: `${height}px`,
+                          transform: "none",
+                          maxWidth: "100%",
+                          maxHeight: "100%",
+                          overflow: "auto",
+                        }
+                  }
+                >
+                  <CardContent className="h-full w-full p-0">
+                    {/* Checkerboard transparency background */}
+                    <div
+                      className="pointer-events-none absolute inset-0 opacity-[0.03]"
+                      style={{
+                        backgroundImage:
+                          "radial-gradient(circle, #fff 10%, transparent 11%), radial-gradient(circle, #fff 10%, transparent 11%)",
+                        backgroundSize: "20px 20px",
+                        backgroundPosition: "0 0, 10px 10px",
+                      }}
+                    />
+
+                    {/* Embedded Live SVG */}
+                    <div
+                      className="flex h-full w-full items-center justify-center select-none"
+                      dangerouslySetInnerHTML={{ __html: svgContent }}
+                    />
+                  </CardContent>
+                </Card>
+              ) : (
+                <div className="flex flex-col items-center gap-2">
+                  <RefreshCw className="h-6 w-6 animate-spin text-zinc-600" />
+                  <p className="text-xs text-zinc-500">Generating preview...</p>
+                </div>
+              )}
+            </div>
+
+            {/* Footer Info / Status bar */}
+            <div className="z-10 mt-6 flex w-full flex-col justify-between border-t border-zinc-900 pt-4 text-xs text-zinc-500 sm:flex-row sm:items-center">
+              <p>Designed to render beautiful Open Graph social share templates locally.</p>
+              <p className="mt-1 font-mono text-zinc-400 sm:mt-0">Renderer: satori-core v0.12.1</p>
+            </div>
           </div>
-        </div>
-      </main>
+        </main>
+      </div>
     </div>
   );
 }
