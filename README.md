@@ -43,14 +43,14 @@ pnpm install
 
 ### Development Scripts
 
-| Command        | Action                                                  |
-| :------------- | :------------------------------------------------------ |
-| `pnpm dev`     | Starts the development server at `localhost:5173`       |
-| `pnpm build`   | Builds the production                   |
-| `pnpm preview` | Previews the production build locally                   |
-| `pnpm fmt`     | Formats the codebase                      |
-| `pnpm lint`    | Runs linter |
-| `pnpm check`   | Runs linting and formatting |
+| Command        | Action                                            |
+| :------------- | :------------------------------------------------ |
+| `pnpm dev`     | Starts the development server at `localhost:5173` |
+| `pnpm build`   | Builds the production                             |
+| `pnpm preview` | Previews the production build locally             |
+| `pnpm fmt`     | Formats the codebase                              |
+| `pnpm lint`    | Runs linter                                       |
+| `pnpm check`   | Runs linting and formatting                       |
 
 ## Templates
 
