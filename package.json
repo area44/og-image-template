@@ -7,9 +7,9 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "lint": "oxlint --fix .",
-    "format": "oxfmt .",
-    "check": "oxlint --fix . && oxfmt ."
+    "lint": "oxlint --fix",
+    "fmt": "oxfmt",
+    "check": "oxlint --fix && oxfmt"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
