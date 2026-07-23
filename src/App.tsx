@@ -251,8 +251,76 @@ export default function App() {
           >
             {isSidebarOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
           </Button>
-          <div className="rounded-xl bg-gradient-to-tr from-coral-500 to-rose-500 p-2 shadow-lg shadow-rose-500/10">
-            <Flame className="h-4 w-4 text-white" />
+          <div className="relative h-8 w-8 shrink-0">
+            <svg
+              className="h-full w-full"
+              viewBox="0 0 100 100"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <defs>
+                <linearGradient id="header-primary" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#ff7f50" />
+                  <stop offset="100%" stop-color="#f43f5e" />
+                </linearGradient>
+                <linearGradient id="header-accent" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#3f3f46" />
+                  <stop offset="100%" stop-color="#18181b" />
+                </linearGradient>
+              </defs>
+              <rect
+                x="18"
+                y="22"
+                width="56"
+                height="38"
+                rx="8"
+                fill="url(#header-accent)"
+                stroke="#27272a"
+                stroke-width="2.5"
+                transform="rotate(-6 50 50)"
+                opacity="0.8"
+              />
+              <rect
+                x="22"
+                y="24"
+                width="56"
+                height="38"
+                rx="8"
+                fill="#09090b"
+                stroke="url(#header-primary)"
+                stroke-width="2.5"
+              />
+              <line
+                x1="31"
+                y1="32"
+                x2="63"
+                y2="32"
+                stroke="#27272a"
+                stroke-width="3"
+                stroke-linecap="round"
+              />
+              <line
+                x1="31"
+                y1="40"
+                x2="52"
+                y2="40"
+                stroke="#18181b"
+                stroke-width="3"
+                stroke-linecap="round"
+              />
+              <g transform="translate(52, 38)">
+                <circle cx="16" cy="16" r="14" fill="url(#header-primary)" />
+                <path
+                  d="M16 9C16 9 18 13 18 15.8C18 18.6 15.4 20.6 12.8 20.6C10.2 20.6 8.4 18.6 8.4 15.8C8.4 13 12 9.8 12 9.8"
+                  stroke="#ffffff"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  fill="none"
+                  transform="translate(1, 0.2)"
+                />
+              </g>
+            </svg>
           </div>
           <div>
             <div className="flex items-center gap-1.5">

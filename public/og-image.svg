@@ -42,13 +42,27 @@
   <!-- Top-left glowing accent -->
   <circle cx="100" cy="100" r="150" fill="#ff7f50" opacity="0.05" filter="url(#glow)" />
 
-  <!-- Logo Icon Group -->
+  <!-- New Logo Icon Group (Modern Isometric Overlapping Cards with Flame) -->
   <g transform="translate(100, 150)">
-    <!-- Brand badge flame background -->
-    <rect x="0" y="0" width="80" height="80" rx="24" fill="url(#coral-gradient)" filter="url(#glow)" />
-    <!-- White Flame icon path matching standard Lucide flame -->
-    <path d="M40 18C40 18 45 28 45 35C45 42 38.5 47 32 47C25.5 47 21 42 21 35C21 28 30 20 30 20" stroke="#ffffff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none" transform="translate(10, 10)" />
-    <path d="M40 32C40 32 44 40 44 45C44 50 39 54 34 54C29 54 25 50 25 45" stroke="#ffffff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none" transform="translate(10, 10)" />
+    <!-- Ambient glow inside logo -->
+    <circle cx="40" cy="40" r="36" fill="url(#coral-gradient)" opacity="0.3" filter="url(#glow)" />
+
+    <!-- Backing Card -->
+    <rect x="12" y="16" width="48" height="32" rx="6" fill="#18181b" stroke="#27272a" stroke-width="1.5" transform="rotate(-6 40 40)" opacity="0.8" />
+
+    <!-- Foreground Card -->
+    <rect x="15" y="18" width="48" height="32" rx="6" fill="#09090b" stroke="url(#coral-gradient)" stroke-width="1.8" />
+
+    <!-- Grid lines inside Card -->
+    <line x1="22" y1="25" x2="52" y2="25" stroke="#27272a" stroke-width="1.8" stroke-linecap="round" />
+    <line x1="22" y1="31" x2="41" y2="31" stroke="#18181b" stroke-width="1.8" stroke-linecap="round" />
+
+    <!-- Flame Badge -->
+    <g transform="translate(42, 30)">
+      <circle cx="13" cy="13" r="12" fill="url(#coral-gradient)" />
+      <path d="M13 6C13 6 15 10 15 13C15 16 12.5 18 10 18C7.5 18 5.5 16 5.5 13C5.5 10 9 7 9 7" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none" transform="translate(1, 0.5)" />
+      <path d="M13 11.5C13 11.5 14.5 15 14.5 17C14.5 19 12.5 20.5 10.5 20.5" stroke="#ffffff" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="none" transform="translate(1, 0.5)" />
+    </g>
   </g>
 
   <!-- Brand Text -->
