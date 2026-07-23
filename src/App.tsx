@@ -10,10 +10,6 @@ import {
   Type,
   AlertCircle,
   Flame,
-  BookOpen,
-  Sparkles,
-  Briefcase,
-  Search,
 } from "lucide-react";
 import React, { useState, useEffect } from "react";
 import satori from "satori";
@@ -38,7 +34,6 @@ const TEMPLATES = {
     defaultTitle: "Hello World!",
     defaultDescription: "We are AREA44.",
     features: ["Tailwind classes (tw)", "Absolute positioning", "Border accents"],
-    icon: BookOpen,
   },
   minimal: {
     id: "minimal",
@@ -47,7 +42,6 @@ const TEMPLATES = {
     defaultTitle: "Long Nhat Nguyen",
     defaultDescription: "Hello, world!",
     features: ["Flexbox layout", "Centered texts", "Sans-serif styles"],
-    icon: Sparkles,
   },
   portfolio: {
     id: "portfolio",
@@ -56,7 +50,6 @@ const TEMPLATES = {
     defaultTitle: "What's up, world!",
     defaultDescription: "We are AREA44.",
     features: ["Double borders", "Geist-inspired layout", "Highly professional font scales"],
-    icon: Briefcase,
   },
 };
 
@@ -282,21 +275,8 @@ export default function App() {
       <div className="flex flex-1 flex-col lg:flex-row lg:overflow-hidden">
         {/* Left Navigation Sidebar - Fumadocs Tree style */}
         <aside className="sticky top-14 hidden h-[calc(100vh-56px)] w-64 shrink-0 flex-col border-r border-zinc-900 bg-zinc-950/30 select-none lg:flex">
-          {/* Mock Search Button (Fumadocs search) */}
-          <div className="px-4 pt-6 pb-2">
-            <button className="flex w-full items-center justify-between rounded-lg border border-zinc-800 bg-zinc-900/30 px-3 py-2 text-zinc-500 transition-all hover:bg-zinc-900/50 hover:text-zinc-400">
-              <div className="flex items-center gap-2">
-                <Search className="h-3.5 w-3.5" />
-                <span className="text-xs font-medium">Search templates...</span>
-              </div>
-              <kbd className="pointer-events-none inline-flex h-5 items-center gap-0.5 rounded border border-zinc-800 bg-zinc-950 px-1.5 font-mono text-[10px] font-medium text-zinc-600 select-none">
-                <span>⌘</span>K
-              </kbd>
-            </button>
-          </div>
-
           {/* Sidebar Content */}
-          <div className="flex-1 space-y-6 overflow-y-auto px-4 py-4">
+          <div className="flex-1 space-y-6 overflow-y-auto px-4 py-4 pt-6">
             <div className="space-y-2">
               <h3 className="px-3 text-[10px] font-bold tracking-wider text-zinc-500 uppercase">
                 Playground Templates
@@ -305,7 +285,6 @@ export default function App() {
                 {(Object.keys(TEMPLATES) as TemplateId[]).map((key) => {
                   const t = TEMPLATES[key];
                   const active = selectedTemplate === key;
-                  const IconComponent = t.icon;
                   return (
                     <button
                       key={key}
@@ -316,9 +295,6 @@ export default function App() {
                           : "border-l-2 border-transparent pl-2.5 text-zinc-400 hover:bg-zinc-900/50 hover:text-zinc-200"
                       }`}
                     >
-                      <IconComponent
-                        className={`h-4 w-4 shrink-0 ${active ? "text-coral-400" : "text-zinc-500"}`}
-                      />
                       <span>{t.name}</span>
                     </button>
                   );
@@ -360,7 +336,6 @@ export default function App() {
             {(Object.keys(TEMPLATES) as TemplateId[]).map((key) => {
               const t = TEMPLATES[key];
               const active = selectedTemplate === key;
-              const IconComponent = t.icon;
               return (
                 <button
                   key={key}
@@ -369,9 +344,6 @@ export default function App() {
                     active ? "bg-zinc-900 text-coral-400" : "text-zinc-500 hover:text-zinc-300"
                   }`}
                 >
-                  <IconComponent
-                    className={`h-3.5 w-3.5 shrink-0 ${active ? "text-coral-400" : "text-zinc-500"}`}
-                  />
                   <span>{t.name}</span>
                 </button>
               );
