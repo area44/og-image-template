@@ -11,6 +11,9 @@ import {
   Image as ImageIcon,
   AlertCircle,
   Flame,
+  BookOpen,
+  Sparkles,
+  Briefcase,
 } from "lucide-react";
 import React, { useState, useEffect } from "react";
 import satori from "satori";
@@ -35,6 +38,7 @@ const TEMPLATES = {
     defaultTitle: "Hello World!",
     defaultDescription: "We are AREA44.",
     features: ["Tailwind classes (tw)", "Absolute positioning", "Border accents"],
+    icon: BookOpen,
   },
   minimal: {
     id: "minimal",
@@ -43,6 +47,7 @@ const TEMPLATES = {
     defaultTitle: "Long Nhat Nguyen",
     defaultDescription: "Hello, world!",
     features: ["Flexbox layout", "Centered texts", "Sans-serif styles"],
+    icon: Sparkles,
   },
   portfolio: {
     id: "portfolio",
@@ -51,6 +56,7 @@ const TEMPLATES = {
     defaultTitle: "What's up, world!",
     defaultDescription: "We are AREA44.",
     features: ["Double borders", "Geist-inspired layout", "Highly professional font scales"],
+    icon: Briefcase,
   },
 };
 
@@ -274,48 +280,44 @@ export default function App() {
 
       {/* Main Content Area */}
       <main className="flex min-h-0 flex-1 flex-col lg:flex-row">
-        {/* Left pane - Controls */}
-        <div className="flex w-full flex-col divide-y divide-zinc-900 overflow-y-auto border-r border-zinc-900 bg-zinc-950 lg:w-[420px]">
-          {/* Section: Templates Selection */}
-          <div className="p-6">
-            <div className="mb-4 flex items-center gap-2">
+        {/* Navigation Sidebar - Template Selection */}
+        <div className="flex w-full shrink-0 flex-col border-b border-zinc-900 bg-zinc-950 lg:w-64 lg:border-r lg:border-b-0">
+          <div className="hidden border-b border-zinc-900 px-6 py-5 lg:block">
+            <div className="flex items-center gap-2">
               <ImageIcon className="h-4 w-4 text-coral-400" />
               <h2 className="text-xs font-bold tracking-widest text-zinc-400 uppercase">
-                Choose Template
+                Templates
               </h2>
-            </div>
-
-            <div className="space-y-3">
-              {(Object.keys(TEMPLATES) as TemplateId[]).map((key) => {
-                const t = TEMPLATES[key];
-                const active = selectedTemplate === key;
-                return (
-                  <Button
-                    key={key}
-                    onClick={() => handleTemplateChange(key)}
-                    variant={active ? "default" : "outline"}
-                    className={`flex h-auto w-full flex-col items-start justify-start rounded-xl border p-4 text-left transition-all ${
-                      active
-                        ? "border-coral-500/50 shadow-md"
-                        : "border-zinc-800 bg-zinc-900/40 text-zinc-400 hover:border-zinc-700 hover:bg-zinc-900/60"
-                    }`}
-                  >
-                    <div
-                      className={`mb-1 text-sm font-semibold ${active ? "text-primary-foreground" : "text-zinc-200"}`}
-                    >
-                      {t.name}
-                    </div>
-                    <div
-                      className={`line-clamp-2 text-xs whitespace-normal ${active ? "text-primary-foreground/80" : "text-zinc-500"}`}
-                    >
-                      {t.features.join(" • ")}
-                    </div>
-                  </Button>
-                );
-              })}
             </div>
           </div>
 
+          <nav className="flex flex-row gap-1 overflow-x-auto p-4 lg:flex-col lg:gap-1.5 lg:overflow-x-visible lg:p-4">
+            {(Object.keys(TEMPLATES) as TemplateId[]).map((key) => {
+              const t = TEMPLATES[key];
+              const active = selectedTemplate === key;
+              const IconComponent = t.icon;
+              return (
+                <button
+                  key={key}
+                  onClick={() => handleTemplateChange(key)}
+                  className={`flex shrink-0 items-center gap-3 rounded-lg px-4 py-2.5 text-sm font-semibold transition-all lg:w-full ${
+                    active
+                      ? "bg-coral-500/10 text-coral-400 lg:border-l-2 lg:border-coral-500 lg:pl-3.5"
+                      : "text-zinc-400 hover:bg-zinc-900/50 hover:text-zinc-200 lg:border-l-2 lg:border-transparent lg:pl-3.5"
+                  }`}
+                >
+                  <IconComponent
+                    className={`h-4 w-4 shrink-0 ${active ? "text-coral-400" : "text-zinc-500"}`}
+                  />
+                  <span className="whitespace-nowrap">{t.name}</span>
+                </button>
+              );
+            })}
+          </nav>
+        </div>
+
+        {/* Left pane - Controls */}
+        <div className="flex w-full shrink-0 flex-col divide-y divide-zinc-900 overflow-y-auto border-r border-zinc-900 bg-zinc-950 lg:w-[380px]">
           {/* Section: Customize Fields */}
           <div className="p-6">
             <div className="mb-4 flex items-center gap-2">
