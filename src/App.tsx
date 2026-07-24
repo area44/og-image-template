@@ -1,4 +1,6 @@
 import { Field } from "@base-ui/react/field";
+import geistRegularUrl from "@fontsource/geist/files/geist-latin-400-normal.woff?url";
+import geistBoldUrl from "@fontsource/geist/files/geist-latin-700-normal.woff?url";
 import {
   Copy,
   Check,
@@ -89,12 +91,12 @@ export default function App() {
         setFontsError(null);
 
         const [regularRes, boldRes] = await Promise.all([
-          fetch("https://cdn.jsdelivr.net/npm/@amar-ui-web/core@2.0.0/fonts/Roboto-Regular.ttf"),
-          fetch("https://cdn.jsdelivr.net/npm/@amar-ui-web/core@2.0.0/fonts/Roboto-Bold.ttf"),
+          fetch(geistRegularUrl),
+          fetch(geistBoldUrl),
         ]);
 
         if (!regularRes.ok || !boldRes.ok) {
-          throw new Error("Failed to fetch font files from CDN");
+          throw new Error("Failed to fetch local font files");
         }
 
         const [regularData, boldData] = await Promise.all([
