@@ -10,6 +10,8 @@ import {
   Type,
   AlertCircle,
   Flame,
+  Menu,
+  X,
 } from "lucide-react";
 import React, { useState, useEffect } from "react";
 import satori from "satori";
@@ -66,6 +68,7 @@ export default function App() {
   const [description, setDescription] = useState(TEMPLATES.blog.defaultDescription);
   const [width, setWidth] = useState(1200);
   const [height, setHeight] = useState(630);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const [fonts, setFonts] = useState<LoadedFonts | null>(null);
   const [fontsLoading, setFontsLoading] = useState(true);
@@ -119,6 +122,7 @@ export default function App() {
     setSelectedTemplate(id);
     setTitle(TEMPLATES[id].defaultTitle);
     setDescription(TEMPLATES[id].defaultDescription);
+    setIsSidebarOpen(false);
   };
 
   // Run Satori core in browser to generate the SVG
@@ -238,8 +242,85 @@ export default function App() {
       {/* Global Top Header (Fumadocs style) */}
       <header className="sticky top-0 z-50 flex h-14 w-full shrink-0 items-center justify-between border-b border-zinc-900 bg-zinc-950/80 px-6 backdrop-blur-md select-none">
         <div className="flex items-center gap-3">
-          <div className="rounded-xl bg-gradient-to-tr from-coral-500 to-rose-500 p-2 shadow-lg shadow-rose-500/10">
-            <Flame className="h-4 w-4 text-white" />
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            onClick={() => setIsSidebarOpen((prev) => !prev)}
+            className="mr-1 text-zinc-400 hover:text-zinc-200 lg:hidden"
+            aria-label="Toggle Menu"
+          >
+            {isSidebarOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+          </Button>
+          <div className="relative h-8 w-8 shrink-0">
+            <svg
+              className="h-full w-full"
+              viewBox="0 0 100 100"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <defs>
+                <linearGradient id="header-primary" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#ff7f50" />
+                  <stop offset="100%" stop-color="#f43f5e" />
+                </linearGradient>
+                <linearGradient id="header-accent" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#3f3f46" />
+                  <stop offset="100%" stop-color="#18181b" />
+                </linearGradient>
+              </defs>
+              <rect
+                x="18"
+                y="22"
+                width="56"
+                height="38"
+                rx="8"
+                fill="url(#header-accent)"
+                stroke="#27272a"
+                stroke-width="2.5"
+                transform="rotate(-6 50 50)"
+                opacity="0.8"
+              />
+              <rect
+                x="22"
+                y="24"
+                width="56"
+                height="38"
+                rx="8"
+                fill="#09090b"
+                stroke="url(#header-primary)"
+                stroke-width="2.5"
+              />
+              <line
+                x1="31"
+                y1="32"
+                x2="63"
+                y2="32"
+                stroke="#27272a"
+                stroke-width="3"
+                stroke-linecap="round"
+              />
+              <line
+                x1="31"
+                y1="40"
+                x2="52"
+                y2="40"
+                stroke="#18181b"
+                stroke-width="3"
+                stroke-linecap="round"
+              />
+              <g transform="translate(52, 38)">
+                <circle cx="16" cy="16" r="14" fill="url(#header-primary)" />
+                <path
+                  d="M16 9C16 9 18 13 18 15.8C18 18.6 15.4 20.6 12.8 20.6C10.2 20.6 8.4 18.6 8.4 15.8C8.4 13 12 9.8 12 9.8"
+                  stroke="#ffffff"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  fill="none"
+                  transform="translate(1, 0.2)"
+                />
+              </g>
+            </svg>
           </div>
           <div>
             <div className="flex items-center gap-1.5">
@@ -273,8 +354,22 @@ export default function App() {
 
       {/* Main Workspace below global header */}
       <div className="flex flex-1 flex-col lg:flex-row lg:overflow-hidden">
+        {/* Mobile Sidebar Backdrop Overlay */}
+        {isSidebarOpen && (
+          <button
+            type="button"
+            className="fixed inset-0 top-14 z-30 cursor-default bg-zinc-950/60 backdrop-blur-sm transition-opacity duration-300 lg:hidden"
+            onClick={() => setIsSidebarOpen(false)}
+            aria-label="Close sidebar"
+          />
+        )}
+
         {/* Left Navigation Sidebar - Fumadocs Tree style */}
-        <aside className="sticky top-14 hidden h-[calc(100vh-56px)] w-64 shrink-0 flex-col border-r border-zinc-900 bg-zinc-950/30 select-none lg:flex">
+        <aside
+          className={`fixed top-14 bottom-0 left-0 z-40 flex w-64 shrink-0 flex-col border-r border-zinc-900 bg-zinc-950 transition-transform duration-300 ease-in-out select-none lg:static lg:h-[calc(100vh-56px)] lg:w-64 lg:translate-x-0 lg:border-r lg:bg-zinc-950/30 ${
+            isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
+        >
           {/* Sidebar Content */}
           <div className="flex-1 space-y-6 overflow-y-auto px-4 py-4 pt-6">
             <div className="space-y-2">
@@ -329,27 +424,6 @@ export default function App() {
             </div>
           </div>
         </aside>
-
-        {/* Mobile Template Selector Tabs (Only visible on mobile) */}
-        <div className="shrink-0 border-b border-zinc-900 bg-zinc-950 px-4 py-3 lg:hidden">
-          <div className="flex items-center gap-2 overflow-x-auto pb-1">
-            {(Object.keys(TEMPLATES) as TemplateId[]).map((key) => {
-              const t = TEMPLATES[key];
-              const active = selectedTemplate === key;
-              return (
-                <button
-                  key={key}
-                  onClick={() => handleTemplateChange(key)}
-                  className={`flex shrink-0 items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all ${
-                    active ? "bg-zinc-900 text-coral-400" : "text-zinc-500 hover:text-zinc-300"
-                  }`}
-                >
-                  <span>{t.name}</span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
 
         {/* Main Workspace: Controls + Live Preview */}
         <main className="flex min-h-0 flex-1 flex-col lg:flex-row lg:overflow-hidden">
