@@ -425,27 +425,6 @@ export default function App() {
           </div>
         </aside>
 
-        {/* Mobile Template Selector Tabs (Only visible on mobile) */}
-        <div className="shrink-0 border-b border-zinc-900 bg-zinc-950 px-4 py-3 lg:hidden">
-          <div className="flex items-center gap-2 overflow-x-auto pb-1">
-            {(Object.keys(TEMPLATES) as TemplateId[]).map((key) => {
-              const t = TEMPLATES[key];
-              const active = selectedTemplate === key;
-              return (
-                <button
-                  key={key}
-                  onClick={() => handleTemplateChange(key)}
-                  className={`flex shrink-0 items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-semibold transition-all ${
-                    active ? "bg-zinc-900 text-coral-400" : "text-zinc-500 hover:text-zinc-300"
-                  }`}
-                >
-                  <span>{t.name}</span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
         {/* Main Workspace: Controls + Live Preview */}
         <main className="flex min-h-0 flex-1 flex-col lg:flex-row lg:overflow-hidden">
           {/* Controls Pane (Middle pane) */}
