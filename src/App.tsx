@@ -798,11 +798,11 @@ export default function App() {
                 </div>
               ) : (
                 /* Code Mode with highly polished Monaco Editor inspired by Satori Playground */
-                <div className="relative flex flex-1 animate-in flex-col overflow-hidden rounded-xl border border-zinc-900 bg-zinc-950 shadow-2xl duration-300 fade-in">
+                <div className="relative flex min-h-[500px] flex-1 animate-in flex-col overflow-hidden rounded-xl border border-zinc-900 bg-zinc-950 shadow-2xl duration-300 fade-in lg:h-full lg:min-h-[600px]">
                   <div className="absolute top-2 right-4 z-10 text-[10px] font-bold tracking-wider text-zinc-600 uppercase select-none">
                     Satori Code Editor
                   </div>
-                  <div className="h-full w-full flex-1 pt-10">
+                  <div className="relative h-full min-h-[400px] w-full flex-1 pt-10">
                     <Editor
                       height="100%"
                       defaultLanguage="typescript"
@@ -813,7 +813,8 @@ export default function App() {
                         wordWrap: "on",
                         wrappingIndent: "indent",
                         minimap: { enabled: false },
-                        fontSize: 12,
+                        fontSize: 14,
+                        lineHeight: 22,
                         fontFamily: "Geist Mono, monospace",
                         lineNumbers: "on",
                         scrollBeyondLastLine: false,
