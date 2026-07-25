@@ -1,6 +1,7 @@
 import * as Babel from "@babel/standalone";
 import { Field } from "@base-ui/react/field";
 import geistNormalUrl from "@fontsource-variable/geist/files/geist-latin-wght-normal.woff2?url";
+import Editor from "@monaco-editor/react";
 import {
   Copy,
   Check,
@@ -852,24 +853,41 @@ export default function App() {
                   )}
                 </div>
               ) : (
-                /* Code Mode with live editable textbox */
+                /* Code Mode with highly polished Monaco Editor inspired by Satori Playground */
                 <div className="relative flex flex-1 animate-in flex-col overflow-hidden rounded-xl border border-zinc-900 bg-zinc-950 shadow-2xl duration-300 fade-in">
                   <div className="absolute top-2 right-4 z-10 text-[10px] font-bold tracking-wider text-zinc-600 uppercase select-none">
-                    Live Editable Code Editor
+                    Satori Code Editor
                   </div>
-                  <textarea
-                    value={editedCodes[selectedTemplate]}
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      setEditedCodes((prev) => ({
-                        ...prev,
-                        [selectedTemplate]: val,
-                      }));
-                    }}
-                    className="h-full w-full flex-1 resize-none bg-transparent p-6 pt-10 font-mono text-[11px] leading-relaxed text-zinc-300 outline-none focus:ring-0 sm:text-xs"
-                    spellCheck={false}
-                    placeholder="Write your template TSX code here to see live preview update..."
-                  />
+                  <div className="h-full w-full flex-1 pt-10">
+                    <Editor
+                      height="100%"
+                      defaultLanguage="typescript"
+                      theme="vs-dark"
+                      value={editedCodes[selectedTemplate]}
+                      onChange={(val) => {
+                        setEditedCodes((prev) => ({
+                          ...prev,
+                          [selectedTemplate]: val || "",
+                        }));
+                      }}
+                      options={{
+                        minimap: { enabled: false },
+                        fontSize: 12,
+                        fontFamily: "Geist Mono, monospace",
+                        lineNumbers: "on",
+                        scrollBeyondLastLine: false,
+                        automaticLayout: true,
+                        tabSize: 2,
+                        padding: { top: 12, bottom: 12 },
+                        cursorBlinking: "smooth",
+                        cursorSmoothCaretAnimation: "on",
+                        scrollbar: {
+                          vertical: "visible",
+                          horizontal: "visible",
+                        },
+                      }}
+                    />
+                  </div>
                 </div>
               )}
             </div>
