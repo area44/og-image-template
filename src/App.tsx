@@ -87,7 +87,6 @@ export default function App() {
   const [downloadFormat, setDownloadFormat] = useState<"svg" | "png" | "jpeg" | "jpg">("svg");
 
   const [previewTab, setPreviewTab] = useState<"preview" | "code">("preview");
-  const [codeType, setCodeType] = useState<"tsx" | "svg">("tsx");
   const [copiedCode, setCopiedCode] = useState(false);
 
   // Fetch fonts on mount
@@ -327,7 +326,7 @@ export default function App() {
   };
 
   const handleCodeCopy = async () => {
-    const codeToDisplay = codeType === "tsx" ? TEMPLATE_CODES[selectedTemplate] : svgContent;
+    const codeToDisplay = TEMPLATE_CODES[selectedTemplate];
     if (!codeToDisplay) return;
     try {
       await navigator.clipboard.writeText(codeToDisplay);
@@ -681,45 +680,24 @@ export default function App() {
               {/* Right Side Actions */}
               <div className="flex items-center gap-2">
                 {previewTab === "code" && (
-                  <>
-                    <div className="inline-flex h-8 items-center justify-center rounded-md border border-zinc-800/60 bg-zinc-900/40 p-1 text-zinc-500">
-                      <button
-                        onClick={() => setCodeType("tsx")}
-                        className={`rounded px-2.5 py-0.5 text-[10px] font-semibold transition-all sm:text-xs ${
-                          codeType === "tsx" ? "bg-zinc-800 text-coral-400" : "hover:text-zinc-300"
-                        }`}
-                      >
-                        React Component
-                      </button>
-                      <button
-                        onClick={() => setCodeType("svg")}
-                        className={`rounded px-2.5 py-0.5 text-[10px] font-semibold transition-all sm:text-xs ${
-                          codeType === "svg" ? "bg-zinc-800 text-coral-400" : "hover:text-zinc-300"
-                        }`}
-                      >
-                        Rendered SVG
-                      </button>
-                    </div>
-
-                    <Button
-                      onClick={handleCodeCopy}
-                      size="sm"
-                      variant="outline"
-                      className="h-8 gap-1.5 border-zinc-800 bg-zinc-900/40 text-zinc-400 hover:text-zinc-200"
-                    >
-                      {copiedCode ? (
-                        <>
-                          <Check className="h-3.5 w-3.5 text-emerald-500" />
-                          <span className="text-xs">Copied!</span>
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="h-3.5 w-3.5" />
-                          <span className="text-xs">Copy Code</span>
-                        </>
-                      )}
-                    </Button>
-                  </>
+                  <Button
+                    onClick={handleCodeCopy}
+                    size="sm"
+                    variant="outline"
+                    className="h-8 gap-1.5 border-zinc-800 bg-zinc-900/40 text-zinc-400 hover:text-zinc-200"
+                  >
+                    {copiedCode ? (
+                      <>
+                        <Check className="h-3.5 w-3.5 text-emerald-500" />
+                        <span className="text-xs">Copied!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="h-3.5 w-3.5" />
+                        <span className="text-xs">Copy Code</span>
+                      </>
+                    )}
+                  </Button>
                 )}
               </div>
             </div>
@@ -826,18 +804,16 @@ export default function App() {
                   <div className="flex-1 overflow-auto pr-2">
                     <table className="w-full border-collapse text-left">
                       <tbody>
-                        {(codeType === "tsx" ? TEMPLATE_CODES[selectedTemplate] : svgContent)
-                          .split("\n")
-                          .map((line, idx) => (
-                            <tr key={idx} className="transition-colors hover:bg-zinc-900/30">
-                              <td className="w-10 border-r border-zinc-900/50 pr-4 text-right font-mono text-[11px] text-zinc-600 select-none">
-                                {idx + 1}
-                              </td>
-                              <td className="pl-4 font-mono text-[11px] leading-relaxed whitespace-pre text-zinc-300 sm:text-xs">
-                                {line}
-                              </td>
-                            </tr>
-                          ))}
+                        {TEMPLATE_CODES[selectedTemplate].split("\n").map((line, idx) => (
+                          <tr key={idx} className="transition-colors hover:bg-zinc-900/30">
+                            <td className="w-10 border-r border-zinc-900/50 pr-4 text-right font-mono text-[11px] text-zinc-600 select-none">
+                              {idx + 1}
+                            </td>
+                            <td className="pl-4 font-mono text-[11px] leading-relaxed whitespace-pre text-zinc-300 sm:text-xs">
+                              {line}
+                            </td>
+                          </tr>
+                        ))}
                       </tbody>
                     </table>
                   </div>
