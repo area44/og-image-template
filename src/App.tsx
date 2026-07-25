@@ -1,4 +1,3 @@
-import * as Babel from "@babel/standalone";
 import { Field } from "@base-ui/react/field";
 import geistNormalUrl from "@fontsource-variable/geist/files/geist-latin-wght-normal.woff2?url";
 import Editor, { loader } from "@monaco-editor/react";
@@ -12,7 +11,6 @@ import {
   Menu,
   X,
   Code,
-  RotateCcw,
 } from "lucide-react";
 import * as monaco from "monaco-editor";
 import React, { useState, useEffect } from "react";
@@ -90,13 +88,6 @@ export default function App() {
   const [previewTab, setPreviewTab] = useState<"preview" | "code">("preview");
   const [copiedCode, setCopiedCode] = useState(false);
 
-  // Editable TSX template codes
-  const [editedCodes, setEditedCodes] = useState<Record<TemplateId, string>>({
-    blog: blogCode,
-    minimal: minimalCode,
-    portfolio: portfolioCode,
-  });
-
   // Fetch fonts on mount
   useEffect(() => {
     function stripFvar(buffer: Uint8Array): ArrayBuffer {
@@ -162,7 +153,7 @@ export default function App() {
     setIsSidebarOpen(false);
   };
 
-  // Run Satori core in browser to generate the SVG with dynamically compiled React component
+  // Run Satori core in browser to generate the SVG with the selected template
   useEffect(() => {
     if (!fonts) return;
     const { regular, bold } = fonts;
@@ -174,46 +165,7 @@ export default function App() {
         setRendering(true);
         setRenderError(null);
 
-        // Fetch current custom TSX draft for the template
-        const codeDraft = editedCodes[selectedTemplate];
-
-        let TemplateComponent: React.ComponentType<any>;
-
-        try {
-          // Compile TSX using Babel for browser runtime
-          const compiled = Babel.transform(codeDraft, {
-            presets: [
-              ["env", { modules: "commonjs" }],
-              ["react", { runtime: "classic" }],
-              "typescript",
-            ],
-            filename: "template.tsx",
-          }).code;
-
-          if (!compiled) {
-            throw new Error("Compilation returned empty code");
-          }
-
-          // Evaluate the compiled ES5 code safely to extract the component
-          const exports: any = {};
-          const requireMap: Record<string, any> = {
-            react: React,
-          };
-          const customRequire = (name: string) => {
-            if (requireMap[name]) return requireMap[name];
-            throw new Error(`Cannot find module '${name}'`);
-          };
-          const runCode = new Function("exports", "React", "require", compiled);
-          runCode(exports, React, customRequire);
-
-          const Comp = exports.default || exports.OGImage || exports[Object.keys(exports)[0]];
-          if (typeof Comp !== "function" && typeof Comp !== "object") {
-            throw new Error("No exported component or function found in the code.");
-          }
-          TemplateComponent = Comp;
-        } catch (compileErr: any) {
-          throw new Error(`Compilation / Syntax Error:\n${compileErr.message}`);
-        }
+        const TemplateComponent = TEMPLATES[selectedTemplate].component;
 
         const resolvedWidth = typeof width === "number" ? Math.max(100, width) : 1200;
         const resolvedHeight = typeof height === "number" ? Math.max(100, height) : 630;
@@ -284,7 +236,7 @@ export default function App() {
       isMounted = false;
       clearTimeout(timeout);
     };
-  }, [selectedTemplate, width, height, fonts, editedCodes]);
+  }, [selectedTemplate, width, height, fonts]);
 
   const handleCopy = async () => {
     if (!svgContent) return;
@@ -370,7 +322,7 @@ export default function App() {
   };
 
   const handleCodeCopy = async () => {
-    const codeToDisplay = editedCodes[selectedTemplate];
+    const codeToDisplay = TEMPLATE_CODES[selectedTemplate];
     if (!codeToDisplay) return;
     try {
       await navigator.clipboard.writeText(codeToDisplay);
@@ -379,13 +331,6 @@ export default function App() {
     } catch (err) {
       console.error("Failed to copy code:", err);
     }
-  };
-
-  const handleResetTemplate = () => {
-    setEditedCodes((prev) => ({
-      ...prev,
-      [selectedTemplate]: TEMPLATE_CODES[selectedTemplate],
-    }));
   };
 
   return (
@@ -731,36 +676,24 @@ export default function App() {
               {/* Right Side Actions */}
               <div className="flex items-center gap-2">
                 {previewTab === "code" && (
-                  <>
-                    <Button
-                      onClick={handleResetTemplate}
-                      size="sm"
-                      variant="outline"
-                      title="Reset code to original template"
-                      className="h-8 gap-1.5 border-zinc-800 bg-zinc-900/40 text-zinc-400 hover:text-zinc-200"
-                    >
-                      <RotateCcw className="h-3.5 w-3.5" />
-                      <span className="text-xs">Reset</span>
-                    </Button>
-                    <Button
-                      onClick={handleCodeCopy}
-                      size="sm"
-                      variant="outline"
-                      className="h-8 gap-1.5 border-zinc-800 bg-zinc-900/40 text-zinc-400 hover:text-zinc-200"
-                    >
-                      {copiedCode ? (
-                        <>
-                          <Check className="h-3.5 w-3.5 text-emerald-500" />
-                          <span className="text-xs">Copied!</span>
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="h-3.5 w-3.5" />
-                          <span className="text-xs">Copy Code</span>
-                        </>
-                      )}
-                    </Button>
-                  </>
+                  <Button
+                    onClick={handleCodeCopy}
+                    size="sm"
+                    variant="outline"
+                    className="h-8 gap-1.5 border-zinc-800 bg-zinc-900/40 text-zinc-400 hover:text-zinc-200"
+                  >
+                    {copiedCode ? (
+                      <>
+                        <Check className="h-3.5 w-3.5 text-emerald-500" />
+                        <span className="text-xs">Copied!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="h-3.5 w-3.5" />
+                        <span className="text-xs">Copy Code</span>
+                      </>
+                    )}
+                  </Button>
                 )}
               </div>
             </div>
@@ -859,7 +792,7 @@ export default function App() {
                       className="mt-6 gap-1.5 border-zinc-800 bg-zinc-900/40 text-zinc-400 hover:text-zinc-200"
                     >
                       <Code className="h-3.5 w-3.5" />
-                      <span>Edit & View Code</span>
+                      <span>View Code</span>
                     </Button>
                   )}
                 </div>
@@ -874,14 +807,11 @@ export default function App() {
                       height="100%"
                       defaultLanguage="typescript"
                       theme="vs-dark"
-                      value={editedCodes[selectedTemplate]}
-                      onChange={(val) => {
-                        setEditedCodes((prev) => ({
-                          ...prev,
-                          [selectedTemplate]: val || "",
-                        }));
-                      }}
+                      value={TEMPLATE_CODES[selectedTemplate]}
                       options={{
+                        readOnly: true,
+                        wordWrap: "on",
+                        wrappingIndent: "indent",
                         minimap: { enabled: false },
                         fontSize: 12,
                         fontFamily: "Geist Mono, monospace",
