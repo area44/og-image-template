@@ -8,7 +8,6 @@ import {
   Sliders,
   Type,
   AlertCircle,
-  Flame,
   Menu,
   X,
 } from "lucide-react";
@@ -346,10 +345,6 @@ export default function App() {
           </div>
         </div>
         <div className="flex items-center gap-4">
-          <span className="border-coral-950/40 bg-coral-950/10 text-coral-300 hidden items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-semibold sm:inline-flex">
-            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-coral-400"></span>
-            Base UI Activated
-          </span>
           <a
             href="https://github.com/area44/og-image-template"
             target="_blank"
@@ -403,24 +398,6 @@ export default function App() {
                     </button>
                   );
                 })}
-              </div>
-            </div>
-
-            {/* Resources Group (Fumadocs structure) */}
-            <div className="space-y-2">
-              <h3 className="px-3 text-[10px] font-bold tracking-wider text-zinc-500 uppercase">
-                Resources
-              </h3>
-              <div className="space-y-1">
-                <a
-                  href="https://github.com/area44/og-image-template"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex w-full items-center gap-3 rounded-lg border-l-2 border-transparent px-3 py-2 pl-2.5 text-sm font-medium text-zinc-400 transition-all hover:bg-zinc-900/50 hover:text-zinc-200"
-                >
-                  <Flame className="h-4 w-4 text-zinc-500" />
-                  <span>Repository</span>
-                </a>
               </div>
             </div>
           </div>
