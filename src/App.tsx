@@ -5,7 +5,6 @@ import {
   Check,
   Download,
   RefreshCw,
-  Maximize2,
   Minimize2,
   Sliders,
   Type,
@@ -347,19 +346,6 @@ export default function App() {
               </g>
             </svg>
           </div>
-          <div>
-            <div className="flex items-center gap-1.5">
-              <h1 className="bg-gradient-to-r from-coral-400 via-orange-400 to-rose-400 bg-clip-text text-sm font-extrabold tracking-tight text-transparent">
-                OG Images Coral
-              </h1>
-              <span className="rounded bg-coral-500/10 px-1 py-0.5 text-[8px] font-bold tracking-wider text-coral-400 uppercase">
-                v2.0
-              </span>
-            </div>
-            <p className="hidden text-[10px] font-medium text-zinc-500 sm:block">
-              Beautiful in-browser Open Graph playgrounds
-            </p>
-          </div>
         </div>
         <div className="flex items-center gap-4">
           <span className="border-coral-950/40 bg-coral-950/10 text-coral-300 hidden items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-semibold sm:inline-flex">
@@ -507,6 +493,31 @@ export default function App() {
               </div>
 
               <div className="space-y-4">
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setWidth(1200);
+                      setHeight(630);
+                    }}
+                    className="flex-1 border-zinc-800 bg-zinc-900/40 text-zinc-400 hover:border-zinc-700 hover:bg-zinc-900 hover:text-zinc-200"
+                  >
+                    Standard (1200×630)
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setWidth(800);
+                      setHeight(400);
+                    }}
+                    className="flex-1 border-zinc-800 bg-zinc-900/40 text-zinc-400 hover:border-zinc-700 hover:bg-zinc-900 hover:text-zinc-200"
+                  >
+                    Compact (800×400)
+                  </Button>
+                </div>
+
                 <div className="grid grid-cols-2 gap-3">
                   <Field.Root className="grid gap-1">
                     <Label htmlFor="width-input" className="text-xs font-medium text-zinc-500">
@@ -532,31 +543,6 @@ export default function App() {
                       className="h-9 border-zinc-800 bg-zinc-900/40 text-zinc-200 transition focus-visible:ring-coral-500/50"
                     />
                   </Field.Root>
-                </div>
-
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      setWidth(1200);
-                      setHeight(630);
-                    }}
-                    className="flex-1 border-zinc-800 bg-zinc-900/40 text-zinc-400 hover:border-zinc-700 hover:bg-zinc-900 hover:text-zinc-200"
-                  >
-                    Standard (1200×630)
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      setWidth(800);
-                      setHeight(400);
-                    }}
-                    className="flex-1 border-zinc-800 bg-zinc-900/40 text-zinc-400 hover:border-zinc-700 hover:bg-zinc-900 hover:text-zinc-200"
-                  >
-                    Compact (800×400)
-                  </Button>
                 </div>
               </div>
             </div>
@@ -605,9 +591,6 @@ export default function App() {
             {/* Top Preview Controls */}
             <div className="z-10 mb-4 flex w-full items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="rounded-md border border-zinc-900/50 bg-zinc-900/50 px-2.5 py-1 font-mono text-xs text-zinc-400">
-                  Canvas: {width} × {height}
-                </span>
                 {rendering && <RefreshCw className="h-3.5 w-3.5 animate-spin text-coral-400" />}
               </div>
 
@@ -624,19 +607,6 @@ export default function App() {
                 >
                   <Minimize2 className="h-3.5 w-3.5" />
                   Fit View
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setPreviewScale("full")}
-                  className={`flex h-7 items-center gap-1.5 rounded-md px-3 py-1 text-xs font-semibold transition-all ${
-                    previewScale === "full"
-                      ? "bg-zinc-900 text-white hover:bg-zinc-900"
-                      : "text-zinc-400 hover:bg-transparent hover:text-zinc-200"
-                  }`}
-                >
-                  <Maximize2 className="h-3.5 w-3.5" />
-                  Actual Size
                 </Button>
               </div>
             </div>
@@ -727,12 +697,6 @@ export default function App() {
                   <p className="text-xs text-zinc-500">Generating preview...</p>
                 </div>
               )}
-            </div>
-
-            {/* Footer Info / Status bar */}
-            <div className="z-10 mt-6 flex w-full flex-col justify-between border-t border-zinc-900 pt-4 text-xs text-zinc-500 sm:flex-row sm:items-center">
-              <p>Designed to render beautiful Open Graph social share templates locally.</p>
-              <p className="mt-1 font-mono text-zinc-400 sm:mt-0">Renderer: satori-core v0.12.1</p>
             </div>
           </div>
         </main>
