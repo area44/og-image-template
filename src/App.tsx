@@ -1,6 +1,6 @@
 import { Field } from "@base-ui/react/field";
-import geistRegularUrl from "@fontsource/geist/files/geist-latin-400-normal.woff?url";
-import geistBoldUrl from "@fontsource/geist/files/geist-latin-700-normal.woff?url";
+import geistItalicUrl from "@fontsource-variable/geist/files/geist-latin-wght-italic.woff2?url";
+import geistNormalUrl from "@fontsource-variable/geist/files/geist-latin-wght-normal.woff2?url";
 import {
   Copy,
   Check,
@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import React, { useState, useEffect } from "react";
 import satori from "satori";
+import { woff2Decode } from "woff-lib/woff2/decode";
 
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -85,24 +86,57 @@ export default function App() {
 
   // Fetch fonts on mount
   useEffect(() => {
+    function stripFvar(buffer: Uint8Array): ArrayBuffer {
+      const view = new DataView(buffer.buffer, buffer.byteOffset, buffer.byteLength);
+      const numTables = view.getUint16(4);
+      for (let i = 0; i < numTables; i++) {
+        const offset = 12 + i * 16;
+        const tag = String.fromCharCode(
+          view.getUint8(offset),
+          view.getUint8(offset + 1),
+          view.getUint8(offset + 2),
+          view.getUint8(offset + 3),
+        );
+        if (tag === "fvar") {
+          view.setUint8(offset, "x".charCodeAt(0));
+          view.setUint8(offset + 1, "x".charCodeAt(0));
+          view.setUint8(offset + 2, "x".charCodeAt(0));
+          view.setUint8(offset + 3, "x".charCodeAt(0));
+          break;
+        }
+      }
+      return buffer.buffer.slice(
+        buffer.byteOffset,
+        buffer.byteOffset + buffer.byteLength,
+      ) as ArrayBuffer;
+    }
+
     async function loadFonts() {
       try {
         setFontsLoading(true);
         setFontsError(null);
 
         const [regularRes, boldRes] = await Promise.all([
-          fetch(geistRegularUrl),
-          fetch(geistBoldUrl),
+          fetch(geistNormalUrl),
+          fetch(geistItalicUrl),
         ]);
 
         if (!regularRes.ok || !boldRes.ok) {
-          throw new Error("Failed to fetch local font files");
+          throw new Error("Failed to fetch local variable font files");
         }
 
-        const [regularData, boldData] = await Promise.all([
+        const [regularWoff2, boldWoff2] = await Promise.all([
           regularRes.arrayBuffer(),
           boldRes.arrayBuffer(),
         ]);
+
+        const [regularTtf, boldTtf] = await Promise.all([
+          woff2Decode(new Uint8Array(regularWoff2)),
+          woff2Decode(new Uint8Array(boldWoff2)),
+        ]);
+
+        const regularData = stripFvar(regularTtf);
+        const boldData = stripFvar(boldTtf);
 
         setFonts({
           regular: regularData,
