@@ -1,7 +1,7 @@
 import * as Babel from "@babel/standalone";
 import { Field } from "@base-ui/react/field";
 import geistNormalUrl from "@fontsource-variable/geist/files/geist-latin-wght-normal.woff2?url";
-import Editor from "@monaco-editor/react";
+import Editor, { loader } from "@monaco-editor/react";
 import {
   Copy,
   Check,
@@ -14,6 +14,7 @@ import {
   Code,
   RotateCcw,
 } from "lucide-react";
+import * as monaco from "monaco-editor";
 import React, { useState, useEffect } from "react";
 import satori from "satori";
 import { woff2Decode } from "woff-lib/woff2/decode";
@@ -30,6 +31,9 @@ import MinimalTemplate from "./template/minimal";
 import minimalCode from "./template/minimal.tsx?raw";
 import PortfolioTemplate from "./template/portfolio";
 import portfolioCode from "./template/portfolio.tsx?raw";
+
+// Configure monaco loader to use npm version directly to work offline or in restricted environments
+loader.config({ monaco });
 
 const TEMPLATE_CODES = {
   blog: blogCode,
@@ -192,8 +196,15 @@ export default function App() {
 
           // Evaluate the compiled ES5 code safely to extract the component
           const exports: any = {};
-          const runCode = new Function("exports", "React", compiled);
-          runCode(exports, React);
+          const requireMap: Record<string, any> = {
+            react: React,
+          };
+          const customRequire = (name: string) => {
+            if (requireMap[name]) return requireMap[name];
+            throw new Error(`Cannot find module '${name}'`);
+          };
+          const runCode = new Function("exports", "React", "require", compiled);
+          runCode(exports, React, customRequire);
 
           const Comp = exports.default || exports.OGImage || exports[Object.keys(exports)[0]];
           if (typeof Comp !== "function" && typeof Comp !== "object") {
