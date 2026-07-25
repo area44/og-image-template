@@ -1,5 +1,4 @@
 import { Field } from "@base-ui/react/field";
-import geistItalicUrl from "@fontsource-variable/geist/files/geist-latin-wght-italic.woff2?url";
 import geistNormalUrl from "@fontsource-variable/geist/files/geist-latin-wght-normal.woff2?url";
 import {
   Copy,
@@ -116,31 +115,21 @@ export default function App() {
         setFontsLoading(true);
         setFontsError(null);
 
-        const [regularRes, boldRes] = await Promise.all([
-          fetch(geistNormalUrl),
-          fetch(geistItalicUrl),
-        ]);
+        const regularRes = await fetch(geistNormalUrl);
 
-        if (!regularRes.ok || !boldRes.ok) {
-          throw new Error("Failed to fetch local variable font files");
+        if (!regularRes.ok) {
+          throw new Error("Failed to fetch local variable font file");
         }
 
-        const [regularWoff2, boldWoff2] = await Promise.all([
-          regularRes.arrayBuffer(),
-          boldRes.arrayBuffer(),
-        ]);
+        const regularWoff2 = await regularRes.arrayBuffer();
 
-        const [regularTtf, boldTtf] = await Promise.all([
-          woff2Decode(new Uint8Array(regularWoff2)),
-          woff2Decode(new Uint8Array(boldWoff2)),
-        ]);
+        const regularTtf = await woff2Decode(new Uint8Array(regularWoff2));
 
         const regularData = stripFvar(regularTtf);
-        const boldData = stripFvar(boldTtf);
 
         setFonts({
           regular: regularData,
-          bold: boldData,
+          bold: regularData,
         });
       } catch (err: any) {
         console.error("Error loading fonts:", err);
