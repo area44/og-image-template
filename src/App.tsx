@@ -1,3 +1,4 @@
+import * as Babel from "@babel/standalone";
 import { Field } from "@base-ui/react/field";
 import geistNormalUrl from "@fontsource-variable/geist/files/geist-latin-wght-normal.woff2?url";
 import {
@@ -10,6 +11,7 @@ import {
   Menu,
   X,
   Code,
+  RotateCcw,
 } from "lucide-react";
 import React, { useState, useEffect } from "react";
 import satori from "satori";
@@ -40,24 +42,18 @@ const TEMPLATES = {
     id: "blog",
     name: "Blog Template",
     component: BlogTemplate,
-    defaultTitle: "Hello World!",
-    defaultDescription: "We are AREA44.",
     features: ["Tailwind classes (tw)", "Absolute positioning", "Border accents"],
   },
   minimal: {
     id: "minimal",
     name: "Minimal Template",
     component: MinimalTemplate,
-    defaultTitle: "Long Nhat Nguyen",
-    defaultDescription: "Hello, world!",
     features: ["Flexbox layout", "Centered texts", "Sans-serif styles"],
   },
   portfolio: {
     id: "portfolio",
     name: "Portfolio Template",
     component: PortfolioTemplate,
-    defaultTitle: "What's up, world!",
-    defaultDescription: "We are AREA44.",
     features: ["Double borders", "Geist-inspired layout", "Highly professional font scales"],
   },
 };
@@ -88,6 +84,13 @@ export default function App() {
 
   const [previewTab, setPreviewTab] = useState<"preview" | "code">("preview");
   const [copiedCode, setCopiedCode] = useState(false);
+
+  // Editable TSX template codes
+  const [editedCodes, setEditedCodes] = useState<Record<TemplateId, string>>({
+    blog: blogCode,
+    minimal: minimalCode,
+    portfolio: portfolioCode,
+  });
 
   // Fetch fonts on mount
   useEffect(() => {
@@ -154,7 +157,7 @@ export default function App() {
     setIsSidebarOpen(false);
   };
 
-  // Run Satori core in browser to generate the SVG
+  // Run Satori core in browser to generate the SVG with dynamically compiled React component
   useEffect(() => {
     if (!fonts) return;
     const { regular, bold } = fonts;
@@ -166,10 +169,39 @@ export default function App() {
         setRendering(true);
         setRenderError(null);
 
-        const TemplateComponent = TEMPLATES[selectedTemplate].component as React.ComponentType<{
-          title?: string;
-          description?: string;
-        }>;
+        // Fetch current custom TSX draft for the template
+        const codeDraft = editedCodes[selectedTemplate];
+
+        let TemplateComponent: React.ComponentType<any>;
+
+        try {
+          // Compile TSX using Babel for browser runtime
+          const compiled = Babel.transform(codeDraft, {
+            presets: [
+              ["env", { modules: "commonjs" }],
+              ["react", { runtime: "classic" }],
+              "typescript",
+            ],
+            filename: "template.tsx",
+          }).code;
+
+          if (!compiled) {
+            throw new Error("Compilation returned empty code");
+          }
+
+          // Evaluate the compiled ES5 code safely to extract the component
+          const exports: any = {};
+          const runCode = new Function("exports", "React", compiled);
+          runCode(exports, React);
+
+          const Comp = exports.default || exports.OGImage || exports[Object.keys(exports)[0]];
+          if (typeof Comp !== "function" && typeof Comp !== "object") {
+            throw new Error("No exported component or function found in the code.");
+          }
+          TemplateComponent = Comp;
+        } catch (compileErr: any) {
+          throw new Error(`Compilation / Syntax Error:\n${compileErr.message}`);
+        }
 
         const resolvedWidth = typeof width === "number" ? Math.max(100, width) : 1200;
         const resolvedHeight = typeof height === "number" ? Math.max(100, height) : 630;
@@ -234,13 +266,13 @@ export default function App() {
     }
 
     // Debounce slightly for better performance when typing
-    const timeout = setTimeout(renderOG, 100);
+    const timeout = setTimeout(renderOG, 250);
 
     return () => {
       isMounted = false;
       clearTimeout(timeout);
     };
-  }, [selectedTemplate, width, height, fonts]);
+  }, [selectedTemplate, width, height, fonts, editedCodes]);
 
   const handleCopy = async () => {
     if (!svgContent) return;
@@ -326,7 +358,7 @@ export default function App() {
   };
 
   const handleCodeCopy = async () => {
-    const codeToDisplay = TEMPLATE_CODES[selectedTemplate];
+    const codeToDisplay = editedCodes[selectedTemplate];
     if (!codeToDisplay) return;
     try {
       await navigator.clipboard.writeText(codeToDisplay);
@@ -335,6 +367,13 @@ export default function App() {
     } catch (err) {
       console.error("Failed to copy code:", err);
     }
+  };
+
+  const handleResetTemplate = () => {
+    setEditedCodes((prev) => ({
+      ...prev,
+      [selectedTemplate]: TEMPLATE_CODES[selectedTemplate],
+    }));
   };
 
   return (
@@ -680,24 +719,36 @@ export default function App() {
               {/* Right Side Actions */}
               <div className="flex items-center gap-2">
                 {previewTab === "code" && (
-                  <Button
-                    onClick={handleCodeCopy}
-                    size="sm"
-                    variant="outline"
-                    className="h-8 gap-1.5 border-zinc-800 bg-zinc-900/40 text-zinc-400 hover:text-zinc-200"
-                  >
-                    {copiedCode ? (
-                      <>
-                        <Check className="h-3.5 w-3.5 text-emerald-500" />
-                        <span className="text-xs">Copied!</span>
-                      </>
-                    ) : (
-                      <>
-                        <Copy className="h-3.5 w-3.5" />
-                        <span className="text-xs">Copy Code</span>
-                      </>
-                    )}
-                  </Button>
+                  <>
+                    <Button
+                      onClick={handleResetTemplate}
+                      size="sm"
+                      variant="outline"
+                      title="Reset code to original template"
+                      className="h-8 gap-1.5 border-zinc-800 bg-zinc-900/40 text-zinc-400 hover:text-zinc-200"
+                    >
+                      <RotateCcw className="h-3.5 w-3.5" />
+                      <span className="text-xs">Reset</span>
+                    </Button>
+                    <Button
+                      onClick={handleCodeCopy}
+                      size="sm"
+                      variant="outline"
+                      className="h-8 gap-1.5 border-zinc-800 bg-zinc-900/40 text-zinc-400 hover:text-zinc-200"
+                    >
+                      {copiedCode ? (
+                        <>
+                          <Check className="h-3.5 w-3.5 text-emerald-500" />
+                          <span className="text-xs">Copied!</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="h-3.5 w-3.5" />
+                          <span className="text-xs">Copy Code</span>
+                        </>
+                      )}
+                    </Button>
+                  </>
                 )}
               </div>
             </div>
@@ -739,13 +790,15 @@ export default function App() {
                     ) : renderError ? (
                       <Alert
                         variant="destructive"
-                        className="flex max-w-md flex-col items-center gap-3 border-amber-900/50 bg-amber-950/20 p-6 text-center"
+                        className="flex max-w-2xl flex-col items-start gap-3 border-amber-900/50 bg-amber-950/20 p-6 text-left"
                       >
-                        <AlertCircle className="h-10 w-10 text-amber-500" />
-                        <AlertTitle className="font-semibold text-amber-400">
-                          Rendering Error
-                        </AlertTitle>
-                        <AlertDescription className="max-h-32 overflow-y-auto font-mono text-xs leading-relaxed text-amber-500/80">
+                        <div className="flex items-center gap-2">
+                          <AlertCircle className="h-5 w-5 text-amber-500" />
+                          <AlertTitle className="font-semibold text-amber-400">
+                            Rendering / Code Error
+                          </AlertTitle>
+                        </div>
+                        <AlertDescription className="max-h-60 w-full overflow-y-auto font-mono text-xs leading-relaxed whitespace-pre-wrap text-amber-200/80">
                           {renderError}
                         </AlertDescription>
                       </Alert>
@@ -794,29 +847,29 @@ export default function App() {
                       className="mt-6 gap-1.5 border-zinc-800 bg-zinc-900/40 text-zinc-400 hover:text-zinc-200"
                     >
                       <Code className="h-3.5 w-3.5" />
-                      <span>View Code</span>
+                      <span>Edit & View Code</span>
                     </Button>
                   )}
                 </div>
               ) : (
-                /* Code Mode with dynamic line numbers and hover effects */
-                <div className="relative flex flex-1 animate-in flex-col overflow-hidden rounded-xl border border-zinc-900 bg-zinc-950 p-4 shadow-2xl duration-300 fade-in">
-                  <div className="flex-1 overflow-auto pr-2">
-                    <table className="w-full border-collapse text-left">
-                      <tbody>
-                        {TEMPLATE_CODES[selectedTemplate].split("\n").map((line, idx) => (
-                          <tr key={idx} className="transition-colors hover:bg-zinc-900/30">
-                            <td className="w-10 border-r border-zinc-900/50 pr-4 text-right font-mono text-[11px] text-zinc-600 select-none">
-                              {idx + 1}
-                            </td>
-                            <td className="pl-4 font-mono text-[11px] leading-relaxed whitespace-pre text-zinc-300 sm:text-xs">
-                              {line}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                /* Code Mode with live editable textbox */
+                <div className="relative flex flex-1 animate-in flex-col overflow-hidden rounded-xl border border-zinc-900 bg-zinc-950 shadow-2xl duration-300 fade-in">
+                  <div className="absolute top-2 right-4 z-10 text-[10px] font-bold tracking-wider text-zinc-600 uppercase select-none">
+                    Live Editable Code Editor
                   </div>
+                  <textarea
+                    value={editedCodes[selectedTemplate]}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setEditedCodes((prev) => ({
+                        ...prev,
+                        [selectedTemplate]: val,
+                      }));
+                    }}
+                    className="h-full w-full flex-1 resize-none bg-transparent p-6 pt-10 font-mono text-[11px] leading-relaxed text-zinc-300 outline-none focus:ring-0 sm:text-xs"
+                    spellCheck={false}
+                    placeholder="Write your template TSX code here to see live preview update..."
+                  />
                 </div>
               )}
             </div>
