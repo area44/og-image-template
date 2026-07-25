@@ -5,7 +5,6 @@ import {
   Check,
   Download,
   RefreshCw,
-  Minimize2,
   Sliders,
   Type,
   AlertCircle,
@@ -80,7 +79,6 @@ export default function App() {
   const [renderError, setRenderError] = useState<string | null>(null);
 
   const [copied, setCopied] = useState(false);
-  const [previewScale, setPreviewScale] = useState<"fit" | "full">("fit");
 
   // Fetch fonts on mount
   useEffect(() => {
@@ -593,22 +591,6 @@ export default function App() {
               <div className="flex items-center gap-2">
                 {rendering && <RefreshCw className="h-3.5 w-3.5 animate-spin text-coral-400" />}
               </div>
-
-              <div className="flex rounded-lg border border-zinc-900 bg-background p-0.5">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setPreviewScale("fit")}
-                  className={`flex h-7 items-center gap-1.5 rounded-md px-3 py-1 text-xs font-semibold transition-all ${
-                    previewScale === "fit"
-                      ? "bg-zinc-900 text-white hover:bg-zinc-900"
-                      : "text-zinc-400 hover:bg-transparent hover:text-zinc-200"
-                  }`}
-                >
-                  <Minimize2 className="h-3.5 w-3.5" />
-                  Fit View
-                </Button>
-              </div>
             </div>
 
             {/* Interactive Viewer Frame */}
@@ -655,22 +637,11 @@ export default function App() {
               ) : svgContent ? (
                 <Card
                   className="relative overflow-hidden rounded-2xl border-zinc-900 bg-background shadow-2xl shadow-black/80 transition-all duration-300"
-                  style={
-                    previewScale === "fit"
-                      ? {
-                          width: "100%",
-                          maxWidth: `${width}px`,
-                          aspectRatio: `${width} / ${height}`,
-                        }
-                      : {
-                          width: `${width}px`,
-                          height: `${height}px`,
-                          transform: "none",
-                          maxWidth: "100%",
-                          maxHeight: "100%",
-                          overflow: "auto",
-                        }
-                  }
+                  style={{
+                    width: "100%",
+                    maxWidth: `${width}px`,
+                    aspectRatio: `${width} / ${height}`,
+                  }}
                 >
                   <CardContent className="h-full w-full p-0">
                     {/* Checkerboard transparency background */}
