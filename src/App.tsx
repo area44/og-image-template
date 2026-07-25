@@ -65,8 +65,8 @@ export default function App() {
   const [selectedTemplate, setSelectedTemplate] = useState<TemplateId>("blog");
   const [title, setTitle] = useState(TEMPLATES.blog.defaultTitle);
   const [description, setDescription] = useState(TEMPLATES.blog.defaultDescription);
-  const [width, setWidth] = useState(1200);
-  const [height, setHeight] = useState(630);
+  const [width, setWidth] = useState<number | "">(1200);
+  const [height, setHeight] = useState<number | "">(630);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const [fonts, setFonts] = useState<LoadedFonts | null>(null);
@@ -163,10 +163,13 @@ export default function App() {
           description?: string;
         }>;
 
+        const resolvedWidth = typeof width === "number" ? Math.max(100, width) : 1200;
+        const resolvedHeight = typeof height === "number" ? Math.max(100, height) : 630;
+
         // Satori supports custom Tailwind configurations
         const options = {
-          width,
-          height,
+          width: resolvedWidth,
+          height: resolvedHeight,
           fonts: [
             {
               name: "sans-serif",
@@ -502,7 +505,20 @@ export default function App() {
                       id="width-input"
                       type="number"
                       value={width}
-                      onChange={(e) => setWidth(Math.max(100, parseInt(e.target.value) || 0))}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        if (val === "") {
+                          setWidth("");
+                        } else {
+                          const parsed = parseInt(val, 10);
+                          setWidth(isNaN(parsed) ? "" : parsed);
+                        }
+                      }}
+                      onBlur={() => {
+                        if (typeof width !== "number" || width < 100) {
+                          setWidth(1200);
+                        }
+                      }}
                       className="h-9 border-zinc-800 bg-zinc-900/40 text-zinc-200 transition focus-visible:ring-coral-500/50"
                     />
                   </Field.Root>
@@ -514,7 +530,20 @@ export default function App() {
                       id="height-input"
                       type="number"
                       value={height}
-                      onChange={(e) => setHeight(Math.max(100, parseInt(e.target.value) || 0))}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        if (val === "") {
+                          setHeight("");
+                        } else {
+                          const parsed = parseInt(val, 10);
+                          setHeight(isNaN(parsed) ? "" : parsed);
+                        }
+                      }}
+                      onBlur={() => {
+                        if (typeof height !== "number" || height < 100) {
+                          setHeight(630);
+                        }
+                      }}
                       className="h-9 border-zinc-800 bg-zinc-900/40 text-zinc-200 transition focus-visible:ring-coral-500/50"
                     />
                   </Field.Root>
@@ -616,8 +645,8 @@ export default function App() {
                   className="relative overflow-hidden rounded-2xl border-zinc-900 bg-background shadow-2xl shadow-black/80 transition-all duration-300"
                   style={{
                     width: "100%",
-                    maxWidth: `${width}px`,
-                    aspectRatio: `${width} / ${height}`,
+                    maxWidth: `${typeof width === "number" ? Math.max(100, width) : 1200}px`,
+                    aspectRatio: `${typeof width === "number" ? Math.max(100, width) : 1200} / ${typeof height === "number" ? Math.max(100, height) : 630}`,
                   }}
                 >
                   <CardContent className="h-full w-full p-0">
