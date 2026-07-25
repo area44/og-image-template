@@ -6,10 +6,10 @@ import {
   Download,
   RefreshCw,
   Sliders,
-  Type,
   AlertCircle,
   Menu,
   X,
+  Code,
 } from "lucide-react";
 import React, { useState, useEffect } from "react";
 import satori from "satori";
@@ -20,11 +20,19 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 
 import BlogTemplate from "./template/blog";
+import blogCode from "./template/blog.tsx?raw";
 import MinimalTemplate from "./template/minimal";
+import minimalCode from "./template/minimal.tsx?raw";
 import PortfolioTemplate from "./template/portfolio";
+import portfolioCode from "./template/portfolio.tsx?raw";
+
+const TEMPLATE_CODES = {
+  blog: blogCode,
+  minimal: minimalCode,
+  portfolio: portfolioCode,
+};
 
 // Definition of our templates
 const TEMPLATES = {
@@ -63,8 +71,6 @@ interface LoadedFonts {
 
 export default function App() {
   const [selectedTemplate, setSelectedTemplate] = useState<TemplateId>("blog");
-  const [title, setTitle] = useState(TEMPLATES.blog.defaultTitle);
-  const [description, setDescription] = useState(TEMPLATES.blog.defaultDescription);
   const [width, setWidth] = useState<number | "">(1200);
   const [height, setHeight] = useState<number | "">(630);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -79,6 +85,10 @@ export default function App() {
 
   const [copied, setCopied] = useState(false);
   const [downloadFormat, setDownloadFormat] = useState<"svg" | "png" | "jpeg" | "jpg">("svg");
+
+  const [previewTab, setPreviewTab] = useState<"preview" | "code">("preview");
+  const [codeType, setCodeType] = useState<"tsx" | "svg">("tsx");
+  const [copiedCode, setCopiedCode] = useState(false);
 
   // Fetch fonts on mount
   useEffect(() => {
@@ -139,11 +149,9 @@ export default function App() {
     loadFonts();
   }, []);
 
-  // Sync title & description when template changes
+  // Sync template when changes
   const handleTemplateChange = (id: TemplateId) => {
     setSelectedTemplate(id);
-    setTitle(TEMPLATES[id].defaultTitle);
-    setDescription(TEMPLATES[id].defaultDescription);
     setIsSidebarOpen(false);
   };
 
@@ -208,7 +216,7 @@ export default function App() {
           },
         };
 
-        const element = React.createElement(TemplateComponent, { title, description });
+        const element = React.createElement(TemplateComponent, {});
         const svg = await satori(element, options);
 
         if (isMounted) {
@@ -233,7 +241,7 @@ export default function App() {
       isMounted = false;
       clearTimeout(timeout);
     };
-  }, [selectedTemplate, title, description, width, height, fonts]);
+  }, [selectedTemplate, width, height, fonts]);
 
   const handleCopy = async () => {
     if (!svgContent) return;
@@ -315,6 +323,18 @@ export default function App() {
         URL.revokeObjectURL(url);
       };
       img.src = url;
+    }
+  };
+
+  const handleCodeCopy = async () => {
+    const codeToDisplay = codeType === "tsx" ? TEMPLATE_CODES[selectedTemplate] : svgContent;
+    if (!codeToDisplay) return;
+    try {
+      await navigator.clipboard.writeText(codeToDisplay);
+      setCopiedCode(true);
+      setTimeout(() => setCopiedCode(false), 2000);
+    } catch (err) {
+      console.error("Failed to copy code:", err);
     }
   };
 
@@ -478,49 +498,6 @@ export default function App() {
         <main className="flex min-h-0 flex-1 flex-col lg:flex-row lg:overflow-hidden">
           {/* Controls Pane (Middle pane) */}
           <div className="flex w-full shrink-0 flex-col divide-y divide-zinc-900 overflow-y-auto border-r border-zinc-900 bg-zinc-950 lg:w-[380px]">
-            {/* Section: Customize Fields */}
-            <div className="p-6">
-              <div className="mb-4 flex items-center gap-2">
-                <Type className="h-4 w-4 text-coral-400" />
-                <h2 className="text-xs font-bold tracking-widest text-zinc-400 uppercase">
-                  Customize Content
-                </h2>
-              </div>
-
-              <div className="space-y-4">
-                <Field.Root className="grid gap-1.5">
-                  <Label htmlFor="title-input" className="text-xs font-semibold text-zinc-400">
-                    Title
-                  </Label>
-                  <Input
-                    id="title-input"
-                    type="text"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    placeholder="Enter custom title..."
-                    className="border-zinc-800 bg-zinc-900/40 text-zinc-200 transition focus-visible:ring-coral-500/50"
-                  />
-                </Field.Root>
-
-                <Field.Root className="grid gap-1.5">
-                  <Label
-                    htmlFor="description-input"
-                    className="text-xs font-semibold text-zinc-400"
-                  >
-                    Description
-                  </Label>
-                  <Textarea
-                    id="description-input"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    placeholder="Enter custom description..."
-                    rows={3}
-                    className="resize-none border-zinc-800 bg-zinc-900/40 text-zinc-200 transition focus-visible:ring-coral-500/50"
-                  />
-                </Field.Root>
-              </div>
-            </div>
-
             {/* Section: Output Dimensions */}
             <div className="p-6">
               <div className="mb-4 flex items-center gap-2">
@@ -667,91 +644,203 @@ export default function App() {
             </div>
           </div>
 
-          {/* Right pane - Interactive Live Preview */}
-          <div className="relative flex flex-1 flex-col items-center justify-between overflow-hidden bg-zinc-950 p-6 lg:p-8">
+          {/* Right pane - Interactive Live Preview & Code View (Component Preview Style) */}
+          <div className="relative flex flex-1 animate-in flex-col overflow-hidden bg-zinc-950 p-6 duration-300 fade-in lg:p-8">
             {/* Background grid accents */}
             <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#e11d4803_1px,transparent_1px),linear-gradient(to_bottom,#e11d4803_1px,transparent_1px)] bg-[size:32px_32px]" />
 
-            {/* Top Preview Controls */}
-            <div className="z-10 mb-4 flex w-full items-center justify-between">
-              <div className="flex items-center gap-2">
+            {/* Component Preview Header */}
+            <div className="z-10 mb-6 flex flex-col gap-4 border-b border-zinc-900 pb-4 select-none sm:flex-row sm:items-center sm:justify-between">
+              {/* Left Side: Tabs */}
+              <div className="flex items-center gap-4">
+                <div className="inline-flex h-9 items-center justify-center rounded-lg border border-zinc-800/80 bg-zinc-900/50 p-1 text-zinc-400">
+                  <button
+                    onClick={() => setPreviewTab("preview")}
+                    className={`inline-flex items-center justify-center rounded-md px-3.5 py-1 text-xs font-semibold whitespace-nowrap transition-all focus-visible:outline-none ${
+                      previewTab === "preview"
+                        ? "bg-zinc-800 text-zinc-100 shadow-sm"
+                        : "hover:text-zinc-200"
+                    }`}
+                  >
+                    Preview
+                  </button>
+                  <button
+                    onClick={() => setPreviewTab("code")}
+                    className={`inline-flex items-center justify-center rounded-md px-3.5 py-1 text-xs font-semibold whitespace-nowrap transition-all focus-visible:outline-none ${
+                      previewTab === "code"
+                        ? "bg-zinc-800 text-zinc-100 shadow-sm"
+                        : "hover:text-zinc-200"
+                    }`}
+                  >
+                    Code
+                  </button>
+                </div>
                 {rendering && <RefreshCw className="h-3.5 w-3.5 animate-spin text-coral-400" />}
+              </div>
+
+              {/* Right Side Actions */}
+              <div className="flex items-center gap-2">
+                {previewTab === "code" && (
+                  <>
+                    <div className="inline-flex h-8 items-center justify-center rounded-md border border-zinc-800/60 bg-zinc-900/40 p-1 text-zinc-500">
+                      <button
+                        onClick={() => setCodeType("tsx")}
+                        className={`rounded px-2.5 py-0.5 text-[10px] font-semibold transition-all sm:text-xs ${
+                          codeType === "tsx" ? "bg-zinc-800 text-coral-400" : "hover:text-zinc-300"
+                        }`}
+                      >
+                        React Component
+                      </button>
+                      <button
+                        onClick={() => setCodeType("svg")}
+                        className={`rounded px-2.5 py-0.5 text-[10px] font-semibold transition-all sm:text-xs ${
+                          codeType === "svg" ? "bg-zinc-800 text-coral-400" : "hover:text-zinc-300"
+                        }`}
+                      >
+                        Rendered SVG
+                      </button>
+                    </div>
+
+                    <Button
+                      onClick={handleCodeCopy}
+                      size="sm"
+                      variant="outline"
+                      className="h-8 gap-1.5 border-zinc-800 bg-zinc-900/40 text-zinc-400 hover:text-zinc-200"
+                    >
+                      {copiedCode ? (
+                        <>
+                          <Check className="h-3.5 w-3.5 text-emerald-500" />
+                          <span className="text-xs">Copied!</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="h-3.5 w-3.5" />
+                          <span className="text-xs">Copy Code</span>
+                        </>
+                      )}
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
 
-            {/* Interactive Viewer Frame */}
-            <div className="relative flex min-h-[300px] w-full flex-1 items-center justify-center">
-              {fontsLoading ? (
-                <div className="flex flex-col items-center gap-3">
-                  <RefreshCw className="h-8 w-8 animate-spin text-coral-500" />
-                  <p className="text-sm font-medium text-zinc-400">
-                    Fetching font files for Satori...
-                  </p>
-                </div>
-              ) : fontsError ? (
-                <Alert
-                  variant="destructive"
-                  className="flex max-w-md flex-col items-center gap-3 bg-red-950/20 p-6 text-center"
-                >
-                  <AlertCircle className="h-10 w-10 text-destructive" />
-                  <AlertTitle className="font-semibold text-destructive">
-                    Failed to Load Fonts
-                  </AlertTitle>
-                  <AlertDescription className="text-xs leading-relaxed text-destructive/80">
-                    {fontsError}. Please check your internet connection or reload the page.
-                  </AlertDescription>
-                  <Button
-                    onClick={() => window.location.reload()}
-                    variant="destructive"
-                    size="sm"
-                    className="mt-2 font-medium text-white"
-                  >
-                    Retry Loading
-                  </Button>
-                </Alert>
-              ) : renderError ? (
-                <Alert
-                  variant="destructive"
-                  className="flex max-w-md flex-col items-center gap-3 border-amber-900/50 bg-amber-950/20 p-6 text-center"
-                >
-                  <AlertCircle className="h-10 w-10 text-amber-500" />
-                  <AlertTitle className="font-semibold text-amber-400">Rendering Error</AlertTitle>
-                  <AlertDescription className="max-h-32 overflow-y-auto font-mono text-xs leading-relaxed text-amber-500/80">
-                    {renderError}
-                  </AlertDescription>
-                </Alert>
-              ) : svgContent ? (
-                <Card
-                  className="relative overflow-hidden rounded-2xl border-zinc-900 bg-background shadow-2xl shadow-black/80 transition-all duration-300"
-                  style={{
-                    width: "100%",
-                    maxWidth: `${typeof width === "number" ? Math.max(100, width) : 1200}px`,
-                    aspectRatio: `${typeof width === "number" ? Math.max(100, width) : 1200} / ${typeof height === "number" ? Math.max(100, height) : 630}`,
-                  }}
-                >
-                  <CardContent className="h-full w-full p-0">
-                    {/* Checkerboard transparency background */}
-                    <div
-                      className="pointer-events-none absolute inset-0 opacity-[0.03]"
-                      style={{
-                        backgroundImage:
-                          "radial-gradient(circle, #fff 10%, transparent 11%), radial-gradient(circle, #fff 10%, transparent 11%)",
-                        backgroundSize: "20px 20px",
-                        backgroundPosition: "0 0, 10px 10px",
-                      }}
-                    />
+            {/* Component Preview Content Body */}
+            <div className="relative flex min-h-0 flex-1 flex-col">
+              {previewTab === "preview" ? (
+                /* Preview Mode */
+                <div className="relative flex flex-1 flex-col items-center justify-center">
+                  <div className="relative flex min-h-[300px] w-full flex-1 items-center justify-center">
+                    {fontsLoading ? (
+                      <div className="flex flex-col items-center gap-3">
+                        <RefreshCw className="h-8 w-8 animate-spin text-coral-500" />
+                        <p className="text-sm font-medium text-zinc-400">
+                          Fetching font files for Satori...
+                        </p>
+                      </div>
+                    ) : fontsError ? (
+                      <Alert
+                        variant="destructive"
+                        className="flex max-w-md flex-col items-center gap-3 bg-red-950/20 p-6 text-center"
+                      >
+                        <AlertCircle className="h-10 w-10 text-destructive" />
+                        <AlertTitle className="font-semibold text-destructive">
+                          Failed to Load Fonts
+                        </AlertTitle>
+                        <AlertDescription className="text-xs leading-relaxed text-destructive/80">
+                          {fontsError}. Please check your internet connection or reload the page.
+                        </AlertDescription>
+                        <Button
+                          onClick={() => window.location.reload()}
+                          variant="destructive"
+                          size="sm"
+                          className="mt-2 font-medium text-white"
+                        >
+                          Retry Loading
+                        </Button>
+                      </Alert>
+                    ) : renderError ? (
+                      <Alert
+                        variant="destructive"
+                        className="flex max-w-md flex-col items-center gap-3 border-amber-900/50 bg-amber-950/20 p-6 text-center"
+                      >
+                        <AlertCircle className="h-10 w-10 text-amber-500" />
+                        <AlertTitle className="font-semibold text-amber-400">
+                          Rendering Error
+                        </AlertTitle>
+                        <AlertDescription className="max-h-32 overflow-y-auto font-mono text-xs leading-relaxed text-amber-500/80">
+                          {renderError}
+                        </AlertDescription>
+                      </Alert>
+                    ) : svgContent ? (
+                      <Card
+                        className="relative overflow-hidden rounded-2xl border-zinc-900 bg-background shadow-2xl shadow-black/80 transition-all duration-300"
+                        style={{
+                          width: "100%",
+                          maxWidth: `${typeof width === "number" ? Math.max(100, width) : 1200}px`,
+                          aspectRatio: `${typeof width === "number" ? Math.max(100, width) : 1200} / ${typeof height === "number" ? Math.max(100, height) : 630}`,
+                        }}
+                      >
+                        <CardContent className="h-full w-full p-0">
+                          {/* Checkerboard transparency background */}
+                          <div
+                            className="pointer-events-none absolute inset-0 opacity-[0.03]"
+                            style={{
+                              backgroundImage:
+                                "radial-gradient(circle, #fff 10%, transparent 11%), radial-gradient(circle, #fff 10%, transparent 11%)",
+                              backgroundSize: "20px 20px",
+                              backgroundPosition: "0 0, 10px 10px",
+                            }}
+                          />
 
-                    {/* Embedded Live SVG */}
-                    <div
-                      className="flex h-full w-full items-center justify-center select-none"
-                      dangerouslySetInnerHTML={{ __html: svgContent }}
-                    />
-                  </CardContent>
-                </Card>
+                          {/* Embedded Live SVG */}
+                          <div
+                            className="flex h-full w-full items-center justify-center select-none"
+                            dangerouslySetInnerHTML={{ __html: svgContent }}
+                          />
+                        </CardContent>
+                      </Card>
+                    ) : (
+                      <div className="flex flex-col items-center gap-2">
+                        <RefreshCw className="h-6 w-6 animate-spin text-zinc-600" />
+                        <p className="text-xs text-zinc-500">Generating preview...</p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* View Code button at the bottom of the live preview */}
+                  {svgContent && !fontsLoading && !renderError && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setPreviewTab("code")}
+                      className="mt-6 gap-1.5 border-zinc-800 bg-zinc-900/40 text-zinc-400 hover:text-zinc-200"
+                    >
+                      <Code className="h-3.5 w-3.5" />
+                      <span>View Code</span>
+                    </Button>
+                  )}
+                </div>
               ) : (
-                <div className="flex flex-col items-center gap-2">
-                  <RefreshCw className="h-6 w-6 animate-spin text-zinc-600" />
-                  <p className="text-xs text-zinc-500">Generating preview...</p>
+                /* Code Mode with dynamic line numbers and hover effects */
+                <div className="relative flex flex-1 animate-in flex-col overflow-hidden rounded-xl border border-zinc-900 bg-zinc-950 p-4 shadow-2xl duration-300 fade-in">
+                  <div className="flex-1 overflow-auto pr-2">
+                    <table className="w-full border-collapse text-left">
+                      <tbody>
+                        {(codeType === "tsx" ? TEMPLATE_CODES[selectedTemplate] : svgContent)
+                          .split("\n")
+                          .map((line, idx) => (
+                            <tr key={idx} className="transition-colors hover:bg-zinc-900/30">
+                              <td className="w-10 border-r border-zinc-900/50 pr-4 text-right font-mono text-[11px] text-zinc-600 select-none">
+                                {idx + 1}
+                              </td>
+                              <td className="pl-4 font-mono text-[11px] leading-relaxed whitespace-pre text-zinc-300 sm:text-xs">
+                                {line}
+                              </td>
+                            </tr>
+                          ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               )}
             </div>
