@@ -78,6 +78,7 @@ export default function App() {
   const [renderError, setRenderError] = useState<string | null>(null);
 
   const [copied, setCopied] = useState(false);
+  const [downloadFormat, setDownloadFormat] = useState<"svg" | "png" | "jpeg" | "jpg">("svg");
 
   // Fetch fonts on mount
   useEffect(() => {
@@ -247,15 +248,74 @@ export default function App() {
 
   const handleDownload = () => {
     if (!svgContent) return;
-    const blob = new Blob([svgContent], { type: "image/svg+xml" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `og-image-${selectedTemplate}.svg`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+
+    const resolvedWidth = typeof width === "number" ? Math.max(100, width) : 1200;
+    const resolvedHeight = typeof height === "number" ? Math.max(100, height) : 630;
+
+    if (downloadFormat === "svg") {
+      const blob = new Blob([svgContent], { type: "image/svg+xml" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `og-image-${selectedTemplate}.svg`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } else {
+      const img = new Image();
+      const blob = new Blob([svgContent], { type: "image/svg+xml;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = resolvedWidth;
+        canvas.height = resolvedHeight;
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          if (downloadFormat === "jpeg" || downloadFormat === "jpg") {
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(0, 0, resolvedWidth, resolvedHeight);
+          }
+          ctx.drawImage(img, 0, 0, resolvedWidth, resolvedHeight);
+
+          const mimeType = downloadFormat === "png" ? "image/png" : "image/jpeg";
+          try {
+            canvas.toBlob(
+              (blob) => {
+                if (blob) {
+                  const downloadUrl = URL.createObjectURL(blob);
+                  const a = document.createElement("a");
+                  a.href = downloadUrl;
+                  a.download = `og-image-${selectedTemplate}.${downloadFormat}`;
+                  document.body.appendChild(a);
+                  a.click();
+                  document.body.removeChild(a);
+                  URL.revokeObjectURL(downloadUrl);
+                }
+              },
+              mimeType,
+              0.95,
+            );
+          } catch (err) {
+            console.error("Canvas toBlob error, falling back to toDataURL:", err);
+            const dataUrl = canvas.toDataURL(mimeType, 0.95);
+            const a = document.createElement("a");
+            a.href = dataUrl;
+            a.download = `og-image-${selectedTemplate}.${downloadFormat}`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+          }
+        }
+        URL.revokeObjectURL(url);
+      };
+      img.onerror = (err) => {
+        console.error("Failed to load SVG into Image for download:", err);
+        URL.revokeObjectURL(url);
+      };
+      img.src = url;
+    }
   };
 
   return (
@@ -553,6 +613,26 @@ export default function App() {
 
             {/* Section: Action Buttons */}
             <div className="mt-auto space-y-3 p-6">
+              <div className="space-y-1.5">
+                <span className="text-xs font-semibold text-zinc-400">Download Format</span>
+                <div className="grid grid-cols-4 gap-1.5 rounded-lg border border-zinc-800 bg-zinc-900/40 p-1">
+                  {(["svg", "png", "jpeg", "jpg"] as const).map((fmt) => (
+                    <button
+                      key={fmt}
+                      type="button"
+                      onClick={() => setDownloadFormat(fmt)}
+                      className={`rounded px-1.5 py-1 text-[11px] font-bold uppercase transition-all ${
+                        downloadFormat === fmt
+                          ? "bg-zinc-800 text-coral-400 shadow-sm"
+                          : "text-zinc-500 hover:text-zinc-300"
+                      }`}
+                    >
+                      {fmt}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               <Button
                 onClick={handleCopy}
                 disabled={!svgContent || rendering}
@@ -582,7 +662,7 @@ export default function App() {
                 className="w-full bg-primary py-2.5 font-semibold text-primary-foreground shadow-lg shadow-coral-500/10 hover:opacity-90"
               >
                 <Download className="h-4 w-4" />
-                Download SVG File
+                Download {downloadFormat.toUpperCase()} File
               </Button>
             </div>
           </div>
