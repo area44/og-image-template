@@ -1,5 +1,7 @@
+import * as Babel from "@babel/standalone";
 import { Field } from "@base-ui/react/field";
 import geistNormalUrl from "@fontsource-variable/geist/files/geist-latin-wght-normal.woff2?url";
+import Editor from "@monaco-editor/react";
 import {
   Copy,
   Check,
@@ -58,6 +60,35 @@ const TEMPLATES = {
 
 type TemplateId = keyof typeof TEMPLATES;
 
+function compileTemplate(code: string): React.ComponentType<any> {
+  const transformed = Babel.transform(code, {
+    presets: ["typescript", ["react", { runtime: "classic" }]],
+    plugins: ["transform-modules-commonjs"],
+    filename: "template.tsx",
+  });
+
+  if (!transformed.code) {
+    throw new Error("Transpilation failed: generated code is empty.");
+  }
+
+  const exports: { default?: React.ComponentType<any> } = {};
+  const module = { exports };
+  const require = (name: string) => {
+    if (name === "react") return React;
+    throw new Error(`Module "${name}" cannot be resolved in browser environment.`);
+  };
+
+  const fn = new Function("exports", "module", "require", "React", transformed.code);
+  fn(exports, module, require, React);
+
+  const Component = module.exports.default || exports.default;
+  if (!Component) {
+    throw new Error("Template must export a default React component.");
+  }
+
+  return Component;
+}
+
 interface LoadedFonts {
   regular: ArrayBuffer;
   bold: ArrayBuffer;
@@ -65,6 +96,18 @@ interface LoadedFonts {
 
 export default function App() {
   const [selectedTemplate, setSelectedTemplate] = useState<TemplateId>("blog");
+  const [codes, setCodes] = useState<Record<TemplateId, string>>({
+    blog: blogCode,
+    minimal: minimalCode,
+    portfolio: portfolioCode,
+  });
+
+  const handleResetCode = () => {
+    setCodes((prev) => ({
+      ...prev,
+      [selectedTemplate]: TEMPLATE_CODES[selectedTemplate],
+    }));
+  };
   const [width, setWidth] = useState<number | "">(1200);
   const [height, setHeight] = useState<number | "">(630);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -160,7 +203,13 @@ export default function App() {
         setRendering(true);
         setRenderError(null);
 
-        const TemplateComponent = TEMPLATES[selectedTemplate].component;
+        const currentCode = codes[selectedTemplate];
+        let TemplateComponent: React.ComponentType<any>;
+        try {
+          TemplateComponent = compileTemplate(currentCode);
+        } catch (compileErr: any) {
+          throw new Error(`Compilation Error: ${compileErr.message || compileErr}`);
+        }
 
         const resolvedWidth = typeof width === "number" ? Math.max(100, width) : 1200;
         const resolvedHeight = typeof height === "number" ? Math.max(100, height) : 630;
@@ -231,7 +280,7 @@ export default function App() {
       isMounted = false;
       clearTimeout(timeout);
     };
-  }, [selectedTemplate, width, height, fonts]);
+  }, [selectedTemplate, codes, width, height, fonts]);
 
   const handleCopy = async () => {
     if (!svgContent) return;
@@ -317,7 +366,7 @@ export default function App() {
   };
 
   const handleCodeCopy = async () => {
-    const codeToDisplay = TEMPLATE_CODES[selectedTemplate];
+    const codeToDisplay = codes[selectedTemplate];
     if (!codeToDisplay) return;
     try {
       await navigator.clipboard.writeText(codeToDisplay);
@@ -671,24 +720,35 @@ export default function App() {
               {/* Right Side Actions */}
               <div className="flex items-center gap-2">
                 {previewTab === "code" && (
-                  <Button
-                    onClick={handleCodeCopy}
-                    size="sm"
-                    variant="outline"
-                    className="h-8 gap-1.5 border-zinc-800 bg-zinc-900/40 text-zinc-400 hover:text-zinc-200"
-                  >
-                    {copiedCode ? (
-                      <>
-                        <Check className="h-3.5 w-3.5 text-emerald-500" />
-                        <span className="text-xs">Copied!</span>
-                      </>
-                    ) : (
-                      <>
-                        <Copy className="h-3.5 w-3.5" />
-                        <span className="text-xs">Copy Code</span>
-                      </>
-                    )}
-                  </Button>
+                  <>
+                    <Button
+                      onClick={handleResetCode}
+                      size="sm"
+                      variant="outline"
+                      className="h-8 gap-1.5 border-zinc-800 bg-zinc-900/40 text-zinc-400 hover:text-zinc-200"
+                    >
+                      <RefreshCw className="h-3.5 w-3.5" />
+                      <span className="text-xs">Reset Code</span>
+                    </Button>
+                    <Button
+                      onClick={handleCodeCopy}
+                      size="sm"
+                      variant="outline"
+                      className="h-8 gap-1.5 border-zinc-800 bg-zinc-900/40 text-zinc-400 hover:text-zinc-200"
+                    >
+                      {copiedCode ? (
+                        <>
+                          <Check className="h-3.5 w-3.5 text-emerald-500" />
+                          <span className="text-xs">Copied!</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="h-3.5 w-3.5" />
+                          <span className="text-xs">Copy Code</span>
+                        </>
+                      )}
+                    </Button>
+                  </>
                 )}
               </div>
             </div>
@@ -792,15 +852,36 @@ export default function App() {
                   )}
                 </div>
               ) : (
-                /* Code Mode with highly polished native code block inspired by Shadcn UI Component Style */
+                /* Code Mode with Monaco Editor supporting live edits */
                 <div className="relative flex min-h-[500px] flex-1 animate-in flex-col overflow-hidden rounded-xl border border-zinc-900 bg-zinc-950 shadow-2xl duration-300 fade-in lg:h-full lg:min-h-[600px]">
                   <div className="absolute top-3.5 right-4 z-10 text-[10px] font-bold tracking-wider text-zinc-500 uppercase select-none">
                     Template Source Code
                   </div>
-                  <div className="relative h-full w-full flex-1 overflow-auto p-6 pt-12 select-text">
-                    <pre className="h-full w-full font-mono text-xs leading-relaxed break-all whitespace-pre-wrap text-zinc-300 sm:text-sm md:break-normal">
-                      <code>{TEMPLATE_CODES[selectedTemplate]}</code>
-                    </pre>
+                  <div className="relative h-full w-full flex-1 overflow-hidden pt-12">
+                    <Editor
+                      height="100%"
+                      language="typescript"
+                      theme="vs-dark"
+                      value={codes[selectedTemplate]}
+                      onChange={(value) => {
+                        if (value !== undefined) {
+                          setCodes((prev) => ({
+                            ...prev,
+                            [selectedTemplate]: value,
+                          }));
+                        }
+                      }}
+                      options={{
+                        fontSize: 13,
+                        minimap: { enabled: false },
+                        scrollBeyondLastLine: false,
+                        wordWrap: "on",
+                        tabSize: 2,
+                        automaticLayout: true,
+                        cursorBlinking: "smooth",
+                        padding: { top: 16, bottom: 16 },
+                      }}
+                    />
                   </div>
                 </div>
               )}
