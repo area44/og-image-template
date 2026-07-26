@@ -1,17 +1,9 @@
-import { Field } from "@base-ui/react/field";
+import * as Babel from "@babel/standalone";
 import geistNormalUrl from "@fontsource-variable/geist/files/geist-latin-wght-normal.woff2?url";
-import {
-  Copy,
-  Check,
-  Download,
-  RefreshCw,
-  Sliders,
-  AlertCircle,
-  Menu,
-  X,
-  Code,
-} from "lucide-react";
+import Editor from "@monaco-editor/react";
+import { Copy, Check, Download, RefreshCw, Sliders, AlertCircle, Menu, X } from "lucide-react";
 import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import satori from "satori";
 import { woff2Decode } from "woff-lib/woff2/decode";
 
@@ -19,7 +11,6 @@ import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 
 import BlogTemplate from "./template/blog";
 import blogCode from "./template/blog.tsx?raw";
@@ -63,6 +54,39 @@ interface LoadedFonts {
   bold: ArrayBuffer;
 }
 
+function transpileAndEval(code: string): React.ComponentType<any> {
+  const transformed = Babel.transform(code, {
+    presets: [
+      ["react", { runtime: "classic" }],
+      "typescript"
+    ],
+    plugins: [["transform-modules-commonjs", { loose: true }]],
+  });
+
+  const compiledCode = transformed.code || "";
+
+  const exports: { default?: any; [key: string]: any } = {};
+  const mockRequire = (name: string) => {
+    if (name === "react") {
+      return React;
+    }
+    throw new Error(`Module "${name}" is not supported in playground.`);
+  };
+
+  const runCode = new Function("exports", "require", "React", compiledCode);
+  runCode(exports, mockRequire, React);
+
+  const component =
+    exports.default || Object.values(exports).find((val) => typeof val === "function");
+  if (!component) {
+    throw new Error(
+      "No default export or React component found. Ensure you have 'export default function OGImage' or similar.",
+    );
+  }
+
+  return component;
+}
+
 export default function App() {
   const [selectedTemplate, setSelectedTemplate] = useState<TemplateId>("blog");
   const [width, setWidth] = useState<number | "">(1200);
@@ -80,8 +104,88 @@ export default function App() {
   const [copied, setCopied] = useState(false);
   const [downloadFormat, setDownloadFormat] = useState<"svg" | "png" | "jpeg" | "jpg">("svg");
 
-  const [previewTab, setPreviewTab] = useState<"preview" | "code">("preview");
   const [copiedCode, setCopiedCode] = useState(false);
+
+  const [draftCodes, setDraftCodes] = useState<Record<TemplateId, string>>({
+    blog: blogCode,
+    minimal: minimalCode,
+    portfolio: portfolioCode,
+  });
+
+  const [dynamicComponent, setDynamicComponent] = useState<React.ComponentType<any> | null>(null);
+  const [compileError, setCompileError] = useState<string | null>(null);
+  const [pngUrl, setPngUrl] = useState<string | null>(null);
+  const [renderType, setRenderType] = useState<"svg" | "png" | "html">("svg");
+  const [iframeDoc, setIframeDoc] = useState<Document | null>(null);
+  const [renderTime, setRenderTime] = useState<number>(0);
+
+  const [debug, setDebug] = useState(false);
+  const [embedFont, setEmbedFont] = useState(true);
+  const [emojiProvider, setEmojiProvider] = useState<string>("twemoji");
+  const [sharedCopied, setSharedCopied] = useState(false);
+
+  useEffect(() => {
+    const code = draftCodes[selectedTemplate];
+    try {
+      const comp = transpileAndEval(code);
+      setDynamicComponent(() => comp);
+      setCompileError(null);
+    } catch (err: any) {
+      console.error("Transpilation/Eval error:", err);
+      setCompileError(err.message || "Failed to compile TSX code");
+      setDynamicComponent(null);
+    }
+  }, [selectedTemplate, draftCodes]);
+
+  useEffect(() => {
+    if (!svgContent) {
+      setPngUrl(null);
+      return;
+    }
+
+    const resolvedWidth = typeof width === "number" ? Math.max(100, width) : 1200;
+    const resolvedHeight = typeof height === "number" ? Math.max(100, height) : 630;
+
+    const img = new Image();
+    const blob = new Blob([svgContent], { type: "image/svg+xml;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+
+    let active = true;
+
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = resolvedWidth;
+      canvas.height = resolvedHeight;
+      const ctx = canvas.getContext("2d");
+      if (ctx) {
+        ctx.drawImage(img, 0, 0, resolvedWidth, resolvedHeight);
+        try {
+          canvas.toBlob((pngBlob) => {
+            if (active && pngBlob) {
+              const downloadUrl = URL.createObjectURL(pngBlob);
+              setPngUrl((prev) => {
+                if (prev) URL.revokeObjectURL(prev);
+                return downloadUrl;
+              });
+            }
+          }, "image/png");
+        } catch (err) {
+          console.error("Canvas toBlob error:", err);
+        }
+      }
+      URL.revokeObjectURL(url);
+    };
+
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+    };
+
+    img.src = url;
+
+    return () => {
+      active = false;
+    };
+  }, [svgContent, width, height]);
 
   // Fetch fonts on mount
   useEffect(() => {
@@ -150,7 +254,7 @@ export default function App() {
 
   // Run Satori core in browser to generate the SVG with the selected template
   useEffect(() => {
-    if (!fonts) return;
+    if (!fonts || !dynamicComponent) return;
     const { regular, bold } = fonts;
 
     let isMounted = true;
@@ -160,8 +264,6 @@ export default function App() {
         setRendering(true);
         setRenderError(null);
 
-        const TemplateComponent = TEMPLATES[selectedTemplate].component;
-
         const resolvedWidth = typeof width === "number" ? Math.max(100, width) : 1200;
         const resolvedHeight = typeof height === "number" ? Math.max(100, height) : 630;
 
@@ -169,6 +271,8 @@ export default function App() {
         const options = {
           width: resolvedWidth,
           height: resolvedHeight,
+          debug: debug,
+          embedFont: embedFont,
           fonts: [
             {
               name: "sans-serif",
@@ -206,11 +310,17 @@ export default function App() {
           },
         };
 
-        const element = React.createElement(TemplateComponent, {});
+        const comp = dynamicComponent;
+        if (!comp) return;
+
+        const start = performance.now();
+        const element = React.createElement(comp, {});
         const svg = await satori(element, options);
+        const elapsed = performance.now() - start;
 
         if (isMounted) {
           setSvgContent(svg);
+          setRenderTime(elapsed);
         }
       } catch (err: any) {
         console.error("Satori render error:", err);
@@ -231,7 +341,7 @@ export default function App() {
       isMounted = false;
       clearTimeout(timeout);
     };
-  }, [selectedTemplate, width, height, fonts]);
+  }, [selectedTemplate, width, height, fonts, dynamicComponent, debug, embedFont]);
 
   const handleCopy = async () => {
     if (!svgContent) return;
@@ -317,7 +427,7 @@ export default function App() {
   };
 
   const handleCodeCopy = async () => {
-    const codeToDisplay = TEMPLATE_CODES[selectedTemplate];
+    const codeToDisplay = draftCodes[selectedTemplate];
     if (!codeToDisplay) return;
     try {
       await navigator.clipboard.writeText(codeToDisplay);
@@ -325,6 +435,133 @@ export default function App() {
       setTimeout(() => setCopiedCode(false), 2000);
     } catch (err) {
       console.error("Failed to copy code:", err);
+    }
+  };
+
+  const handleCodeReset = () => {
+    setDraftCodes((prev) => ({
+      ...prev,
+      [selectedTemplate]: TEMPLATE_CODES[selectedTemplate],
+    }));
+  };
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const shared = params.get("share");
+    if (shared) {
+      try {
+        const decoded = decodeURIComponent(escape(atob(shared)));
+        const parsed = JSON.parse(decoded);
+        if (parsed.code) {
+          setDraftCodes((prev) => ({
+            ...prev,
+            [selectedTemplate]: parsed.code,
+          }));
+        }
+        if (typeof parsed.width === "number") setWidth(parsed.width);
+        if (typeof parsed.height === "number") setHeight(parsed.height);
+        if (typeof parsed.debug === "boolean") setDebug(parsed.debug);
+        if (typeof parsed.embedFont === "boolean") setEmbedFont(parsed.embedFont);
+        if (
+          typeof parsed.renderType === "string" &&
+          (parsed.renderType === "svg" ||
+            parsed.renderType === "png" ||
+            parsed.renderType === "html")
+        ) {
+          setRenderType(parsed.renderType);
+        }
+      } catch (err) {
+        console.error("Failed to parse shared state from URL:", err);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleShare = () => {
+    try {
+      const state = {
+        code: draftCodes[selectedTemplate],
+        width,
+        height,
+        debug,
+        embedFont,
+        renderType,
+      };
+      const stringified = JSON.stringify(state);
+      const encoded = btoa(unescape(encodeURIComponent(stringified)));
+      const url = `${window.location.origin}${window.location.pathname}?share=${encoded}`;
+      navigator.clipboard.writeText(url);
+      setSharedCopied(true);
+      setTimeout(() => setSharedCopied(false), 2000);
+    } catch (err) {
+      console.error("Failed to generate share URL:", err);
+    }
+  };
+
+  const handleIframeRef = (iframe: HTMLIFrameElement | null) => {
+    if (iframe && iframe.contentDocument) {
+      const doc = iframe.contentDocument;
+      if (doc.head.childElementCount === 0) {
+        // Base structure and background style
+        const style = doc.createElement("style");
+        style.innerHTML = `
+          body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            width: 100%;
+            height: 100%;
+            background-color: #18181b;
+            color: white;
+            font-family: sans-serif;
+          }
+          body > div {
+            display: flex;
+            width: 100%;
+            height: 100%;
+          }
+        `;
+        doc.head.appendChild(style);
+
+        // Load Tailwind CSS CDN
+        const script = doc.createElement("script");
+        script.src = "https://cdn.tailwindcss.com";
+        doc.head.appendChild(script);
+
+        // Configure theme
+        const configScript = doc.createElement("script");
+        configScript.innerHTML = `
+          tailwind.config = {
+            theme: {
+              extend: {
+                colors: {
+                  primary: "#ff7f50",
+                }
+              }
+            }
+          }
+        `;
+        doc.head.appendChild(configScript);
+
+        // Convert Satori `tw` attributes to HTML `class` in real-time
+        const observerScript = doc.createElement("script");
+        observerScript.innerHTML = `
+          const convertTw = () => {
+            document.querySelectorAll("[tw]").forEach((el) => {
+              const tw = el.getAttribute("tw");
+              if (tw) {
+                el.setAttribute("class", tw);
+                el.removeAttribute("tw");
+              }
+            });
+          };
+          const observer = new MutationObserver(convertTw);
+          observer.observe(document.body, { childList: true, subtree: true });
+          convertTw();
+        `;
+        doc.head.appendChild(observerScript);
+      }
+      setIframeDoc(doc);
     }
   };
 
@@ -416,8 +653,30 @@ export default function App() {
               </g>
             </svg>
           </div>
+          <span className="hidden font-semibold text-zinc-200 sm:inline">OG Image Playground</span>
+          <span className="rounded bg-zinc-800 px-1.5 py-0.5 text-[10px] font-medium text-zinc-400">
+            satori v0.12.2
+          </span>
         </div>
         <div className="flex items-center gap-4">
+          <Button
+            onClick={handleShare}
+            size="sm"
+            variant="outline"
+            className="h-8 gap-1.5 border-zinc-800 bg-zinc-900/40 text-zinc-300 hover:text-zinc-100"
+          >
+            {sharedCopied ? (
+              <>
+                <Check className="h-3.5 w-3.5 text-emerald-500" />
+                <span>Copied Link!</span>
+              </>
+            ) : (
+              <>
+                <Copy className="h-3.5 w-3.5" />
+                <span>Share</span>
+              </>
+            )}
+          </Button>
           <a
             href="https://github.com/area44/og-image-template"
             target="_blank"
@@ -484,330 +743,446 @@ export default function App() {
           </div>
         </aside>
 
-        {/* Main Workspace: Controls + Live Preview */}
-        <main className="flex min-h-0 flex-1 flex-col lg:flex-row lg:overflow-hidden">
-          {/* Controls Pane (Middle pane) */}
-          <div className="flex w-full shrink-0 flex-col divide-y divide-zinc-900 overflow-y-auto border-r border-zinc-900 bg-zinc-950 lg:w-[380px]">
-            {/* Section: Output Dimensions */}
-            <div className="p-6">
-              <div className="mb-4 flex items-center gap-2">
-                <Sliders className="h-4 w-4 text-coral-400" />
-                <h2 className="text-xs font-bold tracking-widest text-zinc-400 uppercase">
-                  Dimensions
-                </h2>
-              </div>
-
-              <div className="space-y-4">
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      setWidth(1200);
-                      setHeight(630);
-                    }}
-                    className="flex-1 border-zinc-800 bg-zinc-900/40 text-zinc-400 hover:border-zinc-700 hover:bg-zinc-900 hover:text-zinc-200"
-                  >
-                    Standard (1200×630)
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      setWidth(800);
-                      setHeight(400);
-                    }}
-                    className="flex-1 border-zinc-800 bg-zinc-900/40 text-zinc-400 hover:border-zinc-700 hover:bg-zinc-900 hover:text-zinc-200"
-                  >
-                    Compact (800×400)
-                  </Button>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <Field.Root className="grid gap-1">
-                    <Label htmlFor="width-input" className="text-xs font-medium text-zinc-500">
-                      Width (px)
-                    </Label>
-                    <Input
-                      id="width-input"
-                      type="number"
-                      value={width}
-                      onChange={(e) => {
-                        const val = e.target.value;
-                        if (val === "") {
-                          setWidth("");
-                        } else {
-                          const parsed = parseInt(val, 10);
-                          setWidth(isNaN(parsed) ? "" : parsed);
-                        }
-                      }}
-                      onBlur={() => {
-                        if (typeof width !== "number" || width < 100) {
-                          setWidth(1200);
-                        }
-                      }}
-                      className="h-9 border-zinc-800 bg-zinc-900/40 text-zinc-200 transition focus-visible:ring-coral-500/50"
-                    />
-                  </Field.Root>
-                  <Field.Root className="grid gap-1">
-                    <Label htmlFor="height-input" className="text-xs font-medium text-zinc-500">
-                      Height (px)
-                    </Label>
-                    <Input
-                      id="height-input"
-                      type="number"
-                      value={height}
-                      onChange={(e) => {
-                        const val = e.target.value;
-                        if (val === "") {
-                          setHeight("");
-                        } else {
-                          const parsed = parseInt(val, 10);
-                          setHeight(isNaN(parsed) ? "" : parsed);
-                        }
-                      }}
-                      onBlur={() => {
-                        if (typeof height !== "number" || height < 100) {
-                          setHeight(630);
-                        }
-                      }}
-                      className="h-9 border-zinc-800 bg-zinc-900/40 text-zinc-200 transition focus-visible:ring-coral-500/50"
-                    />
-                  </Field.Root>
-                </div>
+        {/* Responsive Workspace Main Content */}
+        <div className="flex min-h-0 flex-1 flex-col lg:flex-row lg:overflow-hidden">
+          {/* Left/Upper Panel: TSX/TypeScript Code Editor */}
+          <div className="flex flex-1 flex-col border-b border-zinc-900 bg-zinc-950 lg:h-full lg:w-1/2 lg:border-r lg:border-b-0">
+            <div className="flex h-11 shrink-0 items-center justify-between border-b border-zinc-900 bg-zinc-950/50 px-4">
+              <span className="text-xs font-semibold tracking-wider text-zinc-400 uppercase">
+                TSX Source Editor
+              </span>
+              <div className="flex items-center gap-1.5">
+                <Button
+                  onClick={handleCodeReset}
+                  size="sm"
+                  variant="outline"
+                  className="h-7 gap-1 border-zinc-800 bg-zinc-900/40 px-2.5 text-zinc-400 hover:text-zinc-200"
+                >
+                  <RefreshCw className="h-3 w-3" />
+                  <span className="text-[11px]">Reset</span>
+                </Button>
+                <Button
+                  onClick={handleCodeCopy}
+                  size="sm"
+                  variant="outline"
+                  className="h-7 gap-1 border-zinc-800 bg-zinc-900/40 px-2.5 text-zinc-400 hover:text-zinc-200"
+                >
+                  {copiedCode ? (
+                    <>
+                      <Check className="h-3 w-3 text-emerald-500" />
+                      <span className="text-[11px]">Copied!</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="h-3 w-3" />
+                      <span className="text-[11px]">Copy</span>
+                    </>
+                  )}
+                </Button>
               </div>
             </div>
-
-            {/* Section: Action Buttons */}
-            <div className="mt-auto space-y-3 p-6">
-              <div className="space-y-1.5">
-                <span className="text-xs font-semibold text-zinc-400">Download Format</span>
-                <div className="grid grid-cols-4 gap-1.5 rounded-lg border border-zinc-800 bg-zinc-900/40 p-1">
-                  {(["svg", "png", "jpeg", "jpg"] as const).map((fmt) => (
-                    <button
-                      key={fmt}
-                      type="button"
-                      onClick={() => setDownloadFormat(fmt)}
-                      className={`rounded px-1.5 py-1 text-[11px] font-bold uppercase transition-all ${
-                        downloadFormat === fmt
-                          ? "bg-zinc-800 text-coral-400 shadow-sm"
-                          : "text-zinc-500 hover:text-zinc-300"
-                      }`}
-                    >
-                      {fmt}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <Button
-                onClick={handleCopy}
-                disabled={!svgContent || rendering}
-                variant={copied ? "default" : "secondary"}
-                className={`w-full py-2.5 font-semibold transition-all ${
-                  copied
-                    ? "bg-emerald-600 text-white shadow-md shadow-emerald-600/10 hover:bg-emerald-700"
-                    : "border border-zinc-800 bg-zinc-900 text-zinc-100 hover:bg-zinc-800 hover:text-zinc-200"
-                }`}
-              >
-                {copied ? (
-                  <>
-                    <Check className="h-4 w-4" />
-                    Copied SVG Code!
-                  </>
-                ) : (
-                  <>
-                    <Copy className="h-4 w-4" />
-                    Copy SVG Code
-                  </>
-                )}
-              </Button>
-
-              <Button
-                onClick={handleDownload}
-                disabled={!svgContent || rendering}
-                className="w-full bg-primary py-2.5 font-semibold text-primary-foreground shadow-lg shadow-coral-500/10 hover:opacity-90"
-              >
-                <Download className="h-4 w-4" />
-                Download {downloadFormat.toUpperCase()} File
-              </Button>
+            <div className="relative min-h-[450px] flex-1 overflow-hidden lg:h-[calc(100%-44px)] lg:min-h-0">
+              <Editor
+                height="100%"
+                defaultLanguage="typescript"
+                value={draftCodes[selectedTemplate]}
+                onChange={(val) => {
+                  if (val !== undefined) {
+                    setDraftCodes((prev) => ({
+                      ...prev,
+                      [selectedTemplate]: val,
+                    }));
+                  }
+                }}
+                options={{
+                  minimap: { enabled: false },
+                  fontSize: 13,
+                  lineNumbers: "on",
+                  wordWrap: "on",
+                  automaticLayout: true,
+                  theme: "vs-dark",
+                  padding: { top: 12 },
+                  tabSize: 2,
+                }}
+              />
             </div>
           </div>
 
-          {/* Right pane - Interactive Live Preview & Code View (Component Preview Style) */}
-          <div className="relative flex flex-1 animate-in flex-col overflow-hidden bg-zinc-950 p-6 duration-300 fade-in lg:p-8">
-            {/* Background grid accents */}
-            <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#e11d4803_1px,transparent_1px),linear-gradient(to_bottom,#e11d4803_1px,transparent_1px)] bg-[size:32px_32px]" />
+          {/* Right/Lower Panel: Live Preview & Configurations Sidebar */}
+          <div className="flex flex-1 flex-col divide-y divide-zinc-900 overflow-y-auto bg-zinc-950 lg:h-full lg:w-1/2">
+            {/* Live Preview Pane */}
+            <div className="relative flex flex-col p-6 lg:p-8">
+              {/* Background grid accents */}
+              <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#e11d4803_1px,transparent_1px),linear-gradient(to_bottom,#e11d4803_1px,transparent_1px)] bg-[size:32px_32px]" />
 
-            {/* Component Preview Header */}
-            <div className="z-10 mb-6 flex flex-col gap-4 border-b border-zinc-900 pb-4 select-none sm:flex-row sm:items-center sm:justify-between">
-              {/* Left Side: Tabs */}
-              <div className="flex items-center gap-4">
+              {/* Tab Selector Header */}
+              <div className="z-10 mb-6 flex items-center justify-between border-b border-zinc-900 pb-4 select-none">
                 <div className="inline-flex h-9 items-center justify-center rounded-lg border border-zinc-800/80 bg-zinc-900/50 p-1 text-zinc-400">
-                  <button
-                    onClick={() => setPreviewTab("preview")}
-                    className={`inline-flex items-center justify-center rounded-md px-3.5 py-1 text-xs font-semibold whitespace-nowrap transition-all focus-visible:outline-none ${
-                      previewTab === "preview"
-                        ? "bg-zinc-800 text-zinc-100 shadow-sm"
-                        : "hover:text-zinc-200"
-                    }`}
-                  >
-                    Preview
-                  </button>
-                  <button
-                    onClick={() => setPreviewTab("code")}
-                    className={`inline-flex items-center justify-center rounded-md px-3.5 py-1 text-xs font-semibold whitespace-nowrap transition-all focus-visible:outline-none ${
-                      previewTab === "code"
-                        ? "bg-zinc-800 text-zinc-100 shadow-sm"
-                        : "hover:text-zinc-200"
-                    }`}
-                  >
-                    Code
-                  </button>
+                  {(["svg", "png", "html"] as const).map((type) => (
+                    <button
+                      key={type}
+                      onClick={() => setRenderType(type)}
+                      className={`inline-flex items-center justify-center rounded-md px-3.5 py-1 text-xs font-semibold whitespace-nowrap transition-all focus-visible:outline-none ${
+                        renderType === type
+                          ? "bg-zinc-800 text-zinc-100 shadow-sm"
+                          : "hover:text-zinc-200"
+                      }`}
+                    >
+                      {type.toUpperCase()}
+                    </button>
+                  ))}
                 </div>
                 {rendering && <RefreshCw className="h-3.5 w-3.5 animate-spin text-coral-400" />}
               </div>
 
-              {/* Right Side Actions */}
-              <div className="flex items-center gap-2">
-                {previewTab === "code" && (
-                  <Button
-                    onClick={handleCodeCopy}
-                    size="sm"
-                    variant="outline"
-                    className="h-8 gap-1.5 border-zinc-800 bg-zinc-900/40 text-zinc-400 hover:text-zinc-200"
+              {/* Rendering Core Display */}
+              <div className="relative flex min-h-[300px] w-full flex-col items-center justify-center">
+                {fontsLoading ? (
+                  <div className="flex flex-col items-center gap-3">
+                    <RefreshCw className="h-8 w-8 animate-spin text-coral-500" />
+                    <p className="text-sm font-medium text-zinc-400">
+                      Fetching font files for Satori...
+                    </p>
+                  </div>
+                ) : fontsError ? (
+                  <Alert
+                    variant="destructive"
+                    className="flex max-w-md flex-col items-center gap-3 bg-red-950/20 p-6 text-center"
                   >
-                    {copiedCode ? (
+                    <AlertCircle className="h-10 w-10 text-destructive" />
+                    <AlertTitle className="font-semibold text-destructive">
+                      Failed to Load Fonts
+                    </AlertTitle>
+                    <AlertDescription className="text-xs leading-relaxed text-destructive/80">
+                      {fontsError}. Please check your internet connection or reload the page.
+                    </AlertDescription>
+                    <Button
+                      onClick={() => window.location.reload()}
+                      variant="destructive"
+                      size="sm"
+                      className="mt-2 font-medium text-white"
+                    >
+                      Retry Loading
+                    </Button>
+                  </Alert>
+                ) : compileError || renderError ? (
+                  <Alert
+                    variant="destructive"
+                    className="flex max-w-2xl flex-col items-start gap-3 border-amber-900/50 bg-amber-950/20 p-6 text-left"
+                  >
+                    <div className="flex items-center gap-2">
+                      <AlertCircle className="h-5 w-5 text-amber-500" />
+                      <AlertTitle className="font-semibold text-amber-400">
+                        {compileError ? "Compilation / Code Error" : "Satori Rendering Error"}
+                      </AlertTitle>
+                    </div>
+                    <AlertDescription className="max-h-60 w-full overflow-y-auto font-mono text-xs leading-relaxed whitespace-pre-wrap text-amber-200/80">
+                      {compileError || renderError}
+                    </AlertDescription>
+                  </Alert>
+                ) : (
+                  <Card
+                    className="relative overflow-hidden rounded-2xl border-zinc-900 bg-background shadow-2xl shadow-black/80 transition-all duration-300"
+                    style={{
+                      width: "100%",
+                      maxWidth: `${typeof width === "number" ? Math.max(100, width) : 1200}px`,
+                      aspectRatio: `${typeof width === "number" ? Math.max(100, width) : 1200} / ${typeof height === "number" ? Math.max(100, height) : 630}`,
+                    }}
+                  >
+                    <CardContent className="h-full w-full p-0">
+                      {/* Checkerboard background */}
+                      <div
+                        className="pointer-events-none absolute inset-0 opacity-[0.03]"
+                        style={{
+                          backgroundImage:
+                            "radial-gradient(circle, #fff 10%, transparent 11%), radial-gradient(circle, #fff 10%, transparent 11%)",
+                          backgroundSize: "20px 20px",
+                          backgroundPosition: "0 0, 10px 10px",
+                        }}
+                      />
+
+                      {/* Embed content based on render type */}
+                      {renderType === "svg" && svgContent && (
+                        <div
+                          className="flex h-full w-full items-center justify-center select-none"
+                          dangerouslySetInnerHTML={{ __html: svgContent }}
+                        />
+                      )}
+
+                      {renderType === "png" && pngUrl && (
+                        <img
+                          src={pngUrl}
+                          className="h-full w-full object-contain select-none"
+                          alt="Live PNG Preview"
+                        />
+                      )}
+
+                      {renderType === "html" && (
+                        <iframe
+                          title="HTML Live Preview"
+                          ref={handleIframeRef}
+                          className="h-full w-full border-0 bg-zinc-900"
+                        />
+                      )}
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
+
+              {/* Rendering Performance Footer */}
+              <div className="mt-4 flex items-center justify-between px-1 text-xs text-zinc-500 select-none">
+                <span className="font-mono">
+                  {renderType.toUpperCase()} Preview Rendered in {renderTime.toFixed(1)}ms
+                </span>
+                <span className="font-mono">
+                  {width || 1200} × {height || 630} px
+                </span>
+              </div>
+            </div>
+
+            {/* Satori Playground Configurations Area */}
+            <div className="space-y-6 p-6">
+              {/* Dimensions Subsection */}
+              <div>
+                <div className="mb-4 flex items-center gap-2 select-none">
+                  <Sliders className="h-4 w-4 text-coral-400" />
+                  <h2 className="text-xs font-bold tracking-widest text-zinc-400 uppercase">
+                    Container Configurations
+                  </h2>
+                </div>
+
+                <div className="space-y-4">
+                  {/* Aspect Ratio Preset Buttons */}
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setWidth(1200);
+                        setHeight(630);
+                      }}
+                      className="min-w-[100px] flex-1 border-zinc-800 bg-zinc-900/40 text-zinc-400 hover:border-zinc-700 hover:bg-zinc-900 hover:text-zinc-200"
+                    >
+                      1.9:1 (1200×630)
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setWidth(1200);
+                        setHeight(600);
+                      }}
+                      className="min-w-[100px] flex-1 border-zinc-800 bg-zinc-900/40 text-zinc-400 hover:border-zinc-700 hover:bg-zinc-900 hover:text-zinc-200"
+                    >
+                      2:1 (1200×600)
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setWidth(800);
+                        setHeight(400);
+                      }}
+                      className="min-w-[100px] flex-1 border-zinc-800 bg-zinc-900/40 text-zinc-400 hover:border-zinc-700 hover:bg-zinc-900 hover:text-zinc-200"
+                    >
+                      Reset (800×400)
+                    </Button>
+                  </div>
+
+                  {/* Width slider & input */}
+                  <div className="grid gap-3">
+                    <div className="space-y-1">
+                      <div className="flex items-center justify-between text-xs text-zinc-400">
+                        <label htmlFor="width-input">Width: {width || 1200}px</label>
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <input
+                          type="range"
+                          min="100"
+                          max="1200"
+                          value={width || 1200}
+                          onChange={(e) => setWidth(parseInt(e.target.value, 10))}
+                          className="h-1.5 flex-1 cursor-pointer appearance-none rounded-lg bg-zinc-800 accent-coral-500"
+                        />
+                        <Input
+                          id="width-input"
+                          type="number"
+                          value={width}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            if (val === "") setWidth("");
+                            else {
+                              const parsed = parseInt(val, 10);
+                              setWidth(isNaN(parsed) ? "" : parsed);
+                            }
+                          }}
+                          onBlur={() => {
+                            if (typeof width !== "number" || width < 100) {
+                              setWidth(1200);
+                            }
+                          }}
+                          className="h-8 w-20 border-zinc-800 bg-zinc-900/40 text-center text-xs text-zinc-200"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Height slider & input */}
+                    <div className="space-y-1">
+                      <div className="flex items-center justify-between text-xs text-zinc-400">
+                        <label htmlFor="height-input">Height: {height || 630}px</label>
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <input
+                          type="range"
+                          min="100"
+                          max="1200"
+                          value={height || 630}
+                          onChange={(e) => setHeight(parseInt(e.target.value, 10))}
+                          className="h-1.5 flex-1 cursor-pointer appearance-none rounded-lg bg-zinc-800 accent-coral-500"
+                        />
+                        <Input
+                          id="height-input"
+                          type="number"
+                          value={height}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            if (val === "") setHeight("");
+                            else {
+                              const parsed = parseInt(val, 10);
+                              setHeight(isNaN(parsed) ? "" : parsed);
+                            }
+                          }}
+                          onBlur={() => {
+                            if (typeof height !== "number" || height < 100) {
+                              setHeight(630);
+                            }
+                          }}
+                          className="h-8 w-20 border-zinc-800 bg-zinc-900/40 text-center text-xs text-zinc-200"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Satori Core Engine Options Section */}
+              <div className="grid grid-cols-2 gap-4 border-t border-zinc-900 pt-4 select-none">
+                <div className="flex items-center gap-2">
+                  <input
+                    id="debug-checkbox"
+                    type="checkbox"
+                    checked={debug}
+                    onChange={(e) => setDebug(e.target.checked)}
+                    className="h-4 w-4 rounded border-zinc-800 bg-zinc-900 accent-coral-500"
+                  />
+                  <label htmlFor="debug-checkbox" className="text-xs text-zinc-300 cursor-pointer">
+                    Debug Mode Bounding Box
+                  </label>
+                </div>
+                <div className="flex items-center gap-2">
+                  <input
+                    id="embed-font-checkbox"
+                    type="checkbox"
+                    checked={embedFont}
+                    onChange={(e) => setEmbedFont(e.target.checked)}
+                    className="h-4 w-4 rounded border-zinc-800 bg-zinc-900 accent-coral-500"
+                  />
+                  <label
+                    htmlFor="embed-font-checkbox"
+                    className="cursor-pointer text-xs text-zinc-300"
+                  >
+                    Embed Font Paths
+                  </label>
+                </div>
+              </div>
+
+              {/* Emoji Provider Selector */}
+              <div className="flex items-center justify-between border-t border-zinc-900 pt-4">
+                <label htmlFor="emoji-provider" className="text-xs text-zinc-400">
+                  Emoji Provider Option
+                </label>
+                <select
+                  id="emoji-provider"
+                  value={emojiProvider}
+                  onChange={(e) => setEmojiProvider(e.target.value)}
+                  className="rounded-lg border border-zinc-800 bg-zinc-900/50 px-2.5 py-1 text-xs text-zinc-300 outline-none focus:border-zinc-700"
+                >
+                  <option value="twemoji">Twemoji</option>
+                  <option value="fluent">Fluent Emoji</option>
+                  <option value="fluentFlat">Fluent Emoji Flat</option>
+                  <option value="noto">Noto Emoji</option>
+                  <option value="blobmoji">Blobmoji</option>
+                  <option value="openmoji">OpenMoji</option>
+                </select>
+              </div>
+
+              {/* Download and Export Controls Area */}
+              <div className="space-y-3 border-t border-zinc-900 pt-6">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-semibold text-zinc-400">
+                    Download Output Format
+                  </span>
+                  <div className="grid grid-cols-4 gap-1 rounded-lg border border-zinc-800 bg-zinc-900/40 p-0.5">
+                    {(["svg", "png", "jpeg", "jpg"] as const).map((fmt) => (
+                      <button
+                        key={fmt}
+                        type="button"
+                        onClick={() => setDownloadFormat(fmt)}
+                        className={`rounded px-2.5 py-1 text-[10px] font-bold uppercase transition-all ${
+                          downloadFormat === fmt
+                            ? "bg-zinc-800 text-coral-400 shadow-sm"
+                            : "text-zinc-500 hover:text-zinc-300"
+                        }`}
+                      >
+                        {fmt}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <Button
+                    onClick={handleCopy}
+                    disabled={!svgContent || rendering}
+                    variant={copied ? "default" : "secondary"}
+                    className={`py-2 text-xs font-semibold transition-all ${
+                      copied
+                        ? "bg-emerald-600 text-white hover:bg-emerald-700"
+                        : "border border-zinc-800 bg-zinc-900 text-zinc-200 hover:bg-zinc-800"
+                    }`}
+                  >
+                    {copied ? (
                       <>
-                        <Check className="h-3.5 w-3.5 text-emerald-500" />
-                        <span className="text-xs">Copied!</span>
+                        <Check className="h-3.5 w-3.5" />
+                        Copied SVG!
                       </>
                     ) : (
                       <>
                         <Copy className="h-3.5 w-3.5" />
-                        <span className="text-xs">Copy Code</span>
+                        Copy SVG Code
                       </>
                     )}
                   </Button>
-                )}
+
+                  <Button
+                    onClick={handleDownload}
+                    disabled={!svgContent || rendering}
+                    className="bg-primary py-2 text-xs font-semibold text-primary-foreground hover:opacity-90"
+                  >
+                    <Download className="h-3.5 w-3.5" />
+                    Download {downloadFormat.toUpperCase()}
+                  </Button>
+                </div>
               </div>
             </div>
-
-            {/* Component Preview Content Body */}
-            <div className="relative flex min-h-0 flex-1 flex-col">
-              {previewTab === "preview" ? (
-                /* Preview Mode */
-                <div className="relative flex flex-1 flex-col items-center justify-center">
-                  <div className="relative flex min-h-[300px] w-full flex-1 items-center justify-center">
-                    {fontsLoading ? (
-                      <div className="flex flex-col items-center gap-3">
-                        <RefreshCw className="h-8 w-8 animate-spin text-coral-500" />
-                        <p className="text-sm font-medium text-zinc-400">
-                          Fetching font files for Satori...
-                        </p>
-                      </div>
-                    ) : fontsError ? (
-                      <Alert
-                        variant="destructive"
-                        className="flex max-w-md flex-col items-center gap-3 bg-red-950/20 p-6 text-center"
-                      >
-                        <AlertCircle className="h-10 w-10 text-destructive" />
-                        <AlertTitle className="font-semibold text-destructive">
-                          Failed to Load Fonts
-                        </AlertTitle>
-                        <AlertDescription className="text-xs leading-relaxed text-destructive/80">
-                          {fontsError}. Please check your internet connection or reload the page.
-                        </AlertDescription>
-                        <Button
-                          onClick={() => window.location.reload()}
-                          variant="destructive"
-                          size="sm"
-                          className="mt-2 font-medium text-white"
-                        >
-                          Retry Loading
-                        </Button>
-                      </Alert>
-                    ) : renderError ? (
-                      <Alert
-                        variant="destructive"
-                        className="flex max-w-2xl flex-col items-start gap-3 border-amber-900/50 bg-amber-950/20 p-6 text-left"
-                      >
-                        <div className="flex items-center gap-2">
-                          <AlertCircle className="h-5 w-5 text-amber-500" />
-                          <AlertTitle className="font-semibold text-amber-400">
-                            Rendering / Code Error
-                          </AlertTitle>
-                        </div>
-                        <AlertDescription className="max-h-60 w-full overflow-y-auto font-mono text-xs leading-relaxed whitespace-pre-wrap text-amber-200/80">
-                          {renderError}
-                        </AlertDescription>
-                      </Alert>
-                    ) : svgContent ? (
-                      <Card
-                        className="relative overflow-hidden rounded-2xl border-zinc-900 bg-background shadow-2xl shadow-black/80 transition-all duration-300"
-                        style={{
-                          width: "100%",
-                          maxWidth: `${typeof width === "number" ? Math.max(100, width) : 1200}px`,
-                          aspectRatio: `${typeof width === "number" ? Math.max(100, width) : 1200} / ${typeof height === "number" ? Math.max(100, height) : 630}`,
-                        }}
-                      >
-                        <CardContent className="h-full w-full p-0">
-                          {/* Checkerboard transparency background */}
-                          <div
-                            className="pointer-events-none absolute inset-0 opacity-[0.03]"
-                            style={{
-                              backgroundImage:
-                                "radial-gradient(circle, #fff 10%, transparent 11%), radial-gradient(circle, #fff 10%, transparent 11%)",
-                              backgroundSize: "20px 20px",
-                              backgroundPosition: "0 0, 10px 10px",
-                            }}
-                          />
-
-                          {/* Embedded Live SVG */}
-                          <div
-                            className="flex h-full w-full items-center justify-center select-none"
-                            dangerouslySetInnerHTML={{ __html: svgContent }}
-                          />
-                        </CardContent>
-                      </Card>
-                    ) : (
-                      <div className="flex flex-col items-center gap-2">
-                        <RefreshCw className="h-6 w-6 animate-spin text-zinc-600" />
-                        <p className="text-xs text-zinc-500">Generating preview...</p>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* View Code button at the bottom of the live preview */}
-                  {svgContent && !fontsLoading && !renderError && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setPreviewTab("code")}
-                      className="mt-6 gap-1.5 border-zinc-800 bg-zinc-900/40 text-zinc-400 hover:text-zinc-200"
-                    >
-                      <Code className="h-3.5 w-3.5" />
-                      <span>View Code</span>
-                    </Button>
-                  )}
-                </div>
-              ) : (
-                /* Code Mode with highly polished native code block inspired by Shadcn UI Component Style */
-                <div className="relative flex min-h-[500px] flex-1 animate-in flex-col overflow-hidden rounded-xl border border-zinc-900 bg-zinc-950 shadow-2xl duration-300 fade-in lg:h-full lg:min-h-[600px]">
-                  <div className="absolute top-3.5 right-4 z-10 text-[10px] font-bold tracking-wider text-zinc-500 uppercase select-none">
-                    Template Source Code
-                  </div>
-                  <div className="relative h-full w-full flex-1 overflow-auto p-6 pt-12 select-text">
-                    <pre className="h-full w-full font-mono text-xs leading-relaxed break-all whitespace-pre-wrap text-zinc-300 sm:text-sm md:break-normal">
-                      <code>{TEMPLATE_CODES[selectedTemplate]}</code>
-                    </pre>
-                  </div>
-                </div>
-              )}
-            </div>
           </div>
-        </main>
+        </div>
       </div>
+
+      {/* Render portaled components into iframe element document body */}
+      {iframeDoc &&
+        dynamicComponent &&
+        createPortal(React.createElement(dynamicComponent, {}), iframeDoc.body)}
     </div>
   );
 }
