@@ -562,6 +562,15 @@ export default function App() {
     }
   };
 
+  const handleEditorBeforeMount = (monaco: any) => {
+    monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
+      jsx: monaco.languages.typescript.JsxEmit.React,
+      target: monaco.languages.typescript.ScriptTarget.ES2020,
+      esModuleInterop: true,
+      allowNonTsExtensions: true,
+    });
+  };
+
   return (
     <div className="selection:text-coral-200 flex min-h-screen flex-col bg-background text-foreground selection:bg-coral-500/30 lg:h-screen lg:overflow-hidden">
       {/* Decorative top ambient glow */}
@@ -782,6 +791,8 @@ export default function App() {
               <Editor
                 height="100%"
                 defaultLanguage="typescript"
+                path={`file:///${selectedTemplate}.tsx`}
+                beforeMount={handleEditorBeforeMount}
                 value={draftCodes[selectedTemplate]}
                 onChange={(val) => {
                   if (val !== undefined) {
