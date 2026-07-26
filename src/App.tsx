@@ -1,6 +1,5 @@
 import { Field } from "@base-ui/react/field";
 import geistNormalUrl from "@fontsource-variable/geist/files/geist-latin-wght-normal.woff2?url";
-import Editor, { loader } from "@monaco-editor/react";
 import {
   Copy,
   Check,
@@ -12,7 +11,6 @@ import {
   X,
   Code,
 } from "lucide-react";
-import * as monaco from "monaco-editor";
 import React, { useState, useEffect } from "react";
 import satori from "satori";
 import { woff2Decode } from "woff-lib/woff2/decode";
@@ -29,9 +27,6 @@ import MinimalTemplate from "./template/minimal";
 import minimalCode from "./template/minimal.tsx?raw";
 import PortfolioTemplate from "./template/portfolio";
 import portfolioCode from "./template/portfolio.tsx?raw";
-
-// Configure monaco loader to use npm version directly to work offline or in restricted environments
-loader.config({ monaco });
 
 const TEMPLATE_CODES = {
   blog: blogCode,
@@ -797,38 +792,15 @@ export default function App() {
                   )}
                 </div>
               ) : (
-                /* Code Mode with highly polished Monaco Editor inspired by Satori Playground */
+                /* Code Mode with highly polished native code block inspired by Shadcn UI Component Style */
                 <div className="relative flex min-h-[500px] flex-1 animate-in flex-col overflow-hidden rounded-xl border border-zinc-900 bg-zinc-950 shadow-2xl duration-300 fade-in lg:h-full lg:min-h-[600px]">
-                  <div className="absolute top-2 right-4 z-10 text-[10px] font-bold tracking-wider text-zinc-600 uppercase select-none">
-                    Satori Code Editor
+                  <div className="absolute top-3.5 right-4 z-10 text-[10px] font-bold tracking-wider text-zinc-500 uppercase select-none">
+                    Template Source Code
                   </div>
-                  <div className="relative h-full min-h-[400px] w-full flex-1 pt-10">
-                    <Editor
-                      height="100%"
-                      defaultLanguage="typescript"
-                      theme="vs-dark"
-                      value={TEMPLATE_CODES[selectedTemplate]}
-                      options={{
-                        readOnly: true,
-                        wordWrap: "on",
-                        wrappingIndent: "indent",
-                        minimap: { enabled: false },
-                        fontSize: 14,
-                        lineHeight: 22,
-                        fontFamily: "Geist Mono, monospace",
-                        lineNumbers: "on",
-                        scrollBeyondLastLine: false,
-                        automaticLayout: true,
-                        tabSize: 2,
-                        padding: { top: 12, bottom: 12 },
-                        cursorBlinking: "smooth",
-                        cursorSmoothCaretAnimation: "on",
-                        scrollbar: {
-                          vertical: "visible",
-                          horizontal: "visible",
-                        },
-                      }}
-                    />
+                  <div className="relative h-full w-full flex-1 overflow-auto p-6 pt-12 select-text">
+                    <pre className="h-full w-full font-mono text-xs leading-relaxed break-all whitespace-pre-wrap text-zinc-300 sm:text-sm md:break-normal">
+                      <code>{TEMPLATE_CODES[selectedTemplate]}</code>
+                    </pre>
                   </div>
                 </div>
               )}
