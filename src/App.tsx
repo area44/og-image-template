@@ -56,10 +56,7 @@ interface LoadedFonts {
 
 function transpileAndEval(code: string): React.ComponentType<any> {
   const transformed = Babel.transform(code, {
-    presets: [
-      ["react", { runtime: "classic" }],
-      "typescript"
-    ],
+    presets: [["react", { runtime: "classic" }], "typescript"],
     plugins: [["transform-modules-commonjs", { loose: true }]],
   });
 
@@ -1075,7 +1072,7 @@ export default function App() {
                     onChange={(e) => setDebug(e.target.checked)}
                     className="h-4 w-4 rounded border-zinc-800 bg-zinc-900 accent-coral-500"
                   />
-                  <label htmlFor="debug-checkbox" className="text-xs text-zinc-300 cursor-pointer">
+                  <label htmlFor="debug-checkbox" className="cursor-pointer text-xs text-zinc-300">
                     Debug Mode Bounding Box
                   </label>
                 </div>
