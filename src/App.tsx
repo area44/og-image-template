@@ -853,7 +853,7 @@ export default function App() {
                 </div>
               ) : (
                 /* Code Mode with Monaco Editor supporting live edits */
-                <div className="relative flex min-h-[500px] flex-1 animate-in flex-col overflow-hidden rounded-xl border border-zinc-900 bg-zinc-950 shadow-2xl duration-300 fade-in lg:h-full lg:min-h-[600px]">
+                <div className="relative flex min-h-[500px] flex-1 animate-in flex-col overflow-hidden rounded-xl border border-zinc-900 bg-zinc-950 shadow-2xl duration-300 fade-in lg:h-[calc(100vh-200px)]">
                   <div className="absolute top-3.5 right-4 z-10 text-[10px] font-bold tracking-wider text-zinc-500 uppercase select-none">
                     Template Source Code
                   </div>
