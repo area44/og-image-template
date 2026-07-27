@@ -94,10 +94,7 @@ export function Header({ isSidebarOpen, setIsSidebarOpen, onShare, sharedCopied 
             </g>
           </svg>
         </div>
-        <span className="hidden font-semibold text-zinc-200 sm:inline">OG Image Playground</span>
-        <span className="rounded bg-zinc-800 px-1.5 py-0.5 text-[10px] font-medium text-zinc-400">
-          satori v0.12.2
-        </span>
+        <span className="hidden font-semibold text-zinc-200 sm:inline">OG Image Coral</span>
       </div>
       <div className="flex items-center gap-4">
         <Button

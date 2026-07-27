@@ -68,7 +68,6 @@ export function Sidebar({ selectedTemplate, onTemplateSelect, isSidebarOpen }: S
       <div className="border-t border-zinc-900 p-4">
         <div className="flex items-center justify-between px-1 text-[11px] text-zinc-500">
           <span>By AREA44</span>
-          <span>Renderer v0.12.1</span>
         </div>
       </div>
     </aside>
