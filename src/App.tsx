@@ -471,12 +471,8 @@ export default function App() {
             className="w-full"
           >
             <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="code" className="py-1.5 text-xs font-semibold">
-                Editor
-              </TabsTrigger>
-              <TabsTrigger value="preview" className="py-1.5 text-xs font-semibold">
-                Live Preview & Configs
-              </TabsTrigger>
+              <TabsTrigger value="code">Editor</TabsTrigger>
+              <TabsTrigger value="preview">Live Preview & Configs</TabsTrigger>
             </TabsList>
           </Tabs>
         </div>
