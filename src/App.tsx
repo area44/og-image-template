@@ -475,7 +475,7 @@ export default function App() {
                   : "text-zinc-400 hover:bg-transparent hover:text-zinc-200"
               }`}
             >
-              TSX Source Editor
+              Editor
             </Button>
             <Button
               onClick={() => setActivePanel("preview")}

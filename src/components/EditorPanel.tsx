@@ -41,9 +41,7 @@ export function EditorPanel({
       }`}
     >
       <div className="flex h-11 shrink-0 items-center justify-between border-b border-zinc-900 bg-zinc-950/50 px-4">
-        <span className="text-xs font-semibold tracking-wider text-zinc-400 uppercase">
-          TSX Source Editor
-        </span>
+        <span className="text-xs font-semibold tracking-wider text-zinc-400 uppercase">Editor</span>
         <div className="flex items-center gap-1.5">
           <Button
             onClick={onReset}

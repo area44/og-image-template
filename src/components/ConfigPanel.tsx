@@ -37,9 +37,7 @@ export function ConfigPanel({
       <div>
         <div className="mb-4 flex items-center gap-2 select-none">
           <Sliders className="h-4 w-4 text-coral-400" />
-          <h2 className="text-xs font-bold tracking-widest text-zinc-400 uppercase">
-            Container Configurations
-          </h2>
+          <h2 className="text-xs font-bold tracking-widest text-zinc-400 uppercase">Config</h2>
         </div>
 
         <div className="space-y-4">
