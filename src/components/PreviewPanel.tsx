@@ -1,5 +1,4 @@
 import { AlertCircle, RefreshCw } from "lucide-react";
-import React from "react";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -8,33 +7,25 @@ import { Card, CardContent } from "@/components/ui/card";
 interface PreviewPanelProps {
   width: number | "";
   height: number | "";
-  renderType: "svg" | "png" | "html";
-  setRenderType: React.Dispatch<React.SetStateAction<"svg" | "png" | "html">>;
   rendering: boolean;
   fontsLoading: boolean;
   fontsError: string | null;
   compileError: string | null;
   renderError: string | null;
   svgContent: string;
-  pngUrl: string | null;
   renderTime: number;
-  handleIframeRef: (iframe: HTMLIFrameElement | null) => void;
 }
 
 export function PreviewPanel({
   width,
   height,
-  renderType,
-  setRenderType,
   rendering,
   fontsLoading,
   fontsError,
   compileError,
   renderError,
   svgContent,
-  pngUrl,
   renderTime,
-  handleIframeRef,
 }: PreviewPanelProps) {
   const resolvedWidth = typeof width === "number" ? Math.max(100, width) : 1200;
   const resolvedHeight = typeof height === "number" ? Math.max(100, height) : 630;
@@ -44,21 +35,8 @@ export function PreviewPanel({
       {/* Background grid accents */}
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#e11d4803_1px,transparent_1px),linear-gradient(to_bottom,#e11d4803_1px,transparent_1px)] bg-[size:32px_32px]" />
 
-      {/* Tab Selector Header */}
-      <div className="z-10 mb-6 flex items-center justify-between border-b border-zinc-900 pb-4 select-none">
-        <div className="inline-flex h-9 items-center justify-center rounded-lg border border-zinc-800/80 bg-zinc-900/50 p-1 text-zinc-400">
-          {(["svg", "png", "html"] as const).map((type) => (
-            <button
-              key={type}
-              onClick={() => setRenderType(type)}
-              className={`inline-flex items-center justify-center rounded-md px-3.5 py-1 text-xs font-semibold whitespace-nowrap transition-all focus-visible:outline-none ${
-                renderType === type ? "bg-zinc-800 text-zinc-100 shadow-sm" : "hover:text-zinc-200"
-              }`}
-            >
-              {type.toUpperCase()}
-            </button>
-          ))}
-        </div>
+      {/* Top Header holding only loading spinner */}
+      <div className="z-10 mb-6 flex h-9 items-center justify-end border-b border-zinc-900 pb-4 select-none">
         {rendering && <RefreshCw className="h-3.5 w-3.5 animate-spin text-coral-400" />}
       </div>
 
@@ -124,27 +102,11 @@ export function PreviewPanel({
                 }}
               />
 
-              {/* Embed content based on render type */}
-              {renderType === "svg" && svgContent && (
+              {/* Embed direct SVG content */}
+              {svgContent && (
                 <div
                   className="flex h-full w-full items-center justify-center select-none"
                   dangerouslySetInnerHTML={{ __html: svgContent }}
-                />
-              )}
-
-              {renderType === "png" && pngUrl && (
-                <img
-                  src={pngUrl}
-                  className="h-full w-full object-contain select-none"
-                  alt="Live PNG Preview"
-                />
-              )}
-
-              {renderType === "html" && (
-                <iframe
-                  title="HTML Live Preview"
-                  ref={handleIframeRef}
-                  className="h-full w-full border-0 bg-zinc-900"
                 />
               )}
             </CardContent>
@@ -154,9 +116,7 @@ export function PreviewPanel({
 
       {/* Rendering Performance Footer */}
       <div className="mt-4 flex items-center justify-between px-1 text-xs text-zinc-500 select-none">
-        <span className="font-mono">
-          {renderType.toUpperCase()} Preview Rendered in {renderTime.toFixed(1)}ms
-        </span>
+        <span className="font-mono">Preview Rendered in {renderTime.toFixed(1)}ms</span>
         <span className="font-mono">
           {width || 1200} × {height || 630} px
         </span>

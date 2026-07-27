@@ -2,7 +2,6 @@ import geistNormalUrl from "@fontsource-variable/geist/files/geist-latin-wght-no
 import Editor, { useMonaco } from "@monaco-editor/react";
 import { Copy, Check, RefreshCw } from "lucide-react";
 import React, { useState, useEffect } from "react";
-import { createPortal } from "react-dom";
 import satori from "satori";
 import { woff2Decode } from "woff-lib/woff2/decode";
 
@@ -83,9 +82,6 @@ export default function App() {
     () => BlogTemplate,
   );
   const [compileError, setCompileError] = useState<string | null>(null);
-  const [pngUrl, setPngUrl] = useState<string | null>(null);
-  const [renderType, setRenderType] = useState<"svg" | "png" | "html">("svg");
-  const [iframeDoc, setIframeDoc] = useState<Document | null>(null);
   const [renderTime, setRenderTime] = useState<number>(0);
 
   const [sharedCopied, setSharedCopied] = useState(false);
@@ -137,56 +133,6 @@ export default function App() {
       clearTimeout(timeout);
     };
   }, [monaco, selectedTemplate, draftCodes]);
-
-  useEffect(() => {
-    if (!svgContent) {
-      setPngUrl(null);
-      return;
-    }
-
-    const resolvedWidth = typeof width === "number" ? Math.max(100, width) : 1200;
-    const resolvedHeight = typeof height === "number" ? Math.max(100, height) : 630;
-
-    const img = new Image();
-    const blob = new Blob([svgContent], { type: "image/svg+xml;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-
-    let active = true;
-
-    img.onload = () => {
-      const canvas = document.createElement("canvas");
-      canvas.width = resolvedWidth;
-      canvas.height = resolvedHeight;
-      const ctx = canvas.getContext("2d");
-      if (ctx) {
-        ctx.drawImage(img, 0, 0, resolvedWidth, resolvedHeight);
-        try {
-          canvas.toBlob((pngBlob) => {
-            if (active && pngBlob) {
-              const downloadUrl = URL.createObjectURL(pngBlob);
-              setPngUrl((prev) => {
-                if (prev) URL.revokeObjectURL(prev);
-                return downloadUrl;
-              });
-            }
-          }, "image/png");
-        } catch (err) {
-          console.error("Canvas toBlob error:", err);
-        }
-      }
-      URL.revokeObjectURL(url);
-    };
-
-    img.onerror = () => {
-      URL.revokeObjectURL(url);
-    };
-
-    img.src = url;
-
-    return () => {
-      active = false;
-    };
-  }, [svgContent, width, height]);
 
   // Fetch fonts on mount
   useEffect(() => {
@@ -459,14 +405,6 @@ export default function App() {
         }
         if (typeof parsed.width === "number") setWidth(parsed.width);
         if (typeof parsed.height === "number") setHeight(parsed.height);
-        if (
-          typeof parsed.renderType === "string" &&
-          (parsed.renderType === "svg" ||
-            parsed.renderType === "png" ||
-            parsed.renderType === "html")
-        ) {
-          setRenderType(parsed.renderType);
-        }
       } catch (err) {
         console.error("Failed to parse shared state from URL:", err);
       }
@@ -480,7 +418,6 @@ export default function App() {
         code: draftCodes[selectedTemplate],
         width,
         height,
-        renderType,
       };
       const stringified = JSON.stringify(state);
       const encoded = btoa(unescape(encodeURIComponent(stringified)));
@@ -490,73 +427,6 @@ export default function App() {
       setTimeout(() => setSharedCopied(false), 2000);
     } catch (err) {
       console.error("Failed to generate share URL:", err);
-    }
-  };
-
-  const handleIframeRef = (iframe: HTMLIFrameElement | null) => {
-    if (iframe && iframe.contentDocument) {
-      const doc = iframe.contentDocument;
-      if (doc.head.childElementCount === 0) {
-        // Base structure and background style
-        const style = doc.createElement("style");
-        style.innerHTML = `
-          body {
-            margin: 0;
-            padding: 0;
-            display: flex;
-            width: 100%;
-            height: 100%;
-            background-color: #18181b;
-            color: white;
-            font-family: sans-serif;
-          }
-          body > div {
-            display: flex;
-            width: 100%;
-            height: 100%;
-          }
-        `;
-        doc.head.appendChild(style);
-
-        // Load Tailwind CSS CDN
-        const script = doc.createElement("script");
-        script.src = "https://cdn.tailwindcss.com";
-        doc.head.appendChild(script);
-
-        // Configure theme
-        const configScript = doc.createElement("script");
-        configScript.innerHTML = `
-          tailwind.config = {
-            theme: {
-              extend: {
-                colors: {
-                  primary: "#ff7f50",
-                }
-              }
-            }
-          }
-        `;
-        doc.head.appendChild(configScript);
-
-        // Convert Satori `tw` attributes to HTML `class` in real-time
-        const observerScript = doc.createElement("script");
-        observerScript.innerHTML = `
-          const convertTw = () => {
-            document.querySelectorAll("[tw]").forEach((el) => {
-              const tw = el.getAttribute("tw");
-              if (tw) {
-                el.setAttribute("class", tw);
-                el.removeAttribute("tw");
-              }
-            });
-          };
-          const observer = new MutationObserver(convertTw);
-          observer.observe(document.body, { childList: true, subtree: true });
-          convertTw();
-        `;
-        doc.head.appendChild(observerScript);
-      }
-      setIframeDoc(doc);
     }
   };
 
@@ -710,17 +580,13 @@ export default function App() {
             <PreviewPanel
               width={width}
               height={height}
-              renderType={renderType}
-              setRenderType={setRenderType}
               rendering={rendering}
               fontsLoading={fontsLoading}
               fontsError={fontsError}
               compileError={compileError}
               renderError={renderError}
               svgContent={svgContent}
-              pngUrl={pngUrl}
               renderTime={renderTime}
-              handleIframeRef={handleIframeRef}
             />
 
             {/* Config Panel */}
@@ -740,11 +606,6 @@ export default function App() {
           </div>
         </div>
       </div>
-
-      {/* Render portaled components into iframe element document body */}
-      {iframeDoc &&
-        dynamicComponent &&
-        createPortal(React.createElement(dynamicComponent, {}), iframeDoc.body)}
     </div>
   );
 }
