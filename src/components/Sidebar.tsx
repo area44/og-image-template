@@ -1,3 +1,5 @@
+import { Button } from "@/components/ui/button";
+
 import BlogTemplate from "../template/blog";
 import MinimalTemplate from "../template/minimal";
 import PortfolioTemplate from "../template/portfolio";
@@ -45,17 +47,18 @@ export function Sidebar({ selectedTemplate, onTemplateSelect, isSidebarOpen }: S
               const t = TEMPLATES[key];
               const active = selectedTemplate === key;
               return (
-                <button
+                <Button
                   key={key}
                   onClick={() => onTemplateSelect(key)}
-                  className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-semibold transition-all ${
+                  variant="ghost"
+                  className={`flex h-auto w-full items-center justify-start gap-3 rounded-lg px-3 py-2 text-sm font-semibold transition-all ${
                     active
-                      ? "border-l-2 border-coral-500 bg-coral-500/10 pl-2.5 text-coral-400"
+                      ? "border-l-2 border-coral-500 bg-coral-500/10 pl-2.5 text-coral-400 hover:bg-coral-500/15 hover:text-coral-400"
                       : "border-l-2 border-transparent pl-2.5 text-zinc-400 hover:bg-zinc-900/50 hover:text-zinc-200"
                   }`}
                 >
                   <span>{t.name}</span>
-                </button>
+                </Button>
               );
             })}
           </div>
@@ -65,7 +68,6 @@ export function Sidebar({ selectedTemplate, onTemplateSelect, isSidebarOpen }: S
       <div className="border-t border-zinc-900 p-4">
         <div className="flex items-center justify-between px-1 text-[11px] text-zinc-500">
           <span>By AREA44</span>
-          <span>Renderer v0.12.1</span>
         </div>
       </div>
     </aside>

@@ -1,15 +1,15 @@
 import geistNormalUrl from "@fontsource-variable/geist/files/geist-latin-wght-normal.woff2?url";
-import Editor, { useMonaco } from "@monaco-editor/react";
-import { Copy, Check, RefreshCw } from "lucide-react";
+import { useMonaco } from "@monaco-editor/react";
 import React, { useState, useEffect } from "react";
 import satori from "satori";
 import { woff2Decode } from "woff-lib/woff2/decode";
 
 import { ConfigPanel } from "@/components/ConfigPanel";
+import { EditorPanel } from "@/components/EditorPanel";
 import { Header } from "@/components/Header";
 import { PreviewPanel } from "@/components/PreviewPanel";
 import { Sidebar, TEMPLATES, TemplateId } from "@/components/Sidebar";
-import { Button } from "@/components/ui/button";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import BlogTemplate from "./template/blog";
 import blogCode from "./template/blog.tsx?raw";
@@ -69,8 +69,6 @@ export default function App() {
 
   const [copied, setCopied] = useState(false);
   const [downloadFormat, setDownloadFormat] = useState<"svg" | "png" | "jpeg" | "jpg">("svg");
-
-  const [copiedCode, setCopiedCode] = useState(false);
 
   const [draftCodes, setDraftCodes] = useState<Record<TemplateId, string>>({
     blog: blogCode,
@@ -371,18 +369,6 @@ export default function App() {
     }
   };
 
-  const handleCodeCopy = async () => {
-    const codeToDisplay = draftCodes[selectedTemplate];
-    if (!codeToDisplay) return;
-    try {
-      await navigator.clipboard.writeText(codeToDisplay);
-      setCopiedCode(true);
-      setTimeout(() => setCopiedCode(false), 2000);
-    } catch (err) {
-      console.error("Failed to copy code:", err);
-    }
-  };
-
   const handleCodeReset = () => {
     setDraftCodes((prev) => ({
       ...prev,
@@ -478,99 +464,35 @@ export default function App() {
         />
 
         {/* Mobile Tab Switcher */}
-        <div className="flex shrink-0 border-b border-zinc-900 bg-zinc-950 p-2 select-none lg:hidden">
-          <div className="grid w-full grid-cols-2 gap-1 rounded-lg border border-zinc-800/80 bg-zinc-900/30 p-1">
-            <button
-              onClick={() => setActivePanel("code")}
-              className={`rounded-md py-1.5 text-xs font-semibold transition-all ${
-                activePanel === "code"
-                  ? "bg-zinc-800 text-zinc-100 shadow-sm"
-                  : "text-zinc-400 hover:text-zinc-200"
-              }`}
-            >
-              TSX Source Editor
-            </button>
-            <button
-              onClick={() => setActivePanel("preview")}
-              className={`rounded-md py-1.5 text-xs font-semibold transition-all ${
-                activePanel === "preview"
-                  ? "bg-zinc-800 text-zinc-100 shadow-sm"
-                  : "text-zinc-400 hover:text-zinc-200"
-              }`}
-            >
-              Live Preview & Configs
-            </button>
-          </div>
+        <div className="flex w-full shrink-0 border-b border-border bg-zinc-950 p-2 select-none lg:hidden">
+          <Tabs
+            value={activePanel}
+            onValueChange={(val) => setActivePanel(val as "code" | "preview")}
+            className="w-full"
+          >
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="code">Editor</TabsTrigger>
+              <TabsTrigger value="preview">Live Preview & Configs</TabsTrigger>
+            </TabsList>
+          </Tabs>
         </div>
 
         {/* Responsive Workspace Main Content */}
         <div className="flex min-h-0 flex-1 flex-col lg:flex-row lg:overflow-hidden">
           {/* Left/Upper Panel: TSX/TypeScript Code Editor */}
-          <div
-            className={`min-h-0 flex-1 flex-col border-b border-zinc-900 bg-zinc-950 lg:h-full lg:w-1/2 lg:border-r lg:border-b-0 ${activePanel === "code" ? "flex" : "hidden lg:flex"}`}
-          >
-            <div className="flex h-11 shrink-0 items-center justify-between border-b border-zinc-900 bg-zinc-950/50 px-4">
-              <span className="text-xs font-semibold tracking-wider text-zinc-400 uppercase">
-                TSX Source Editor
-              </span>
-              <div className="flex items-center gap-1.5">
-                <Button
-                  onClick={handleCodeReset}
-                  size="sm"
-                  variant="outline"
-                  className="h-7 gap-1 border-zinc-800 bg-zinc-900/40 px-2.5 text-zinc-400 hover:text-zinc-200"
-                >
-                  <RefreshCw className="h-3 w-3" />
-                  <span className="text-[11px]">Reset</span>
-                </Button>
-                <Button
-                  onClick={handleCodeCopy}
-                  size="sm"
-                  variant="outline"
-                  className="h-7 gap-1 border-zinc-800 bg-zinc-900/40 px-2.5 text-zinc-400 hover:text-zinc-200"
-                >
-                  {copiedCode ? (
-                    <>
-                      <Check className="h-3 w-3 text-emerald-500" />
-                      <span className="text-[11px]">Copied!</span>
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="h-3 w-3" />
-                      <span className="text-[11px]">Copy</span>
-                    </>
-                  )}
-                </Button>
-              </div>
-            </div>
-            <div className="min-h-0 w-full flex-1 overflow-hidden">
-              <Editor
-                height="100%"
-                defaultLanguage="typescript"
-                path={`file:///${selectedTemplate}.tsx`}
-                beforeMount={handleEditorBeforeMount}
-                value={draftCodes[selectedTemplate]}
-                onChange={(val) => {
-                  if (val !== undefined) {
-                    setDraftCodes((prev) => ({
-                      ...prev,
-                      [selectedTemplate]: val,
-                    }));
-                  }
-                }}
-                options={{
-                  minimap: { enabled: false },
-                  fontSize: 13,
-                  lineNumbers: "on",
-                  wordWrap: "on",
-                  automaticLayout: true,
-                  theme: "vs-dark",
-                  padding: { top: 12 },
-                  tabSize: 2,
-                }}
-              />
-            </div>
-          </div>
+          <EditorPanel
+            selectedTemplate={selectedTemplate}
+            value={draftCodes[selectedTemplate]}
+            onChange={(val) => {
+              setDraftCodes((prev) => ({
+                ...prev,
+                [selectedTemplate]: val,
+              }));
+            }}
+            onReset={handleCodeReset}
+            activePanel={activePanel}
+            beforeMount={handleEditorBeforeMount}
+          />
 
           {/* Right/Lower Panel: Live Preview & Configurations Sidebar */}
           <div
