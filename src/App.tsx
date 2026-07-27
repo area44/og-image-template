@@ -464,31 +464,17 @@ export default function App() {
         />
 
         {/* Mobile Tab Switcher */}
-        <div className="flex w-full shrink-0 border-b border-zinc-900 bg-zinc-950 p-2 select-none lg:hidden">
+        <div className="flex w-full shrink-0 border-b border-border bg-zinc-950 p-2 select-none lg:hidden">
           <Tabs
             value={activePanel}
             onValueChange={(val) => setActivePanel(val as "code" | "preview")}
             className="w-full"
           >
-            <TabsList className="grid w-full grid-cols-2 gap-1 rounded-lg border border-zinc-800/80 bg-zinc-900/30 p-1">
-              <TabsTrigger
-                value="code"
-                className={`h-auto rounded-md py-1.5 text-xs font-semibold transition-all ${
-                  activePanel === "code"
-                    ? "bg-zinc-800 text-zinc-100 shadow-sm hover:bg-zinc-800 hover:text-zinc-100"
-                    : "text-zinc-400 hover:bg-transparent hover:text-zinc-200"
-                }`}
-              >
+            <TabsList className="grid w-full grid-cols-2 rounded-lg border border-zinc-800/20 bg-zinc-900/40 p-1">
+              <TabsTrigger value="code" className="cursor-pointer py-1.5 text-xs font-semibold">
                 Editor
               </TabsTrigger>
-              <TabsTrigger
-                value="preview"
-                className={`h-auto rounded-md py-1.5 text-xs font-semibold transition-all ${
-                  activePanel === "preview"
-                    ? "bg-zinc-800 text-zinc-100 shadow-sm hover:bg-zinc-800 hover:text-zinc-100"
-                    : "text-zinc-400 hover:bg-transparent hover:text-zinc-200"
-                }`}
-              >
+              <TabsTrigger value="preview" className="cursor-pointer py-1.5 text-xs font-semibold">
                 Live Preview & Configs
               </TabsTrigger>
             </TabsList>
