@@ -89,6 +89,7 @@ export default function App() {
   const [width, setWidth] = useState<number | "">(1200);
   const [height, setHeight] = useState<number | "">(630);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [activePanel, setActivePanel] = useState<"code" | "preview">("code");
 
   const [fonts, setFonts] = useState<LoadedFonts | null>(null);
   const [fontsLoading, setFontsLoading] = useState(true);
@@ -116,9 +117,6 @@ export default function App() {
   const [iframeDoc, setIframeDoc] = useState<Document | null>(null);
   const [renderTime, setRenderTime] = useState<number>(0);
 
-  const [debug, setDebug] = useState(false);
-  const [embedFont, setEmbedFont] = useState(true);
-  const [emojiProvider, setEmojiProvider] = useState<string>("twemoji");
   const [sharedCopied, setSharedCopied] = useState(false);
 
   useEffect(() => {
@@ -268,8 +266,6 @@ export default function App() {
         const options = {
           width: resolvedWidth,
           height: resolvedHeight,
-          debug: debug,
-          embedFont: embedFont,
           fonts: [
             {
               name: "sans-serif",
@@ -338,7 +334,7 @@ export default function App() {
       isMounted = false;
       clearTimeout(timeout);
     };
-  }, [selectedTemplate, width, height, fonts, dynamicComponent, debug, embedFont]);
+  }, [selectedTemplate, width, height, fonts, dynamicComponent]);
 
   const handleCopy = async () => {
     if (!svgContent) return;
@@ -457,8 +453,6 @@ export default function App() {
         }
         if (typeof parsed.width === "number") setWidth(parsed.width);
         if (typeof parsed.height === "number") setHeight(parsed.height);
-        if (typeof parsed.debug === "boolean") setDebug(parsed.debug);
-        if (typeof parsed.embedFont === "boolean") setEmbedFont(parsed.embedFont);
         if (
           typeof parsed.renderType === "string" &&
           (parsed.renderType === "svg" ||
@@ -480,8 +474,6 @@ export default function App() {
         code: draftCodes[selectedTemplate],
         width,
         height,
-        debug,
-        embedFont,
         renderType,
       };
       const stringified = JSON.stringify(state);
@@ -749,10 +741,38 @@ export default function App() {
           </div>
         </aside>
 
+        {/* Mobile Tab Switcher (Visible only on mobile/tablet) */}
+        <div className="flex shrink-0 border-b border-zinc-900 bg-zinc-950 p-2 select-none lg:hidden">
+          <div className="grid w-full grid-cols-2 gap-1 rounded-lg border border-zinc-800/80 bg-zinc-900/30 p-1">
+            <button
+              onClick={() => setActivePanel("code")}
+              className={`rounded-md py-1.5 text-xs font-semibold transition-all ${
+                activePanel === "code"
+                  ? "bg-zinc-800 text-zinc-100 shadow-sm"
+                  : "text-zinc-400 hover:text-zinc-200"
+              }`}
+            >
+              TSX Source Editor
+            </button>
+            <button
+              onClick={() => setActivePanel("preview")}
+              className={`rounded-md py-1.5 text-xs font-semibold transition-all ${
+                activePanel === "preview"
+                  ? "bg-zinc-800 text-zinc-100 shadow-sm"
+                  : "text-zinc-400 hover:text-zinc-200"
+              }`}
+            >
+              Live Preview & Configs
+            </button>
+          </div>
+        </div>
+
         {/* Responsive Workspace Main Content */}
         <div className="flex min-h-0 flex-1 flex-col lg:flex-row lg:overflow-hidden">
           {/* Left/Upper Panel: TSX/TypeScript Code Editor */}
-          <div className="flex flex-1 flex-col border-b border-zinc-900 bg-zinc-950 lg:h-full lg:w-1/2 lg:border-r lg:border-b-0">
+          <div
+            className={`flex-1 flex-col border-b border-zinc-900 bg-zinc-950 lg:h-full lg:w-1/2 lg:border-r lg:border-b-0 ${activePanel === "code" ? "flex" : "hidden lg:flex"}`}
+          >
             <div className="flex h-11 shrink-0 items-center justify-between border-b border-zinc-900 bg-zinc-950/50 px-4">
               <span className="text-xs font-semibold tracking-wider text-zinc-400 uppercase">
                 TSX Source Editor
@@ -817,7 +837,9 @@ export default function App() {
           </div>
 
           {/* Right/Lower Panel: Live Preview & Configurations Sidebar */}
-          <div className="flex flex-1 flex-col divide-y divide-zinc-900 overflow-y-auto bg-zinc-950 lg:h-full lg:w-1/2">
+          <div
+            className={`flex-1 flex-col divide-y divide-zinc-900 overflow-y-auto bg-zinc-950 lg:h-full lg:w-1/2 ${activePanel === "preview" ? "flex" : "hidden lg:flex"}`}
+          >
             {/* Live Preview Pane */}
             <div className="relative flex flex-col p-6 lg:p-8">
               {/* Background grid accents */}
@@ -1071,57 +1093,6 @@ export default function App() {
                     </div>
                   </div>
                 </div>
-              </div>
-
-              {/* Satori Core Engine Options Section */}
-              <div className="grid grid-cols-2 gap-4 border-t border-zinc-900 pt-4 select-none">
-                <div className="flex items-center gap-2">
-                  <input
-                    id="debug-checkbox"
-                    type="checkbox"
-                    checked={debug}
-                    onChange={(e) => setDebug(e.target.checked)}
-                    className="h-4 w-4 rounded border-zinc-800 bg-zinc-900 accent-coral-500"
-                  />
-                  <label htmlFor="debug-checkbox" className="cursor-pointer text-xs text-zinc-300">
-                    Debug Mode Bounding Box
-                  </label>
-                </div>
-                <div className="flex items-center gap-2">
-                  <input
-                    id="embed-font-checkbox"
-                    type="checkbox"
-                    checked={embedFont}
-                    onChange={(e) => setEmbedFont(e.target.checked)}
-                    className="h-4 w-4 rounded border-zinc-800 bg-zinc-900 accent-coral-500"
-                  />
-                  <label
-                    htmlFor="embed-font-checkbox"
-                    className="cursor-pointer text-xs text-zinc-300"
-                  >
-                    Embed Font Paths
-                  </label>
-                </div>
-              </div>
-
-              {/* Emoji Provider Selector */}
-              <div className="flex items-center justify-between border-t border-zinc-900 pt-4">
-                <label htmlFor="emoji-provider" className="text-xs text-zinc-400">
-                  Emoji Provider Option
-                </label>
-                <select
-                  id="emoji-provider"
-                  value={emojiProvider}
-                  onChange={(e) => setEmojiProvider(e.target.value)}
-                  className="rounded-lg border border-zinc-800 bg-zinc-900/50 px-2.5 py-1 text-xs text-zinc-300 outline-none focus:border-zinc-700"
-                >
-                  <option value="twemoji">Twemoji</option>
-                  <option value="fluent">Fluent Emoji</option>
-                  <option value="fluentFlat">Fluent Emoji Flat</option>
-                  <option value="noto">Noto Emoji</option>
-                  <option value="blobmoji">Blobmoji</option>
-                  <option value="openmoji">OpenMoji</option>
-                </select>
               </div>
 
               {/* Download and Export Controls Area */}
