@@ -9,7 +9,7 @@ import { EditorPanel } from "@/components/EditorPanel";
 import { Header } from "@/components/Header";
 import { PreviewPanel } from "@/components/PreviewPanel";
 import { Sidebar, TEMPLATES, TemplateId } from "@/components/Sidebar";
-import { Button } from "@/components/ui/button";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import BlogTemplate from "./template/blog";
 import blogCode from "./template/blog.tsx?raw";
@@ -464,31 +464,35 @@ export default function App() {
         />
 
         {/* Mobile Tab Switcher */}
-        <div className="flex shrink-0 border-b border-zinc-900 bg-zinc-950 p-2 select-none lg:hidden">
-          <div className="grid w-full grid-cols-2 gap-1 rounded-lg border border-zinc-800/80 bg-zinc-900/30 p-1">
-            <Button
-              onClick={() => setActivePanel("code")}
-              variant="ghost"
-              className={`h-auto rounded-md py-1.5 text-xs font-semibold transition-all ${
-                activePanel === "code"
-                  ? "bg-zinc-800 text-zinc-100 shadow-sm hover:bg-zinc-800 hover:text-zinc-100"
-                  : "text-zinc-400 hover:bg-transparent hover:text-zinc-200"
-              }`}
-            >
-              Editor
-            </Button>
-            <Button
-              onClick={() => setActivePanel("preview")}
-              variant="ghost"
-              className={`h-auto rounded-md py-1.5 text-xs font-semibold transition-all ${
-                activePanel === "preview"
-                  ? "bg-zinc-800 text-zinc-100 shadow-sm hover:bg-zinc-800 hover:text-zinc-100"
-                  : "text-zinc-400 hover:bg-transparent hover:text-zinc-200"
-              }`}
-            >
-              Live Preview & Configs
-            </Button>
-          </div>
+        <div className="flex w-full shrink-0 border-b border-zinc-900 bg-zinc-950 p-2 select-none lg:hidden">
+          <Tabs
+            value={activePanel}
+            onValueChange={(val) => setActivePanel(val as "code" | "preview")}
+            className="w-full"
+          >
+            <TabsList className="grid w-full grid-cols-2 gap-1 rounded-lg border border-zinc-800/80 bg-zinc-900/30 p-1">
+              <TabsTrigger
+                value="code"
+                className={`h-auto rounded-md py-1.5 text-xs font-semibold transition-all ${
+                  activePanel === "code"
+                    ? "bg-zinc-800 text-zinc-100 shadow-sm hover:bg-zinc-800 hover:text-zinc-100"
+                    : "text-zinc-400 hover:bg-transparent hover:text-zinc-200"
+                }`}
+              >
+                Editor
+              </TabsTrigger>
+              <TabsTrigger
+                value="preview"
+                className={`h-auto rounded-md py-1.5 text-xs font-semibold transition-all ${
+                  activePanel === "preview"
+                    ? "bg-zinc-800 text-zinc-100 shadow-sm hover:bg-zinc-800 hover:text-zinc-100"
+                    : "text-zinc-400 hover:bg-transparent hover:text-zinc-200"
+                }`}
+              >
+                Live Preview & Configs
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
         </div>
 
         {/* Responsive Workspace Main Content */}

@@ -3,6 +3,7 @@ import React from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Slider } from "@/components/ui/slider";
 
 interface ConfigPanelProps {
   width: number | "";
@@ -80,18 +81,20 @@ export function ConfigPanel({
 
           {/* Width slider & input */}
           <div className="grid gap-3">
-            <div className="space-y-1">
+            <div className="space-y-2">
               <div className="flex items-center justify-between text-xs text-zinc-400">
                 <label htmlFor="width-input">Width: {width || 1200}px</label>
               </div>
               <div className="flex items-center gap-4">
-                <input
-                  type="range"
-                  min="100"
-                  max="1200"
-                  value={width || 1200}
-                  onChange={(e) => setWidth(parseInt(e.target.value, 10))}
-                  className="h-1.5 flex-1 cursor-pointer appearance-none rounded-lg bg-zinc-800 accent-coral-500"
+                <Slider
+                  min={100}
+                  max={1200}
+                  value={[typeof width === "number" ? width : 1200]}
+                  onValueChange={(val) => {
+                    const num = Array.isArray(val) ? val[0] : val;
+                    setWidth(num);
+                  }}
+                  className="flex-1"
                 />
                 <Input
                   id="width-input"
@@ -116,18 +119,20 @@ export function ConfigPanel({
             </div>
 
             {/* Height slider & input */}
-            <div className="space-y-1">
+            <div className="space-y-2">
               <div className="flex items-center justify-between text-xs text-zinc-400">
                 <label htmlFor="height-input">Height: {height || 630}px</label>
               </div>
               <div className="flex items-center gap-4">
-                <input
-                  type="range"
-                  min="100"
-                  max="1200"
-                  value={height || 630}
-                  onChange={(e) => setHeight(parseInt(e.target.value, 10))}
-                  className="h-1.5 flex-1 cursor-pointer appearance-none rounded-lg bg-zinc-800 accent-coral-500"
+                <Slider
+                  min={100}
+                  max={1200}
+                  value={[typeof height === "number" ? height : 630]}
+                  onValueChange={(val) => {
+                    const num = Array.isArray(val) ? val[0] : val;
+                    setHeight(num);
+                  }}
+                  className="flex-1"
                 />
                 <Input
                   id="height-input"
