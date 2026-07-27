@@ -162,18 +162,20 @@ export function ConfigPanel({
           <span className="text-xs font-semibold text-zinc-400">Download Output Format</span>
           <div className="grid grid-cols-4 gap-1 rounded-lg border border-zinc-800 bg-zinc-900/40 p-0.5">
             {(["svg", "png", "jpeg", "jpg"] as const).map((fmt) => (
-              <button
+              <Button
                 key={fmt}
                 type="button"
+                variant="ghost"
+                size="xs"
                 onClick={() => setDownloadFormat(fmt)}
-                className={`rounded px-2.5 py-1 text-[10px] font-bold uppercase transition-all ${
+                className={`h-auto rounded px-2.5 py-1 text-[10px] font-bold uppercase transition-all ${
                   downloadFormat === fmt
-                    ? "bg-zinc-800 text-coral-400 shadow-sm"
-                    : "text-zinc-500 hover:text-zinc-300"
+                    ? "bg-zinc-800 text-coral-400 shadow-sm hover:bg-zinc-800 hover:text-coral-400"
+                    : "text-zinc-500 hover:bg-transparent hover:text-zinc-300"
                 }`}
               >
                 {fmt}
-              </button>
+              </Button>
             ))}
           </div>
         </div>
