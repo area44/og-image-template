@@ -564,7 +564,7 @@ export default function App() {
   };
 
   return (
-    <div className="selection:text-coral-200 flex min-h-screen flex-col bg-background text-foreground selection:bg-coral-500/30 lg:h-screen lg:overflow-hidden">
+    <div className="selection:text-coral-200 flex h-dvh flex-col overflow-hidden bg-background text-foreground selection:bg-coral-500/30">
       {/* Decorative top ambient glow */}
       <div className="pointer-events-none absolute top-0 left-1/2 -z-10 h-[200px] w-full max-w-7xl -translate-x-1/2 bg-[radial-gradient(ellipse_at_top,rgba(251,113,133,0.15),transparent_50%)]" />
 
@@ -687,7 +687,7 @@ export default function App() {
       </header>
 
       {/* Main Workspace below global header */}
-      <div className="flex flex-1 flex-col lg:flex-row lg:overflow-hidden">
+      <div className="flex min-h-0 flex-1 flex-col lg:flex-row lg:overflow-hidden">
         {/* Mobile Sidebar Backdrop Overlay */}
         {isSidebarOpen && (
           <button
@@ -771,7 +771,7 @@ export default function App() {
         <div className="flex min-h-0 flex-1 flex-col lg:flex-row lg:overflow-hidden">
           {/* Left/Upper Panel: TSX/TypeScript Code Editor */}
           <div
-            className={`flex-1 flex-col border-b border-zinc-900 bg-zinc-950 lg:h-full lg:w-1/2 lg:border-r lg:border-b-0 ${activePanel === "code" ? "flex" : "hidden lg:flex"}`}
+            className={`min-h-0 flex-1 flex-col border-b border-zinc-900 bg-zinc-950 lg:h-full lg:w-1/2 lg:border-r lg:border-b-0 ${activePanel === "code" ? "flex" : "hidden lg:flex"}`}
           >
             <div className="flex h-11 shrink-0 items-center justify-between border-b border-zinc-900 bg-zinc-950/50 px-4">
               <span className="text-xs font-semibold tracking-wider text-zinc-400 uppercase">
@@ -807,7 +807,7 @@ export default function App() {
                 </Button>
               </div>
             </div>
-            <div className="min-h-[450px] w-full flex-1 overflow-hidden lg:min-h-0">
+            <div className="min-h-0 w-full flex-1 overflow-hidden">
               <Editor
                 height="100%"
                 defaultLanguage="typescript"
