@@ -470,11 +470,11 @@ export default function App() {
             onValueChange={(val) => setActivePanel(val as "code" | "preview")}
             className="w-full"
           >
-            <TabsList className="grid w-full grid-cols-2 rounded-lg border border-zinc-800/20 bg-zinc-900/40 p-1">
-              <TabsTrigger value="code" className="cursor-pointer py-1.5 text-xs font-semibold">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="code" className="py-1.5 text-xs font-semibold">
                 Editor
               </TabsTrigger>
-              <TabsTrigger value="preview" className="cursor-pointer py-1.5 text-xs font-semibold">
+              <TabsTrigger value="preview" className="py-1.5 text-xs font-semibold">
                 Live Preview & Configs
               </TabsTrigger>
             </TabsList>
