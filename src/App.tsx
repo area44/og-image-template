@@ -807,7 +807,7 @@ export default function App() {
                 </Button>
               </div>
             </div>
-            <div className="relative min-h-[450px] flex-1 overflow-hidden lg:h-[calc(100%-44px)] lg:min-h-0">
+            <div className="min-h-[450px] w-full flex-1 overflow-hidden lg:min-h-0">
               <Editor
                 height="100%"
                 defaultLanguage="typescript"
