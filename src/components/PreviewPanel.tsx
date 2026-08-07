@@ -35,11 +35,6 @@ export function PreviewPanel({
       {/* Background grid accents */}
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#e11d4803_1px,transparent_1px),linear-gradient(to_bottom,#e11d4803_1px,transparent_1px)] bg-[size:32px_32px]" />
 
-      {/* Top Header holding only loading spinner */}
-      <div className="z-10 mb-6 flex h-9 items-center justify-end border-b border-zinc-900 pb-4 select-none">
-        {rendering && <RefreshCw className="h-3.5 w-3.5 animate-spin text-coral-400" />}
-      </div>
-
       {/* Rendering Core Display */}
       <div className="relative flex min-h-[300px] w-full flex-col items-center justify-center">
         <Card
@@ -108,7 +103,10 @@ export function PreviewPanel({
 
       {/* Rendering Performance Footer */}
       <div className="mt-4 flex items-center justify-between px-1 text-xs text-zinc-500 select-none">
-        <span className="font-mono">Preview Rendered in {renderTime.toFixed(1)}ms</span>
+        <span className="flex items-center gap-2 font-mono">
+          {rendering && <RefreshCw className="h-3 w-3 animate-spin text-coral-400" />}
+          Preview Rendered in {renderTime.toFixed(1)}ms
+        </span>
         <span className="font-mono">
           {width || 1200} × {height || 630} px
         </span>
