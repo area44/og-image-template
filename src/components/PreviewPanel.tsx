@@ -94,7 +94,7 @@ export function PreviewPanel({
               ) : (
                 svgContent && (
                   <div
-                    className="flex h-full w-full items-center justify-center select-none"
+                    className="flex h-full w-full items-center justify-center select-none [&_svg]:h-full [&_svg]:max-h-full [&_svg]:w-full [&_svg]:max-w-full"
                     dangerouslySetInnerHTML={{ __html: svgContent }}
                   />
                 )
