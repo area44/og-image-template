@@ -89,7 +89,7 @@ export function ConfigPanel({
                 <Slider
                   min={100}
                   max={1200}
-                  value={[typeof width === "number" ? width : 1200]}
+                  value={typeof width === "number" ? width : 1200}
                   onValueChange={(val) => {
                     const num = Array.isArray(val) ? val[0] : val;
                     setWidth(num);
@@ -127,7 +127,7 @@ export function ConfigPanel({
                 <Slider
                   min={100}
                   max={1200}
-                  value={[typeof height === "number" ? height : 630]}
+                  value={typeof height === "number" ? height : 630}
                   onValueChange={(val) => {
                     const num = Array.isArray(val) ? val[0] : val;
                     setHeight(num);

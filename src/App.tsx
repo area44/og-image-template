@@ -54,7 +54,7 @@ export default function App() {
   const [selectedTemplate, setSelectedTemplate] = useState<TemplateId>("blog");
   const [width, setWidth] = useState<number | "">(1200);
   const [height, setHeight] = useState<number | "">(630);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [activePanel, setActivePanel] = useState<"code" | "preview">("code");
 
   const [fonts, setFonts] = useState<LoadedFonts | null>(null);
