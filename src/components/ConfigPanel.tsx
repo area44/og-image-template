@@ -88,8 +88,8 @@ export function ConfigPanel({
               <div className="flex items-center gap-4">
                 <Slider
                   min={100}
-                  max={1200}
-                  value={typeof width === "number" ? width : 1200}
+                  max={1500}
+                  value={[typeof width === "number" ? width : 1200]}
                   onValueChange={(val) => {
                     const num = Array.isArray(val) ? val[0] : val;
                     setWidth(num);
@@ -126,8 +126,8 @@ export function ConfigPanel({
               <div className="flex items-center gap-4">
                 <Slider
                   min={100}
-                  max={1200}
-                  value={typeof height === "number" ? height : 630}
+                  max={1000}
+                  value={[typeof height === "number" ? height : 630]}
                   onValueChange={(val) => {
                     const num = Array.isArray(val) ? val[0] : val;
                     setHeight(num);
