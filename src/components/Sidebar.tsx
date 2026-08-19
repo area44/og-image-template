@@ -33,8 +33,10 @@ interface SidebarProps {
 export function Sidebar({ selectedTemplate, onTemplateSelect, isSidebarOpen }: SidebarProps) {
   return (
     <aside
-      className={`fixed top-14 bottom-0 left-0 z-40 flex w-64 shrink-0 flex-col border-r border-zinc-900 bg-zinc-950 transition-transform duration-300 ease-in-out select-none lg:static lg:h-[calc(100vh-56px)] lg:w-64 lg:translate-x-0 lg:border-r lg:bg-zinc-950/30 ${
-        isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+      className={`fixed top-14 bottom-0 left-0 z-40 flex shrink-0 flex-col border-r border-zinc-900 bg-zinc-950 transition-all duration-300 ease-in-out select-none lg:static lg:h-[calc(100vh-56px)] lg:bg-zinc-950/30 ${
+        isSidebarOpen
+          ? "w-64 translate-x-0 opacity-100"
+          : "pointer-events-none w-0 -translate-x-full opacity-0 lg:w-0 lg:translate-x-0 lg:overflow-hidden lg:border-r-0"
       }`}
     >
       <div className="flex-1 space-y-6 overflow-y-auto px-4 py-4 pt-6">

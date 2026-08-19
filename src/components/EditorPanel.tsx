@@ -1,5 +1,7 @@
-import Editor from "@monaco-editor/react";
-import { Copy, Check, RefreshCw } from "lucide-react";
+import { javascript } from "@codemirror/lang-javascript";
+import { oneDark } from "@codemirror/theme-one-dark";
+import CodeMirror from "@uiw/react-codemirror";
+import { Check, Copy, RefreshCw } from "lucide-react";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -10,17 +12,9 @@ interface EditorPanelProps {
   onChange: (value: string) => void;
   onReset: () => void;
   activePanel: "code" | "preview";
-  beforeMount: (monaco: any) => void;
 }
 
-export function EditorPanel({
-  selectedTemplate,
-  value,
-  onChange,
-  onReset,
-  activePanel,
-  beforeMount,
-}: EditorPanelProps) {
+export function EditorPanel({ value, onChange, onReset, activePanel }: EditorPanelProps) {
   const [copiedCode, setCopiedCode] = useState(false);
 
   const handleCodeCopy = async () => {
@@ -71,27 +65,36 @@ export function EditorPanel({
           </Button>
         </div>
       </div>
-      <div className="min-h-0 w-full flex-1 overflow-hidden">
-        <Editor
-          height="100%"
-          defaultLanguage="typescript"
-          path={`file:///${selectedTemplate}.tsx`}
-          beforeMount={beforeMount}
+      <div className="min-h-0 w-full flex-1 overflow-auto text-xs [&_.cm-editor]:h-full [&_.cm-scroller]:overflow-auto">
+        <CodeMirror
           value={value}
+          height="100%"
+          theme={oneDark}
+          extensions={[javascript({ jsx: true, typescript: true })]}
           onChange={(val) => {
-            if (val !== undefined) {
-              onChange(val);
-            }
+            onChange(val);
           }}
-          options={{
-            minimap: { enabled: false },
-            fontSize: 13,
-            lineNumbers: "on",
-            wordWrap: "on",
-            automaticLayout: true,
-            theme: "vs-dark",
-            padding: { top: 12 },
-            tabSize: 2,
+          basicSetup={{
+            lineNumbers: true,
+            highlightActiveLineGutter: true,
+            foldGutter: true,
+            dropCursor: true,
+            allowMultipleSelections: true,
+            indentOnInput: true,
+            bracketMatching: true,
+            closeBrackets: true,
+            autocompletion: true,
+            rectangularSelection: true,
+            crosshairCursor: true,
+            highlightActiveLine: true,
+            highlightSelectionMatches: true,
+            closeBracketsKeymap: true,
+            defaultKeymap: true,
+            searchKeymap: true,
+            historyKeymap: true,
+            foldKeymap: true,
+            completionKeymap: true,
+            lintKeymap: true,
           }}
         />
       </div>
