@@ -421,7 +421,7 @@ export default function App() {
           >
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="code">Editor</TabsTrigger>
-              <TabsTrigger value="preview">Live Preview & Configs</TabsTrigger>
+              <TabsTrigger value="preview">Live Preview & Config</TabsTrigger>
             </TabsList>
           </Tabs>
         </div>
@@ -442,7 +442,7 @@ export default function App() {
             activePanel={activePanel}
           />
 
-          {/* Right/Lower Panel: Live Preview & Configurations Sidebar */}
+          {/* Right/Lower Panel: Live Preview & Configuration Sidebar */}
           <div
             className={`flex-1 flex-col divide-y divide-zinc-900 overflow-y-auto bg-zinc-950 lg:h-full lg:w-1/2 ${activePanel === "preview" ? "flex" : "hidden lg:flex"}`}
           >
