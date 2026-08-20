@@ -1,7 +1,7 @@
 import geistNormalUrl from "@fontsource-variable/geist/files/geist-latin-wght-normal.woff2?url";
-import { useMonaco } from "@monaco-editor/react";
 import React, { useState, useEffect } from "react";
 import satori from "satori";
+import { transform } from "sucrase";
 import { woff2Decode } from "woff-lib/woff2/decode";
 
 import { ConfigPanel } from "@/components/ConfigPanel";
@@ -51,8 +51,6 @@ function evalCompiledCode(compiledCode: string): React.ComponentType<any> {
 }
 
 export default function App() {
-  const monaco = useMonaco();
-
   const [selectedTemplate, setSelectedTemplate] = useState<TemplateId>("blog");
   const [width, setWidth] = useState<number | "">(1200);
   const [height, setHeight] = useState<number | "">(630);
@@ -82,9 +80,7 @@ export default function App() {
   const [compileError, setCompileError] = useState<string | null>(null);
   const [renderTime, setRenderTime] = useState<number>(0);
 
-  const [sharedCopied, setSharedCopied] = useState(false);
-
-  // Transpile logic using Monaco Editor's built-in TypeScript compiler worker
+  // Transpile logic using Sucrase
   useEffect(() => {
     // Fast path: if code matches default template exactly, immediately use the statically imported component
     if (draftCodes[selectedTemplate] === TEMPLATE_CODES[selectedTemplate]) {
@@ -93,26 +89,18 @@ export default function App() {
       return;
     }
 
-    if (!monaco) return;
-    const m = monaco as any;
     let active = true;
 
-    async function transpile() {
+    function transpile() {
       try {
-        const uri = `file:///${selectedTemplate}.tsx`;
-        const modelUri = m.Uri.parse(uri);
-        const getWorker = await m.languages.typescript.getTypeScriptWorker();
-        const worker = await getWorker(modelUri);
-        const emitResult = await worker.getEmitOutput(modelUri.toString());
-
-        if (!emitResult || !emitResult.outputFiles || emitResult.outputFiles.length === 0) {
-          throw new Error("No output compiled from TypeScript worker.");
-        }
-
-        const compiledCode = emitResult.outputFiles[0].text;
+        const rawCode = draftCodes[selectedTemplate];
+        const res = transform(rawCode, {
+          transforms: ["jsx", "typescript", "imports"],
+          production: true,
+        });
 
         if (active) {
-          const comp = evalCompiledCode(compiledCode);
+          const comp = evalCompiledCode(res.code);
           setDynamicComponent(() => comp);
           setCompileError(null);
         }
@@ -125,12 +113,12 @@ export default function App() {
       }
     }
 
-    const timeout = setTimeout(transpile, 250);
+    const timeout = setTimeout(transpile, 150);
     return () => {
       active = false;
       clearTimeout(timeout);
     };
-  }, [monaco, selectedTemplate, draftCodes]);
+  }, [selectedTemplate, draftCodes]);
 
   // Fetch fonts on mount
   useEffect(() => {
@@ -194,7 +182,6 @@ export default function App() {
   // Sync template when changes
   const handleTemplateChange = (id: TemplateId) => {
     setSelectedTemplate(id);
-    setIsSidebarOpen(false);
   };
 
   // Run Satori core in browser to generate the SVG with the selected template
@@ -398,51 +385,13 @@ export default function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleShare = () => {
-    try {
-      const state = {
-        code: draftCodes[selectedTemplate],
-        width,
-        height,
-      };
-      const stringified = JSON.stringify(state);
-      const encoded = btoa(unescape(encodeURIComponent(stringified)));
-      const url = `${window.location.origin}${window.location.pathname}?share=${encoded}`;
-      navigator.clipboard.writeText(url);
-      setSharedCopied(true);
-      setTimeout(() => setSharedCopied(false), 2000);
-    } catch (err) {
-      console.error("Failed to generate share URL:", err);
-    }
-  };
-
-  const handleEditorBeforeMount = (m: any) => {
-    m.languages.typescript.typescriptDefaults.setCompilerOptions({
-      jsx: m.languages.typescript.JsxEmit.React,
-      target: m.languages.typescript.ScriptTarget.ES2020,
-      module: m.languages.typescript.ModuleKind.CommonJS,
-      esModuleInterop: true,
-      allowNonTsExtensions: true,
-    });
-
-    m.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
-      noSemanticValidation: true,
-      noSyntaxValidation: false,
-    });
-  };
-
   return (
     <div className="selection:text-coral-200 flex h-dvh flex-col overflow-hidden bg-background text-foreground selection:bg-coral-500/30">
       {/* Decorative top ambient glow */}
       <div className="pointer-events-none absolute top-0 left-1/2 -z-10 h-[200px] w-full max-w-7xl -translate-x-1/2 bg-[radial-gradient(ellipse_at_top,rgba(251,113,133,0.15),transparent_50%)]" />
 
       {/* Header component */}
-      <Header
-        isSidebarOpen={isSidebarOpen}
-        setIsSidebarOpen={setIsSidebarOpen}
-        onShare={handleShare}
-        sharedCopied={sharedCopied}
-      />
+      <Header isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} />
 
       {/* Main Workspace below header */}
       <div className="flex min-h-0 flex-1 flex-col lg:flex-row lg:overflow-hidden">
@@ -491,7 +440,6 @@ export default function App() {
             }}
             onReset={handleCodeReset}
             activePanel={activePanel}
-            beforeMount={handleEditorBeforeMount}
           />
 
           {/* Right/Lower Panel: Live Preview & Configurations Sidebar */}

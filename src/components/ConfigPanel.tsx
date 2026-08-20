@@ -88,7 +88,8 @@ export function ConfigPanel({
               <div className="flex items-center gap-4">
                 <Slider
                   min={100}
-                  max={1200}
+                  max={1500}
+                  defaultValue={[1200]}
                   value={[typeof width === "number" ? width : 1200]}
                   onValueChange={(val) => {
                     const num = Array.isArray(val) ? val[0] : val;
@@ -126,7 +127,8 @@ export function ConfigPanel({
               <div className="flex items-center gap-4">
                 <Slider
                   min={100}
-                  max={1200}
+                  max={1000}
+                  defaultValue={[630]}
                   value={[typeof height === "number" ? height : 630]}
                   onValueChange={(val) => {
                     const num = Array.isArray(val) ? val[0] : val;
@@ -161,8 +163,7 @@ export function ConfigPanel({
 
       {/* Download and Export Controls Area */}
       <div className="space-y-3 border-t border-zinc-900 pt-6">
-        <div className="flex items-center justify-between">
-          <span className="text-xs font-semibold text-zinc-400">Download Output Format</span>
+        <div className="flex items-center justify-end">
           <div className="grid grid-cols-4 gap-1 rounded-lg border border-zinc-800 bg-zinc-900/40 p-0.5">
             {(["svg", "png", "jpeg", "jpg"] as const).map((fmt) => (
               <Button
