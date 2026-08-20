@@ -163,8 +163,7 @@ export function ConfigPanel({
 
       {/* Download and Export Controls Area */}
       <div className="space-y-3 border-t border-zinc-900 pt-6">
-        <div className="flex items-center justify-between">
-          <span className="text-xs font-semibold text-zinc-400">Download Output Format</span>
+        <div className="flex items-center justify-end">
           <div className="grid grid-cols-4 gap-1 rounded-lg border border-zinc-800 bg-zinc-900/40 p-0.5">
             {(["svg", "png", "jpeg", "jpg"] as const).map((fmt) => (
               <Button

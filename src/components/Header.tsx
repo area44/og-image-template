@@ -1,4 +1,4 @@
-import { Check, Copy, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import React from "react";
 
 import { Button } from "@/components/ui/button";
@@ -6,11 +6,9 @@ import { Button } from "@/components/ui/button";
 interface HeaderProps {
   isSidebarOpen: boolean;
   setIsSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  onShare: () => void;
-  sharedCopied: boolean;
 }
 
-export function Header({ isSidebarOpen, setIsSidebarOpen, onShare, sharedCopied }: HeaderProps) {
+export function Header({ isSidebarOpen, setIsSidebarOpen }: HeaderProps) {
   return (
     <header className="sticky top-0 z-50 flex h-14 w-full shrink-0 items-center justify-between border-b border-zinc-900 bg-zinc-950/80 px-6 backdrop-blur-md select-none">
       <div className="flex items-center gap-3">
@@ -40,24 +38,6 @@ export function Header({ isSidebarOpen, setIsSidebarOpen, onShare, sharedCopied 
         <span className="hidden font-semibold text-zinc-200 sm:inline">OG Image Coral</span>
       </div>
       <div className="flex items-center gap-4">
-        <Button
-          onClick={onShare}
-          size="sm"
-          variant="outline"
-          className="h-8 gap-1.5 border-zinc-800 bg-zinc-900/40 text-zinc-300 hover:text-zinc-100"
-        >
-          {sharedCopied ? (
-            <>
-              <Check className="h-3.5 w-3.5 text-emerald-500" />
-              <span>Copied Link!</span>
-            </>
-          ) : (
-            <>
-              <Copy className="h-3.5 w-3.5" />
-              <span>Share</span>
-            </>
-          )}
-        </Button>
         <a
           href="https://github.com/area44/og-image-template"
           target="_blank"
