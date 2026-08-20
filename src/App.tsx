@@ -52,8 +52,8 @@ function evalCompiledCode(compiledCode: string): React.ComponentType<any> {
 
 export default function App() {
   const [selectedTemplate, setSelectedTemplate] = useState<TemplateId>("blog");
-  const [width, setWidth] = useState<number | "">(1125);
-  const [height, setHeight] = useState<number | "">(750);
+  const [width, setWidth] = useState<number | "">(1200);
+  const [height, setHeight] = useState<number | "">(630);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [activePanel, setActivePanel] = useState<"code" | "preview">("code");
 
@@ -198,8 +198,8 @@ export default function App() {
         setRendering(true);
         setRenderError(null);
 
-        const resolvedWidth = typeof width === "number" ? Math.max(100, width) : 1125;
-        const resolvedHeight = typeof height === "number" ? Math.max(100, height) : 750;
+        const resolvedWidth = typeof width === "number" ? Math.max(100, width) : 1200;
+        const resolvedHeight = typeof height === "number" ? Math.max(100, height) : 630;
 
         // Satori supports custom Tailwind configurations
         const options = {
@@ -289,8 +289,8 @@ export default function App() {
   const handleDownload = () => {
     if (!svgContent) return;
 
-    const resolvedWidth = typeof width === "number" ? Math.max(100, width) : 1125;
-    const resolvedHeight = typeof height === "number" ? Math.max(100, height) : 750;
+    const resolvedWidth = typeof width === "number" ? Math.max(100, width) : 1200;
+    const resolvedHeight = typeof height === "number" ? Math.max(100, height) : 630;
 
     if (downloadFormat === "svg") {
       const blob = new Blob([svgContent], { type: "image/svg+xml" });

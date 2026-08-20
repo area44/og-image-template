@@ -83,14 +83,14 @@ export function ConfigPanel({
           <div className="grid gap-3">
             <div className="space-y-2">
               <div className="flex items-center justify-between text-xs text-zinc-400">
-                <label htmlFor="width-input">Width: {width || 1125}px</label>
+                <label htmlFor="width-input">Width: {width || 1200}px</label>
               </div>
               <div className="flex items-center gap-4">
                 <Slider
                   min={100}
                   max={1500}
-                  defaultValue={[1125]}
-                  value={[typeof width === "number" ? width : 1125]}
+                  defaultValue={[1200]}
+                  value={[typeof width === "number" ? width : 1200]}
                   onValueChange={(val) => {
                     const num = Array.isArray(val) ? val[0] : val;
                     setWidth(num);
@@ -111,7 +111,7 @@ export function ConfigPanel({
                   }}
                   onBlur={() => {
                     if (typeof width !== "number" || width < 100) {
-                      setWidth(1125);
+                      setWidth(1200);
                     }
                   }}
                   className="h-8 w-20 border-zinc-800 bg-zinc-900/40 text-center text-xs text-zinc-200"
@@ -122,14 +122,14 @@ export function ConfigPanel({
             {/* Height slider & input */}
             <div className="space-y-2">
               <div className="flex items-center justify-between text-xs text-zinc-400">
-                <label htmlFor="height-input">Height: {height || 750}px</label>
+                <label htmlFor="height-input">Height: {height || 630}px</label>
               </div>
               <div className="flex items-center gap-4">
                 <Slider
                   min={100}
                   max={1000}
-                  defaultValue={[750]}
-                  value={[typeof height === "number" ? height : 750]}
+                  defaultValue={[630]}
+                  value={[typeof height === "number" ? height : 630]}
                   onValueChange={(val) => {
                     const num = Array.isArray(val) ? val[0] : val;
                     setHeight(num);
@@ -150,7 +150,7 @@ export function ConfigPanel({
                   }}
                   onBlur={() => {
                     if (typeof height !== "number" || height < 100) {
-                      setHeight(750);
+                      setHeight(630);
                     }
                   }}
                   className="h-8 w-20 border-zinc-800 bg-zinc-900/40 text-center text-xs text-zinc-200"
