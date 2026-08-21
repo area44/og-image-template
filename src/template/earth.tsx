@@ -5,32 +5,48 @@ interface OGImageProps {
 }
 
 export default function OGImage({
-  title = "Optimized CDN Caching & Immutable Asset Deployment",
-  category = "RELEASE",
-  date = "OCT 24, 2026",
+  title = "Optimized CDN caching and deploying of immutable static assets",
+  category = "",
+  date = "",
 }: OGImageProps = {}) {
-  // Detailed dot matrix map representation of Earth's continents
+  // High-resolution dot-matrix world map grid matching original Vercel OG image
   const mapGrid = [
-    "                                                                ",
-    "                 .......                ...     ....            ",
-    "     ...       ............            .....   ..............   ",
-    "   .......    ..............          ....... ................  ",
-    "  .........  ................        .......................... ",
-    "  .......... ................       ........................... ",
-    "   .........  ..............       ......................... .. ",
-    "    .......    ............        ........................     ",
-    "      ...       ..........          ......................      ",
-    "       .         ........            ...................        ",
-    "                  ......              .................         ",
-    "                 ........              ...............          ",
-    "                ..........              .............    ...    ",
-    "                ..........               ...........   .......  ",
-    "                 ........                 .........   ......... ",
-    "                 .......                   .......    ......... ",
-    "                  .....                      ...       .......  ",
-    "                   ...                                   ... .  ",
-    "                    .                                           ",
-    "                                                                ",
+    "                                                                                                ",
+    "                                                 ... .....                                      ",
+    "                                                ............                ...  ...            ",
+    "                                           .. ................        ........ .... ..          ",
+    "                                         ......................       ................          ",
+    "                               .     .. ........................     ..................     .   ",
+    "                     ..      ....   ... .........................   ....................  ....  ",
+    "                    ....    ......  .... ......................... ..................... ...... ",
+    "                   ......  ......... .... .............................................. .......",
+    "       ...        ....... ............... ..................................................... ",
+    "     .......      ....... ..................................................................... ",
+    "    .........   ......... ....................................................................  ",
+    "   ...........  ......... ...................................................................   ",
+    "  ............ .........   .................................................................    ",
+    "  ............. ........    ...............................................................     ",
+    "  ............. ........     .............................................................      ",
+    "   ...........   ......       ...........................................................       ",
+    "    .........     ....          ........................................................        ",
+    "      .....        ..            ................................... .................          ",
+    "        .                         .................................    ..............           ",
+    "                                   ...............................       ...........            ",
+    "                                    .............................         .........             ",
+    "                                    ............................           .......              ",
+    "                                     ..........................             .....               ",
+    "                                     .........................                .        ...      ",
+    "                                      .......................                         .....     ",
+    "                                       .....................                         .......    ",
+    "                                        ...................                         .........   ",
+    "                                         .................                          .........   ",
+    "                                          ...............                            .......    ",
+    "                                           .............                              .....     ",
+    "                                            ...........                                ...      ",
+    "                                             .........                                  .       ",
+    "                                              .......                                           ",
+    "                                               .....                                            ",
+    "                                                ...                                             ",
   ];
 
   return (
@@ -49,7 +65,7 @@ export default function OGImage({
         overflow: "hidden",
       }}
     >
-      {/* Background Dotted Earth World Map Grid */}
+      {/* Background World Map Grid */}
       <div
         style={{
           display: "flex",
@@ -57,27 +73,27 @@ export default function OGImage({
           top: 0,
           right: 0,
           bottom: 0,
-          width: "680px",
+          width: "820px",
           alignItems: "center",
-          justifyContent: "center",
+          justifyContent: "flex-end",
           opacity: 0.85,
         }}
       >
-        <svg width="650" height="520" viewBox="0 0 650 520" fill="none">
+        <svg width="800" height="600" viewBox="0 0 800 600" fill="none">
           {mapGrid.flatMap((row, rIdx) =>
             row.split("").map((char, cIdx) => {
               if (char !== ".") return null;
-              const x = 15 + cIdx * 9.8;
-              const y = 20 + rIdx * 19;
+              const x = 10 + cIdx * 8.2;
+              const y = 10 + rIdx * 15.5;
               return (
                 <rect
                   key={`${rIdx}-${cIdx}`}
                   x={x}
                   y={y}
-                  width="4"
-                  height="4"
+                  width="3.5"
+                  height="3.5"
                   fill="#333333"
-                  rx="1"
+                  rx="0.8"
                 />
               );
             }),
@@ -85,7 +101,7 @@ export default function OGImage({
         </svg>
       </div>
 
-      {/* Top Header Section */}
+      {/* Top Left Vercel Logo Triangle */}
       <div
         style={{
           display: "flex",
@@ -94,11 +110,9 @@ export default function OGImage({
           zIndex: 10,
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-          <svg width="44" height="38" viewBox="0 0 75 65" fill="#ffffff">
-            <path d="M37.5 0L75 65H0z" />
-          </svg>
-        </div>
+        <svg width="60" height="52" viewBox="0 0 75 65" fill="#ffffff">
+          <path d="M37.5 0L75 65H0z" />
+        </svg>
 
         {(category || date) && (
           <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
@@ -133,23 +147,23 @@ export default function OGImage({
         )}
       </div>
 
-      {/* Main Title Section */}
+      {/* Main Title - Sentenced cased, exact layout as original */}
       <div
         style={{
           display: "flex",
           flexDirection: "column",
-          maxWidth: "820px",
+          maxWidth: "760px",
           zIndex: 10,
           marginTop: "auto",
-          marginBottom: "auto",
+          marginBottom: "40px",
         }}
       >
         <h1
           style={{
-            fontSize: "60px",
-            fontWeight: 700,
+            fontSize: "64px",
+            fontWeight: 600,
             letterSpacing: "-0.04em",
-            lineHeight: 1.12,
+            lineHeight: 1.08,
             color: "#ffffff",
             margin: 0,
           }}
