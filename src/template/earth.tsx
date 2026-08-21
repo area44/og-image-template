@@ -40,6 +40,8 @@ export default function OGImage({
         }}
       >
         <svg
+          width={800}
+          height={450}
           viewBox="0 0 800 450"
           style={{
             width: "720px",
@@ -83,7 +85,6 @@ export default function OGImage({
           lineHeight: 1.15,
           letterSpacing: "-0.03em",
           color: "#ffffff",
-          zIndex: 10,
         }}
       >
         {title}
