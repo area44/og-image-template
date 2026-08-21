@@ -11,12 +11,14 @@ import { PreviewPanel } from "@/components/PreviewPanel";
 import { Sidebar, TEMPLATES, TemplateId } from "@/components/Sidebar";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-import BlogTemplate from "./template/blog";
 import blogCode from "./template/blog.tsx?raw";
+import ChangelogTemplate from "./template/changelog";
+import changelogCode from "./template/changelog.tsx?raw";
 import minimalCode from "./template/minimal.tsx?raw";
 import portfolioCode from "./template/portfolio.tsx?raw";
 
 const TEMPLATE_CODES = {
+  changelog: changelogCode,
   blog: blogCode,
   minimal: minimalCode,
   portfolio: portfolioCode,
@@ -51,7 +53,7 @@ function evalCompiledCode(compiledCode: string): React.ComponentType<any> {
 }
 
 export default function App() {
-  const [selectedTemplate, setSelectedTemplate] = useState<TemplateId>("blog");
+  const [selectedTemplate, setSelectedTemplate] = useState<TemplateId>("changelog");
   const [width, setWidth] = useState<number | "">(1200);
   const [height, setHeight] = useState<number | "">(630);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -69,13 +71,14 @@ export default function App() {
   const [downloadFormat, setDownloadFormat] = useState<"svg" | "png" | "jpeg" | "jpg">("svg");
 
   const [draftCodes, setDraftCodes] = useState<Record<TemplateId, string>>({
+    changelog: changelogCode,
     blog: blogCode,
     minimal: minimalCode,
     portfolio: portfolioCode,
   });
 
   const [dynamicComponent, setDynamicComponent] = useState<React.ComponentType<any> | null>(
-    () => BlogTemplate,
+    () => ChangelogTemplate,
   );
   const [compileError, setCompileError] = useState<string | null>(null);
   const [renderTime, setRenderTime] = useState<number>(0);
