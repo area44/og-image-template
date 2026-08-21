@@ -5,37 +5,37 @@ interface OGImageProps {
 }
 
 export default function OGImage({
-  title = "Optimized CDN caching and deploying of immutable static assets",
-  category = "CHANGELOG",
-  date = "JUL 17, 2026",
+  title = "Optimized CDN Caching & Immutable Asset Deployment",
+  category = "RELEASE",
+  date = "OCT 24, 2026",
 }: OGImageProps = {}) {
-  // Dot matrix map definition (50 cols x 26 rows)
+  // Detailed dot matrix map representation of Earth's continents
   const mapGrid = [
-    "                                                   ",
-    "                                     ..            ",
-    "                                    ....   .       ",
-    "                .                 ...............  ",
-    "              .....    ..   .    ................. ",
-    "   ..       ........  .......... ..................",
-    " .......   ......... ..............................",
-    ".........  ......... ..............................",
-    ".........   .......  ..............................",
-    ".........    .....    ............................ ",
-    " .......              ............................ ",
-    "  .....                ..........................  ",
-    "   ...                  ........................   ",
-    "    .                    ......................    ",
-    "                          ....................     ",
-    "                            ................       ",
-    "                             ..............        ",
-    "               ..              ..........          ",
-    "              ....               ......            ",
-    "             ......               ....             ",
-    "             ......              ......            ",
-    "              ....              ........           ",
-    "               ..                ......            ",
-    "                                   ..              ",
-    "                                                   ",
+    "                                                                ",
+    "                   ...                         .........        ",
+    "                 .......                      ...........       ",
+    "     ...        .........             .....................     ",
+    "   .......     ...........   .       .......................  . ",
+    "  .........   ............. ...     .........................   ",
+    " ........... ................ .    ...........................  ",
+    "............ .................     ...........................  ",
+    "............ ................     ............................  ",
+    " ........... ................     ............................  ",
+    "  .........   ..............      ............................  ",
+    "    .....      ............       ...........................   ",
+    "                 ........          ................... ....     ",
+    "                  ......           ..................           ",
+    "                   ....             ................            ",
+    "                   .....             ..............             ",
+    "                  .......             ............              ",
+    "                  ........             ..........      .......  ",
+    "                  .........             ........      ......... ",
+    "                  .........              ......       ......... ",
+    "                   .......                ....         .......  ",
+    "                    .....                  ..           .....   ",
+    "                     ...                                 ...    ",
+    "                      .                                   .     ",
+    "                                                                ",
   ];
 
   return (
@@ -54,7 +54,7 @@ export default function OGImage({
         overflow: "hidden",
       }}
     >
-      {/* Background Dotted World Map Grid */}
+      {/* Background Dotted Earth World Map Grid */}
       <div
         style={{
           display: "flex",
@@ -62,25 +62,25 @@ export default function OGImage({
           top: 0,
           right: 0,
           bottom: 0,
-          width: "650px",
+          width: "680px",
           alignItems: "center",
           justifyContent: "center",
-          opacity: 0.8,
+          opacity: 0.85,
         }}
       >
-        <svg width="600" height="520" viewBox="0 0 600 520" fill="none">
+        <svg width="650" height="520" viewBox="0 0 650 520" fill="none">
           {mapGrid.flatMap((row, rIdx) =>
             row.split("").map((char, cIdx) => {
               if (char !== ".") return null;
-              const x = 20 + cIdx * 11;
-              const y = 30 + rIdx * 18;
+              const x = 15 + cIdx * 9.8;
+              const y = 20 + rIdx * 19;
               return (
                 <rect
                   key={`${rIdx}-${cIdx}`}
                   x={x}
                   y={y}
-                  width="4.5"
-                  height="4.5"
+                  width="4"
+                  height="4"
                   fill="#333333"
                   rx="1"
                 />
@@ -90,7 +90,7 @@ export default function OGImage({
         </svg>
       </div>
 
-      {/* Top Section: Vercel Triangle & Optional Metadata */}
+      {/* Top Header Section */}
       <div
         style={{
           display: "flex",
@@ -100,7 +100,7 @@ export default function OGImage({
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-          <svg width="46" height="40" viewBox="0 0 75 65" fill="#ffffff">
+          <svg width="44" height="38" viewBox="0 0 75 65" fill="#ffffff">
             <path d="M37.5 0L75 65H0z" />
           </svg>
         </div>

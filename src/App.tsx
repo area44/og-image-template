@@ -12,13 +12,13 @@ import { Sidebar, TEMPLATES, TemplateId } from "@/components/Sidebar";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import blogCode from "./template/blog.tsx?raw";
-import ChangelogTemplate from "./template/changelog";
-import changelogCode from "./template/changelog.tsx?raw";
+import EarthTemplate from "./template/earth";
+import earthCode from "./template/earth.tsx?raw";
 import minimalCode from "./template/minimal.tsx?raw";
 import portfolioCode from "./template/portfolio.tsx?raw";
 
 const TEMPLATE_CODES = {
-  changelog: changelogCode,
+  earth: earthCode,
   blog: blogCode,
   minimal: minimalCode,
   portfolio: portfolioCode,
@@ -53,7 +53,7 @@ function evalCompiledCode(compiledCode: string): React.ComponentType<any> {
 }
 
 export default function App() {
-  const [selectedTemplate, setSelectedTemplate] = useState<TemplateId>("changelog");
+  const [selectedTemplate, setSelectedTemplate] = useState<TemplateId>("earth");
   const [width, setWidth] = useState<number | "">(1200);
   const [height, setHeight] = useState<number | "">(630);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -71,14 +71,14 @@ export default function App() {
   const [downloadFormat, setDownloadFormat] = useState<"svg" | "png" | "jpeg" | "jpg">("svg");
 
   const [draftCodes, setDraftCodes] = useState<Record<TemplateId, string>>({
-    changelog: changelogCode,
+    earth: earthCode,
     blog: blogCode,
     minimal: minimalCode,
     portfolio: portfolioCode,
   });
 
   const [dynamicComponent, setDynamicComponent] = useState<React.ComponentType<any> | null>(
-    () => ChangelogTemplate,
+    () => EarthTemplate,
   );
   const [compileError, setCompileError] = useState<string | null>(null);
   const [renderTime, setRenderTime] = useState<number>(0);
