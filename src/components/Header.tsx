@@ -21,17 +21,38 @@ export function Header({ isSidebarOpen, setIsSidebarOpen }: HeaderProps) {
         >
           {isSidebarOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
         </Button>
-        <div className="relative h-7 w-7 shrink-0 text-coral-400">
-          <svg
-            className="h-full w-full"
-            viewBox="0 0 44 45"
-            fill="currentColor"
-            xmlns="http://www.w3.org/2000/svg"
-          >
+        <div className="relative h-6 w-6 shrink-0">
+          <svg className="h-full w-full" viewBox="0 0 256 257" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient
+                id="header-vite-grad-bg"
+                x1="-0.828%"
+                y1="57.636%"
+                x2="57.626%"
+                y2="-7.909%"
+              >
+                <stop offset="0%" stopColor="#41D1FF" />
+                <stop offset="100%" stopColor="#BD34FE" />
+              </linearGradient>
+              <linearGradient
+                id="header-vite-grad-bolt"
+                x1="43.376%"
+                y1="2.242%"
+                x2="50.316%"
+                y2="89.03%"
+              >
+                <stop offset="0%" stopColor="#FFEA83" />
+                <stop offset="8.333%" stopColor="#FFDD35" />
+                <stop offset="100%" stopColor="#FFA800" />
+              </linearGradient>
+            </defs>
             <path
-              fillRule="evenodd"
-              clipRule="evenodd"
-              d="M9.00052 6.3584H16.3467V20.2046C16.3467 23.8864 13.3619 26.8712 9.68002 26.8712H6.50053V8.8584C6.50053 7.47769 7.61981 6.3584 9.00052 6.3584ZM35.32 17.8456C31.6381 17.8456 28.6533 20.8303 28.6533 24.5122V38.3584H35.9995C37.3802 38.3584 38.4995 37.2391 38.4995 35.8584V17.8456H35.32ZM24.654 16.2046C20.9721 16.2046 17.9873 13.2198 17.9873 9.53792V6.35844L36.0001 6.35844C37.3808 6.35844 38.5001 7.47772 38.5001 8.85844L38.5001 16.2046H24.654ZM6.5 35.8584C6.5 37.2391 7.61929 38.3584 9 38.3584H27.0128V35.1789C27.0128 31.497 24.0281 28.5122 20.3462 28.5122H6.5V35.8584Z"
+              fill="url(#header-vite-grad-bg)"
+              d="M255.153 37.938L134.897 252.976c-2.483 4.44-8.862 4.466-11.382.048L.875 37.958c-2.746-4.814 1.371-10.646 6.827-9.67l120.385 21.517a6.537 6.537 0 0 0 2.322-.004l117.867-21.483c5.438-.991 9.574 4.796 6.877 9.62Z"
+            />
+            <path
+              fill="url(#header-vite-grad-bolt)"
+              d="M185.432 13.808l-62.198 11.23a3.267 3.267 0 0 0-2.68 3.193l-.223 57.575a3.267 3.267 0 0 0 3.738 3.232l16.11-2.617a3.267 3.267 0 0 1 3.734 3.652l-3.328 22.022a3.267 3.267 0 0 0 3.82 3.715l16.638-2.702a3.267 3.267 0 0 1 3.733 3.653l-8.625 57.065c-.56 3.704 4.225 5.894 6.643 3.036l1.378-1.628 65.577-122.923c1.782-3.342-.998-7.327-4.743-6.648l-18.46 3.348a3.267 3.267 0 0 1-3.734-3.652l4.89-32.328a3.267 3.267 0 0 0-3.82-3.715l-16.59 2.694a3.267 3.267 0 0 1-3.733-3.653l3.056-20.218a3.267 3.267 0 0 0-4.13-3.682Z"
             />
           </svg>
         </div>
