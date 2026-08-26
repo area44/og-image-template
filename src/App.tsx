@@ -13,11 +13,13 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import BlogTemplate from "./template/blog";
 import blogCode from "./template/blog.tsx?raw";
+import changelogCode from "./template/changelog.tsx?raw";
 import minimalCode from "./template/minimal.tsx?raw";
 import portfolioCode from "./template/portfolio.tsx?raw";
 
 const TEMPLATE_CODES = {
   blog: blogCode,
+  changelog: changelogCode,
   minimal: minimalCode,
   portfolio: portfolioCode,
 };
@@ -70,6 +72,7 @@ export default function App() {
 
   const [draftCodes, setDraftCodes] = useState<Record<TemplateId, string>>({
     blog: blogCode,
+    changelog: changelogCode,
     minimal: minimalCode,
     portfolio: portfolioCode,
   });
