@@ -375,44 +375,6 @@ export default function App() {
     }));
   };
 
-  const handleImageUpload = (dataUrl: string) => {
-    setDraftCodes((prev) => {
-      const currentCode = prev[selectedTemplate];
-
-      // 1. Try replacing backgroundImage = "..." or backgroundImage: "..."
-      const bgImageRegex = /(backgroundImage\s*[:=]\s*)["'`]([^"'`]+)["'`]/;
-      if (bgImageRegex.test(currentCode)) {
-        return {
-          ...prev,
-          [selectedTemplate]: currentCode.replace(bgImageRegex, `$1"${dataUrl}"`),
-        };
-      }
-
-      // 2. Try replacing any src="http..." or src='http...'
-      const srcRegex = /(src\s*=\s*)["'`][^"'`]+["'`]/;
-      if (srcRegex.test(currentCode)) {
-        return {
-          ...prev,
-          [selectedTemplate]: currentCode.replace(srcRegex, `$1"${dataUrl}"`),
-        };
-      }
-
-      // 3. Fallback: If template function header has default parameters
-      const propHeaderRegex = /(function\s+\w+\s*\(\s*\{)([^}]*)(\}\s*:\s*\w+\s*=\s*\{\}\s*\))/;
-      if (propHeaderRegex.test(currentCode)) {
-        return {
-          ...prev,
-          [selectedTemplate]: currentCode.replace(
-            propHeaderRegex,
-            `$1$2,\n  backgroundImage = "${dataUrl}"$3`,
-          ),
-        };
-      }
-
-      return prev;
-    });
-  };
-
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const shared = params.get("share");
@@ -519,7 +481,6 @@ export default function App() {
               setDownloadFormat={setDownloadFormat}
               onCopySvg={handleCopy}
               onDownload={handleDownload}
-              onImageUpload={handleImageUpload}
               svgContent={svgContent}
               rendering={rendering}
               copied={copied}
