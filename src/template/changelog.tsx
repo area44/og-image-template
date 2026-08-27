@@ -7,7 +7,7 @@ interface OGImageProps {
 export default function OGImage({
   title = "Optimized CDN caching and deploying of immutable static assets",
   category = "CHANGELOG",
-  backgroundImage = "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1200&auto=format&fit=crop",
+  backgroundImage = "/changelog-bg.png",
 }: OGImageProps = {}) {
   return (
     <div
