@@ -1,5 +1,5 @@
-import { Check, Copy, Download, Sliders } from "lucide-react";
-import React from "react";
+import { Check, Copy, Download, Image as ImageIcon, Sliders, Upload } from "lucide-react";
+import React, { useRef } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,6 +14,7 @@ interface ConfigPanelProps {
   setDownloadFormat: React.Dispatch<React.SetStateAction<"svg" | "png" | "jpeg" | "jpg">>;
   onCopySvg: () => void;
   onDownload: () => void;
+  onImageUpload?: (dataUrl: string) => void;
   svgContent: string;
   rendering: boolean;
   copied: boolean;
@@ -28,10 +29,27 @@ export function ConfigPanel({
   setDownloadFormat,
   onCopySvg,
   onDownload,
+  onImageUpload,
   svgContent,
   rendering,
   copied,
 }: ConfigPanelProps) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !onImageUpload) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const dataUrl = event.target?.result as string;
+      if (dataUrl) {
+        onImageUpload(dataUrl);
+      }
+    };
+    reader.readAsDataURL(file);
+    // Reset file input value so re-selecting same file triggers event
+    e.target.value = "";
+  };
   return (
     <div className="space-y-6 p-6">
       {/* Dimensions Subsection */}
@@ -156,6 +174,37 @@ export function ConfigPanel({
                   className="h-8 w-20 border-zinc-800 bg-zinc-900/40 text-center text-xs text-zinc-200"
                 />
               </div>
+            </div>
+
+            {/* Local Image Upload Subsection */}
+            <div className="space-y-2 pt-2">
+              <div className="flex items-center justify-between text-xs text-zinc-400">
+                <label
+                  htmlFor="local-image-upload"
+                  className="flex cursor-pointer items-center gap-1.5 font-medium text-zinc-300"
+                >
+                  <ImageIcon className="h-3.5 w-3.5 text-coral-400" />
+                  Local Image Upload
+                </label>
+              </div>
+              <input
+                id="local-image-upload"
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                className="hidden"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => fileInputRef.current?.click()}
+                className="w-full justify-center gap-2 border-zinc-800 bg-zinc-900/40 text-xs text-zinc-300 hover:border-zinc-700 hover:bg-zinc-900 hover:text-zinc-100"
+              >
+                <Upload className="h-3.5 w-3.5 text-coral-400" />
+                Upload Local Image
+              </Button>
             </div>
           </div>
         </div>
