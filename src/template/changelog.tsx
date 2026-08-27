@@ -1,11 +1,13 @@
 interface OGImageProps {
   title?: string;
   category?: string;
+  backgroundImage?: string;
 }
 
 export default function OGImage({
   title = "Optimized CDN caching and deploying of immutable static assets",
   category = "CHANGELOG",
+  backgroundImage = "",
 }: OGImageProps = {}) {
   return (
     <div
@@ -20,6 +22,42 @@ export default function OGImage({
         fontFamily: "Geist Sans, sans-serif",
       }}
     >
+      {/* Optional Background Image with Dark Gradient Overlay */}
+      {backgroundImage ? (
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            display: "flex",
+            width: "100%",
+            height: "100%",
+          }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={backgroundImage}
+            alt="Background"
+            style={{
+              position: "absolute",
+              inset: 0,
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+            }}
+          />
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              display: "flex",
+              width: "100%",
+              height: "100%",
+              backgroundColor: "rgba(0, 0, 0, 0.75)",
+            }}
+          />
+        </div>
+      ) : null}
+
       {/* Subtle World Map Dotted Grid Pattern on the Right */}
       <div
         style={{
