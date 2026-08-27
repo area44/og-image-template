@@ -1,6 +1,6 @@
 import geistNormalUrl from "@fontsource-variable/geist/files/geist-latin-wght-normal.woff2?url";
 import React, { useState, useEffect } from "react";
-import satori from "satori";
+import satori, { init } from "satori/standalone";
 import { transform } from "sucrase";
 import { woff2Decode } from "woff-lib/woff2/decode";
 
@@ -62,6 +62,7 @@ export default function App() {
   const [fonts, setFonts] = useState<LoadedFonts | null>(null);
   const [fontsLoading, setFontsLoading] = useState(true);
   const [fontsError, setFontsError] = useState<string | null>(null);
+  const [satoriInitialized, setSatoriInitialized] = useState(false);
 
   const [svgContent, setSvgContent] = useState<string>("");
   const [rendering, setRendering] = useState(false);
@@ -155,6 +156,14 @@ export default function App() {
         setFontsLoading(true);
         setFontsError(null);
 
+        const wasmRes = await fetch("/yoga.wasm");
+        if (!wasmRes.ok) {
+          throw new Error("Failed to fetch yoga.wasm layout engine");
+        }
+        const wasmBuffer = await wasmRes.arrayBuffer();
+        await init(wasmBuffer);
+        setSatoriInitialized(true);
+
         const regularRes = await fetch(geistNormalUrl);
 
         if (!regularRes.ok) {
@@ -189,7 +198,7 @@ export default function App() {
 
   // Run Satori core in browser to generate the SVG with the selected template
   useEffect(() => {
-    if (!fonts || !dynamicComponent) return;
+    if (!fonts || !dynamicComponent || !satoriInitialized) return;
     const { regular, bold } = fonts;
 
     let isMounted = true;
@@ -274,7 +283,7 @@ export default function App() {
       isMounted = false;
       clearTimeout(timeout);
     };
-  }, [selectedTemplate, width, height, fonts, dynamicComponent]);
+  }, [selectedTemplate, width, height, fonts, dynamicComponent, satoriInitialized]);
 
   const handleCopy = async () => {
     if (!svgContent) return;
