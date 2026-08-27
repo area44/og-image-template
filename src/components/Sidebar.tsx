@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 
 import BlogTemplate from "../template/blog";
-import ChangelogTemplate from "../template/changelog";
+import EarthTemplate from "../template/earth";
 import MinimalTemplate from "../template/minimal";
 import PortfolioTemplate from "../template/portfolio";
 
@@ -11,10 +11,10 @@ export const TEMPLATES = {
     name: "Blog Template",
     component: BlogTemplate,
   },
-  changelog: {
-    id: "changelog",
-    name: "Changelog Template",
-    component: ChangelogTemplate,
+  earth: {
+    id: "earth",
+    name: "Earth Template",
+    component: EarthTemplate,
   },
   minimal: {
     id: "minimal",
