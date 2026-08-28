@@ -40,25 +40,27 @@ export function EditorPanel({ value, onChange, onReset, activePanel }: EditorPan
             onClick={onReset}
             size="sm"
             variant="outline"
+            aria-label="Reset template code to default"
             className="h-7 gap-1 border-zinc-800 bg-zinc-900/40 px-2.5 text-zinc-400 hover:text-zinc-200"
           >
-            <RefreshCw className="h-3 w-3" />
+            <RefreshCw className="h-3 w-3" aria-hidden="true" />
             <span className="text-[11px]">Reset</span>
           </Button>
           <Button
             onClick={handleCodeCopy}
             size="sm"
             variant="outline"
+            aria-label={copiedCode ? "Code copied to clipboard" : "Copy template code to clipboard"}
             className="h-7 gap-1 border-zinc-800 bg-zinc-900/40 px-2.5 text-zinc-400 hover:text-zinc-200"
           >
             {copiedCode ? (
               <>
-                <Check className="h-3 w-3 text-emerald-500" />
+                <Check className="h-3 w-3 text-emerald-500" aria-hidden="true" />
                 <span className="text-[11px]">Copied!</span>
               </>
             ) : (
               <>
-                <Copy className="h-3 w-3" />
+                <Copy className="h-3 w-3" aria-hidden="true" />
                 <span className="text-[11px]">Copy</span>
               </>
             )}

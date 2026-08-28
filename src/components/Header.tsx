@@ -28,6 +28,7 @@ export function Header({ isSidebarOpen, setIsSidebarOpen }: HeaderProps) {
           href="https://github.com/area44/og-image-template"
           target="_blank"
           rel="noopener noreferrer"
+          aria-label="GitHub repository (opens in a new tab)"
           className="text-xs font-semibold text-zinc-400 transition hover:text-zinc-200 hover:underline"
         >
           GitHub

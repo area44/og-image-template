@@ -51,6 +51,7 @@ export function ConfigPanel({
                 setWidth(1200);
                 setHeight(600);
               }}
+              aria-label="Set dimension preset to 2:1 ratio (1200 by 600 pixels)"
               className="min-w-[100px] flex-1 border-zinc-800 bg-zinc-900/40 text-zinc-400 hover:border-zinc-700 hover:bg-zinc-900 hover:text-zinc-200"
             >
               2:1 (1200×600)
@@ -62,6 +63,7 @@ export function ConfigPanel({
                 setWidth(1200);
                 setHeight(630);
               }}
+              aria-label="Reset dimensions to standard OG ratio (1200 by 630 pixels)"
               className="min-w-[100px] flex-1 border-zinc-800 bg-zinc-900/40 text-zinc-400 hover:border-zinc-700 hover:bg-zinc-900 hover:text-zinc-200"
             >
               Reset (1200×630)
@@ -80,6 +82,7 @@ export function ConfigPanel({
                   max={1500}
                   defaultValue={[1200]}
                   value={[typeof width === "number" ? width : 1200]}
+                  aria-label="Adjust canvas width"
                   onValueChange={(val) => {
                     const num = Array.isArray(val) ? val[0] : val;
                     setWidth(num);
@@ -90,6 +93,7 @@ export function ConfigPanel({
                   id="width-input"
                   type="number"
                   value={width}
+                  aria-label="Canvas width in pixels"
                   onChange={(e) => {
                     const val = e.target.value;
                     if (val === "") setWidth("");
@@ -119,6 +123,7 @@ export function ConfigPanel({
                   max={1000}
                   defaultValue={[630]}
                   value={[typeof height === "number" ? height : 630]}
+                  aria-label="Adjust canvas height"
                   onValueChange={(val) => {
                     const num = Array.isArray(val) ? val[0] : val;
                     setHeight(num);
@@ -129,6 +134,7 @@ export function ConfigPanel({
                   id="height-input"
                   type="number"
                   value={height}
+                  aria-label="Canvas height in pixels"
                   onChange={(e) => {
                     const val = e.target.value;
                     if (val === "") setHeight("");
@@ -153,13 +159,18 @@ export function ConfigPanel({
       {/* Download and Export Controls Area */}
       <div className="space-y-3 border-t border-zinc-900 pt-6">
         <div className="flex items-center justify-end">
-          <div className="grid grid-cols-4 gap-1 rounded-lg border border-zinc-800 bg-zinc-900/40 p-0.5">
+          <div
+            aria-label="Export format"
+            className="grid grid-cols-4 gap-1 rounded-lg border border-zinc-800 bg-zinc-900/40 p-0.5"
+          >
             {(["svg", "png", "jpeg", "jpg"] as const).map((fmt) => (
               <Button
                 key={fmt}
                 type="button"
                 variant="ghost"
                 size="xs"
+                aria-pressed={downloadFormat === fmt}
+                aria-label={`Export format ${fmt.toUpperCase()}`}
                 onClick={() => setDownloadFormat(fmt)}
                 className={`h-auto rounded px-2.5 py-1 text-[10px] font-bold uppercase transition-all ${
                   downloadFormat === fmt
@@ -178,6 +189,7 @@ export function ConfigPanel({
             onClick={onCopySvg}
             disabled={!svgContent || rendering}
             variant={copied ? "default" : "secondary"}
+            aria-label={copied ? "Copied SVG code to clipboard" : "Copy SVG code to clipboard"}
             className={`py-2 text-xs font-semibold transition-all ${
               copied
                 ? "bg-emerald-600 text-white hover:bg-emerald-700"
@@ -186,12 +198,12 @@ export function ConfigPanel({
           >
             {copied ? (
               <>
-                <Check className="h-3.5 w-3.5" />
+                <Check className="h-3.5 w-3.5" aria-hidden="true" />
                 Copied SVG!
               </>
             ) : (
               <>
-                <Copy className="h-3.5 w-3.5" />
+                <Copy className="h-3.5 w-3.5" aria-hidden="true" />
                 Copy SVG Code
               </>
             )}
@@ -200,9 +212,10 @@ export function ConfigPanel({
           <Button
             onClick={onDownload}
             disabled={!svgContent || rendering}
+            aria-label={`Download image as ${downloadFormat.toUpperCase()}`}
             className="bg-primary py-2 text-xs font-semibold text-primary-foreground hover:opacity-90"
           >
-            <Download className="h-3.5 w-3.5" />
+            <Download className="h-3.5 w-3.5" aria-hidden="true" />
             Download {downloadFormat.toUpperCase()}
           </Button>
         </div>
