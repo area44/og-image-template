@@ -6,24 +6,11 @@ import { woff2Decode } from "woff-lib/woff2/decode";
 
 import { ConfigPanel } from "@/components/ConfigPanel";
 import { EditorPanel } from "@/components/EditorPanel";
-import { Header } from "@/components/Header";
+import { Layout } from "@/components/Layout";
 import { PreviewPanel } from "@/components/PreviewPanel";
-import { Sidebar, TEMPLATES, TemplateId } from "@/components/Sidebar";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { TEMPLATES, TEMPLATE_CODES, TemplateId, DEFAULT_TEMPLATE_ID } from "@/template/config";
 
-import BlogTemplate from "./template/blog";
-import blogCode from "./template/blog.tsx?raw";
 import earthBg from "./template/earth/earth-bg.png";
-import earthCode from "./template/earth/earth.tsx?raw";
-import minimalCode from "./template/minimal.tsx?raw";
-import portfolioCode from "./template/portfolio.tsx?raw";
-
-const TEMPLATE_CODES = {
-  blog: blogCode,
-  earth: earthCode,
-  minimal: minimalCode,
-  portfolio: portfolioCode,
-};
 
 interface LoadedFonts {
   regular: ArrayBuffer;
@@ -61,7 +48,7 @@ function evalCompiledCode(compiledCode: string): React.ComponentType<any> {
 }
 
 export default function App() {
-  const [selectedTemplate, setSelectedTemplate] = useState<TemplateId>("blog");
+  const [selectedTemplate, setSelectedTemplate] = useState<TemplateId>(DEFAULT_TEMPLATE_ID);
   const [width, setWidth] = useState<number | "">(1200);
   const [height, setHeight] = useState<number | "">(630);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -79,15 +66,12 @@ export default function App() {
   const [copied, setCopied] = useState(false);
   const [downloadFormat, setDownloadFormat] = useState<"svg" | "png" | "jpeg" | "jpg">("svg");
 
-  const [draftCodes, setDraftCodes] = useState<Record<TemplateId, string>>({
-    blog: blogCode,
-    earth: earthCode,
-    minimal: minimalCode,
-    portfolio: portfolioCode,
-  });
+  const [draftCodes, setDraftCodes] = useState<Record<TemplateId, string>>(() => ({
+    ...TEMPLATE_CODES,
+  }));
 
   const [dynamicComponent, setDynamicComponent] = useState<React.ComponentType<any> | null>(
-    () => BlogTemplate,
+    () => TEMPLATES[DEFAULT_TEMPLATE_ID].component,
   );
   const [compileError, setCompileError] = useState<string | null>(null);
   const [renderTime, setRenderTime] = useState<number>(0);
@@ -407,96 +391,60 @@ export default function App() {
   }, []);
 
   return (
-    <div className="selection:text-coral-200 flex h-dvh flex-col overflow-hidden bg-background text-foreground selection:bg-coral-500/30">
-      {/* Decorative top ambient glow */}
-      <div className="pointer-events-none absolute top-0 left-1/2 -z-10 h-[200px] w-full max-w-7xl -translate-x-1/2 bg-[radial-gradient(ellipse_at_top,rgba(251,113,133,0.15),transparent_50%)]" />
+    <Layout
+      isSidebarOpen={isSidebarOpen}
+      setIsSidebarOpen={setIsSidebarOpen}
+      selectedTemplate={selectedTemplate}
+      onTemplateSelect={handleTemplateChange}
+      activePanel={activePanel}
+      setActivePanel={setActivePanel}
+    >
+      {/* Left/Upper Panel: TSX/TypeScript Code Editor */}
+      <EditorPanel
+        selectedTemplate={selectedTemplate}
+        value={draftCodes[selectedTemplate]}
+        onChange={(val) => {
+          setDraftCodes((prev) => ({
+            ...prev,
+            [selectedTemplate]: val,
+          }));
+        }}
+        onReset={handleCodeReset}
+        activePanel={activePanel}
+      />
 
-      {/* Header component */}
-      <Header isSidebarOpen={isSidebarOpen} setIsSidebarOpen={setIsSidebarOpen} />
-
-      {/* Main Workspace below header */}
-      <div className="flex min-h-0 flex-1 flex-col lg:flex-row lg:overflow-hidden">
-        {/* Mobile Sidebar Backdrop Overlay */}
-        {isSidebarOpen && (
-          <button
-            type="button"
-            className="fixed inset-0 top-14 z-30 cursor-default bg-zinc-950/60 backdrop-blur-sm transition-opacity duration-300 lg:hidden"
-            onClick={() => setIsSidebarOpen(false)}
-            aria-label="Close sidebar"
-          />
-        )}
-
-        {/* Sidebar Component */}
-        <Sidebar
-          selectedTemplate={selectedTemplate}
-          onTemplateSelect={handleTemplateChange}
-          isSidebarOpen={isSidebarOpen}
+      {/* Right/Lower Panel: Live Preview & Configuration Sidebar */}
+      <div
+        className={`flex-1 flex-col divide-y divide-zinc-900 overflow-y-auto bg-zinc-950 lg:h-full lg:w-1/2 ${activePanel === "preview" ? "flex" : "hidden lg:flex"}`}
+      >
+        {/* Live Preview Panel */}
+        <PreviewPanel
+          width={width}
+          height={height}
+          rendering={rendering}
+          fontsLoading={fontsLoading}
+          fontsError={fontsError}
+          compileError={compileError}
+          renderError={renderError}
+          svgContent={svgContent}
+          renderTime={renderTime}
         />
 
-        {/* Mobile Tab Switcher */}
-        <div className="flex w-full shrink-0 border-b border-border bg-zinc-950 p-2 select-none lg:hidden">
-          <Tabs
-            value={activePanel}
-            onValueChange={(val) => setActivePanel(val as "code" | "preview")}
-            className="w-full"
-          >
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="code">Editor</TabsTrigger>
-              <TabsTrigger value="preview">Live Preview & Config</TabsTrigger>
-            </TabsList>
-          </Tabs>
-        </div>
-
-        {/* Responsive Workspace Main Content */}
-        <div className="flex min-h-0 flex-1 flex-col lg:flex-row lg:overflow-hidden">
-          {/* Left/Upper Panel: TSX/TypeScript Code Editor */}
-          <EditorPanel
-            selectedTemplate={selectedTemplate}
-            value={draftCodes[selectedTemplate]}
-            onChange={(val) => {
-              setDraftCodes((prev) => ({
-                ...prev,
-                [selectedTemplate]: val,
-              }));
-            }}
-            onReset={handleCodeReset}
-            activePanel={activePanel}
-          />
-
-          {/* Right/Lower Panel: Live Preview & Configuration Sidebar */}
-          <div
-            className={`flex-1 flex-col divide-y divide-zinc-900 overflow-y-auto bg-zinc-950 lg:h-full lg:w-1/2 ${activePanel === "preview" ? "flex" : "hidden lg:flex"}`}
-          >
-            {/* Live Preview Panel */}
-            <PreviewPanel
-              width={width}
-              height={height}
-              rendering={rendering}
-              fontsLoading={fontsLoading}
-              fontsError={fontsError}
-              compileError={compileError}
-              renderError={renderError}
-              svgContent={svgContent}
-              renderTime={renderTime}
-            />
-
-            {/* Config Panel */}
-            <ConfigPanel
-              width={width}
-              height={height}
-              setWidth={setWidth}
-              setHeight={setHeight}
-              downloadFormat={downloadFormat}
-              setDownloadFormat={setDownloadFormat}
-              onCopySvg={handleCopy}
-              onDownload={handleDownload}
-              svgContent={svgContent}
-              rendering={rendering}
-              copied={copied}
-            />
-          </div>
-        </div>
+        {/* Config Panel */}
+        <ConfigPanel
+          width={width}
+          height={height}
+          setWidth={setWidth}
+          setHeight={setHeight}
+          downloadFormat={downloadFormat}
+          setDownloadFormat={setDownloadFormat}
+          onCopySvg={handleCopy}
+          onDownload={handleDownload}
+          svgContent={svgContent}
+          rendering={rendering}
+          copied={copied}
+        />
       </div>
-    </div>
+    </Layout>
   );
 }
