@@ -1,3 +1,5 @@
+import earthBg from "./earth-bg.png";
+
 interface OGImageProps {
   title?: string;
   category?: string;
@@ -7,7 +9,7 @@ interface OGImageProps {
 export default function OGImage({
   title = "Global Network Infrastructure & Edge Operations",
   category = "CHANGELOG",
-  backgroundImage = "/earth-bg.png",
+  backgroundImage = earthBg,
 }: OGImageProps = {}) {
   return (
     <div
