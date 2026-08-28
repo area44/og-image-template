@@ -1,6 +1,6 @@
 import geistNormalUrl from "@fontsource-variable/geist/files/geist-latin-wght-normal.woff2?url";
 import React, { useState, useEffect } from "react";
-import satori from "satori";
+import satori, { init } from "satori/standalone";
 import { transform } from "sucrase";
 import { woff2Decode } from "woff-lib/woff2/decode";
 
@@ -13,11 +13,13 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import BlogTemplate from "./template/blog";
 import blogCode from "./template/blog.tsx?raw";
+import earthCode from "./template/earth.tsx?raw";
 import minimalCode from "./template/minimal.tsx?raw";
 import portfolioCode from "./template/portfolio.tsx?raw";
 
 const TEMPLATE_CODES = {
   blog: blogCode,
+  earth: earthCode,
   minimal: minimalCode,
   portfolio: portfolioCode,
 };
@@ -60,6 +62,7 @@ export default function App() {
   const [fonts, setFonts] = useState<LoadedFonts | null>(null);
   const [fontsLoading, setFontsLoading] = useState(true);
   const [fontsError, setFontsError] = useState<string | null>(null);
+  const [satoriInitialized, setSatoriInitialized] = useState(false);
 
   const [svgContent, setSvgContent] = useState<string>("");
   const [rendering, setRendering] = useState(false);
@@ -70,6 +73,7 @@ export default function App() {
 
   const [draftCodes, setDraftCodes] = useState<Record<TemplateId, string>>({
     blog: blogCode,
+    earth: earthCode,
     minimal: minimalCode,
     portfolio: portfolioCode,
   });
@@ -152,6 +156,14 @@ export default function App() {
         setFontsLoading(true);
         setFontsError(null);
 
+        const wasmRes = await fetch("/yoga.wasm");
+        if (!wasmRes.ok) {
+          throw new Error("Failed to fetch yoga.wasm layout engine");
+        }
+        const wasmBuffer = await wasmRes.arrayBuffer();
+        await init(wasmBuffer);
+        setSatoriInitialized(true);
+
         const regularRes = await fetch(geistNormalUrl);
 
         if (!regularRes.ok) {
@@ -186,7 +198,7 @@ export default function App() {
 
   // Run Satori core in browser to generate the SVG with the selected template
   useEffect(() => {
-    if (!fonts || !dynamicComponent) return;
+    if (!fonts || !dynamicComponent || !satoriInitialized) return;
     const { regular, bold } = fonts;
 
     let isMounted = true;
@@ -271,7 +283,7 @@ export default function App() {
       isMounted = false;
       clearTimeout(timeout);
     };
-  }, [selectedTemplate, width, height, fonts, dynamicComponent]);
+  }, [selectedTemplate, width, height, fonts, dynamicComponent, satoriInitialized]);
 
   const handleCopy = async () => {
     if (!svgContent) return;
