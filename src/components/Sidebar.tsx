@@ -1,34 +1,5 @@
 import { Button } from "@/components/ui/button";
-
-import BlogTemplate from "../template/blog";
-import EarthTemplate from "../template/earth/earth";
-import MinimalTemplate from "../template/minimal";
-import PortfolioTemplate from "../template/portfolio";
-
-export const TEMPLATES = {
-  blog: {
-    id: "blog",
-    name: "Blog Template",
-    component: BlogTemplate,
-  },
-  earth: {
-    id: "earth",
-    name: "Earth Template",
-    component: EarthTemplate,
-  },
-  minimal: {
-    id: "minimal",
-    name: "Minimal Template",
-    component: MinimalTemplate,
-  },
-  portfolio: {
-    id: "portfolio",
-    name: "Portfolio Template",
-    component: PortfolioTemplate,
-  },
-} as const;
-
-export type TemplateId = keyof typeof TEMPLATES;
+import { TEMPLATES, TemplateId } from "@/template/config";
 
 interface SidebarProps {
   selectedTemplate: TemplateId;
