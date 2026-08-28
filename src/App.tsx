@@ -13,7 +13,8 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import BlogTemplate from "./template/blog";
 import blogCode from "./template/blog.tsx?raw";
-import earthCode from "./template/earth.tsx?raw";
+import earthBg from "./template/earth/earth-bg.png";
+import earthCode from "./template/earth/earth.tsx?raw";
 import minimalCode from "./template/minimal.tsx?raw";
 import portfolioCode from "./template/portfolio.tsx?raw";
 
@@ -34,6 +35,13 @@ function evalCompiledCode(compiledCode: string): React.ComponentType<any> {
   const mockRequire = (name: string) => {
     if (name === "react") {
       return React;
+    }
+    if (
+      name === "./earth-bg.png" ||
+      name === "../template/earth-bg.png" ||
+      name === "earth-bg.png"
+    ) {
+      return earthBg;
     }
     throw new Error(`Module "${name}" is not supported in playground.`);
   };
@@ -194,6 +202,7 @@ export default function App() {
   // Sync template when changes
   const handleTemplateChange = (id: TemplateId) => {
     setSelectedTemplate(id);
+    setIsSidebarOpen(false);
   };
 
   // Run Satori core in browser to generate the SVG with the selected template

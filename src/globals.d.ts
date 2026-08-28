@@ -5,6 +5,11 @@ declare module "*.woff?url" {
   export default content;
 }
 
+declare module "*.png" {
+  const content: string;
+  export default content;
+}
+
 declare module "*?raw" {
   const content: string;
   export default content;

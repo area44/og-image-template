@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 
 import BlogTemplate from "../template/blog";
-import EarthTemplate from "../template/earth";
+import EarthTemplate from "../template/earth/earth";
 import MinimalTemplate from "../template/minimal";
 import PortfolioTemplate from "../template/portfolio";
 
