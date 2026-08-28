@@ -59,6 +59,8 @@ export function Sidebar({ selectedTemplate, onTemplateSelect, isSidebarOpen }: S
                   key={key}
                   onClick={() => onTemplateSelect(key)}
                   variant="ghost"
+                  aria-pressed={active}
+                  aria-label={`Select ${t.name}`}
                   className={`flex h-auto w-full items-center justify-start gap-3 rounded-lg px-3 py-2 text-sm font-semibold transition-all ${
                     active
                       ? "border-l-2 border-coral-500 bg-coral-500/10 pl-2.5 text-coral-400 hover:bg-coral-500/15 hover:text-coral-400"
