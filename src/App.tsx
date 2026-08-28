@@ -13,8 +13,8 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import BlogTemplate from "./template/blog";
 import blogCode from "./template/blog.tsx?raw";
-import earthBg from "./template/earth-bg.png";
-import earthCode from "./template/earth.tsx?raw";
+import earthBg from "./template/earth/earth-bg.png";
+import earthCode from "./template/earth/earth.tsx?raw";
 import minimalCode from "./template/minimal.tsx?raw";
 import portfolioCode from "./template/portfolio.tsx?raw";
 
