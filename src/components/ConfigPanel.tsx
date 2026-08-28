@@ -49,17 +49,6 @@ export function ConfigPanel({
               size="sm"
               onClick={() => {
                 setWidth(1200);
-                setHeight(630);
-              }}
-              className="min-w-[100px] flex-1 border-zinc-800 bg-zinc-900/40 text-zinc-400 hover:border-zinc-700 hover:bg-zinc-900 hover:text-zinc-200"
-            >
-              1.9:1 (1200×630)
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                setWidth(1200);
                 setHeight(600);
               }}
               className="min-w-[100px] flex-1 border-zinc-800 bg-zinc-900/40 text-zinc-400 hover:border-zinc-700 hover:bg-zinc-900 hover:text-zinc-200"
@@ -70,12 +59,12 @@ export function ConfigPanel({
               variant="outline"
               size="sm"
               onClick={() => {
-                setWidth(800);
-                setHeight(400);
+                setWidth(1200);
+                setHeight(630);
               }}
               className="min-w-[100px] flex-1 border-zinc-800 bg-zinc-900/40 text-zinc-400 hover:border-zinc-700 hover:bg-zinc-900 hover:text-zinc-200"
             >
-              Reset (800×400)
+              Reset (1200×630)
             </Button>
           </div>
 
